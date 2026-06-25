@@ -9,36 +9,72 @@ datasource db {
   provider = "sqlite"
 }
 
+// ---------------------------------------------------------
+// MODELO GLOBAL
+// ---------------------------------------------------------
+
 model User {
-  id            String    @id @default(uuid())
-  name          String
-  username      String    @unique
-  password      String
-  email         String?
-  phone         String?
-  isAdmin       Boolean   @default(false)
-  daysAttending Int       @default(0)
-  hasPaid       Boolean   @default(false)
-  balance       Float     @default(0.0)
-  expenses      Expense[] // Relación con los gastos registrados
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String          @id @default(uuid())
+  name           String
+  username       String          @unique
+  password       String
+  email          String?
+  phone          String?
+  isAdmin        Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  
+  // Relaciones
+  eventAttendances EventAttendee[]
+  expenses         Expense[]
 }
 
-model EventSettings {
-  id        String   @id @default(uuid())
-  eventName String
-  isOpen    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ---------------------------------------------------------
+// MODELOS ESPECÍFICOS POR EVENTO (MULTI-TENANT)
+// ---------------------------------------------------------
+
+model Event {
+  id          String   @id @default(uuid())
+  name        String   // ej. "Fiestas Valdeganga 2026"
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean  @default(false) // Solo UNO puede ser true
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  attendees    EventAttendee[]
+  pricingRules PricingRule[]
+  expenses     Expense[]
+}
+
+model EventAttendee {
+  id            String   @id @default(uuid())
+  daysAttending Int      @default(0)
+  hasPaid       Boolean  @default(false)
+  balance       Float    @default(0.0) // Saldo a favor en ESTE evento
+  
+  // Relaciones
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId       String
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // Un usuario solo puede asistir una vez a un mismo evento
+  @@unique([userId, eventId])
 }
 
 model PricingRule {
   id        String   @id @default(uuid())
-  days      Int      @unique
+  days      Int
   price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  
+  // Relaciones
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // Las reglas de días son únicas por evento (ej. la regla de "5 días" solo existe una vez por evento)
+  @@unique([eventId, days])
 }
 
 model Expense {
@@ -48,8 +84,13 @@ model Expense {
   amount       Float
   receiptImage String?
   date         DateTime @default(now())
+  
+  // Relaciones
   purchaserId  String
   purchaser    User     @relation(fields: [purchaserId], references: [id])
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
