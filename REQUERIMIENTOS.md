@@ -37,3 +37,14 @@ Pantalla resumen para ver de un vistazo la salud económica del grupo:
 - **Tecnologías**: Next.js (Frontend/Backend) + Base de Datos SQLite.
 - **Despliegue Final**: QNAP TS-464 vía Container Station (Docker).
 - **Control de Versiones**: Se utilizará Git y se sincronizará con un repositorio en GitHub.
+
+## 7. Módulo de Autenticación y Perfiles
+El sistema contará con un acceso seguro diferenciando dos roles principales:
+- **Administrador**: Puede crear y dar de alta a otros usuarios, definiendo además si el nuevo usuario tendrá rol de administrador o no.
+- **Usuario Estándar**: Acceso limitado a las funciones operativas de la aplicación.
+- **Campos de Información del Usuario**:
+  - *Nombre y Apellidos* (Obligatorio)
+  - *Usuario* (Obligatorio)
+  - *Password* (Obligatorio)
+  - *Email* (Opcional)
+  - *Número de Móvil* (Opcional)
