@@ -3,48 +3,44 @@
 *Este documento es un ser vivo. Iremos actualizándolo conforme definamos nuevas reglas, pantallas o necesidades antes de empezar a programar.*
 
 ## 1. Objetivo del Proyecto
-Crear una aplicación web ultraligera para gestionar la tesorería (ingresos y gastos) de un grupo de aproximadamente 50 personas durante unas fiestas o eventos. 
+Crear una aplicación web ultraligera para gestionar la tesorería (ingresos y gastos) de un grupo de aproximadamente 50 personas.
 
-## 2. Parámetros Globales (Configuración)
-La aplicación debe ser reutilizable año tras año sin tocar código. Para ello, contará con:
-- **Título Dinámico**: Parámetro para definir el nombre del evento (ej. *"Fiestas Valdeganga 2026"*).
-- **Tabla de Tarifas**: Reglas de precios basadas en la asistencia (ej. 5 días = 60€, 2 días = 30€).
+## 2. Multi-Evento (Arquitectura Global)
+La aplicación será capaz de gestionar **múltiples eventos históricos y futuros de forma simultánea** (ej. "Fiestas Valdeganga 2026", "Fiestas Valdeganga 2027", "Nochevieja 2028"). 
+- Todos los datos del sistema (gastos, tarifas, cuotas pagadas) estarán aislados y vinculados al evento que esté seleccionado en ese momento.
 
-## 3. Gestión de Usuarios y Cuotas
-- Cada usuario tendrá asignado el número de días que asiste.
-- El sistema calculará automáticamente la cuota que debe aportar cruzando sus días con la Tabla de Tarifas.
-- Seguimiento del estado: **Pagado** o **Pendiente**.
-- **Saldo a favor**: Contador interno para cada usuario que refleje el dinero que el Bote le debe por haber adelantado compras.
+## 3. Gestión de Usuarios, Roles y Asistencia
+El sistema contará con un acceso seguro diferenciando dos roles principales:
+- **Administrador**: Puede crear eventos, dar de alta usuarios y conceder roles de administrador.
+- **Usuario Estándar**: Acceso limitado a ver el bote y subir tickets del evento activo.
+- **Participación por Evento**: Un usuario (ej. Pepe) existe globalmente en el sistema con su Email y Password, pero su estado de *"Asiste 5 días y ya ha pagado"* es único para cada evento.
+- **Importación Rápida**: Al crear un nuevo evento, el Administrador dispondrá de una herramienta para "Copiar/Importar" automáticamente a los asistentes del evento anterior, evitando tener que darlos de alta uno a uno cada año.
 
-## 4. Gestión de Gastos (Compras y Tickets)
-- Interfaz para registrar una nueva compra que reste dinero del Bote Común.
+## 4. Gestión de Cuotas y Tarifas
+- **Tabla de Tarifas por Evento**: Cada evento tendrá sus propias reglas de precio (ej. en 2026: 5 días = 60€, pero en 2027: 5 días = 70€).
+- El sistema calculará automáticamente la cuota que debe aportar el usuario en el evento actual cruzando sus días con la tabla de ese año.
+- **Saldo a favor**: Contador interno para cada usuario (por evento) que refleje el dinero que el Bote le debe por haber adelantado compras.
+
+## 5. Gestión de Gastos (Compras y Tickets)
+- Interfaz para registrar una nueva compra vinculada al evento activo.
 - Campos obligatorios:
   - **Comprador** (quién ha adelantado el dinero).
   - **Establecimiento** (ej. Consum, Mercadona).
-  - **Concepto / Descripción**.
   - **Importe total**.
-  - **Fotografía del ticket** (almacenada en el NAS).
-- *Lógica interna*: Al registrar el gasto, ese importe pasa automáticamente al "Saldo a favor" del comprador para saber que hay que devolverle el dinero.
+  - **Fotografía del ticket** (almacenada físicamente en el NAS sin saturar la BD).
+- *Lógica interna*: Al registrar el gasto, ese importe pasa automáticamente al "Saldo a favor" del comprador en ese evento concreto.
 
-## 5. Panel Principal (Dashboard)
-Pantalla resumen para ver de un vistazo la salud económica del grupo:
-- **Bote Total Recaudado** (Suma de cuotas pagadas).
-- **Total Gastado** (Suma de todos los tickets).
-- **Saldo Disponible** (El dinero que queda físicamente en la caja).
+## 6. Lógica de Inteligencia Artificial (Lectura OCR)
+- Se integrará una API externa en la nube (Opción A: OpenAI/Google Vision) para analizar automáticamente la fotografía de los tickets y extraer el *Establecimiento* y el *Importe Total* sin que el usuario tenga que teclearlo a mano.
 
-## 6. Arquitectura y Diseño (UX/UI)
-- **Diseño Responsive (Mobile-First)**: La interfaz estará diseñada primordialmente para **Teléfonos Móviles**, ya que los usuarios subirán los tickets directamente desde el supermercado. La interfaz se adaptará fluidamente a **Escritorio** para la gestión del Administrador.
-- **Tecnologías**: Next.js (Frontend/Backend) + Base de Datos SQLite.
+## 7. Panel Principal (Dashboard)
+Pantalla resumen para ver de un vistazo la salud económica del evento activo:
+- **Bote Total Recaudado**.
+- **Total Gastado**.
+- **Saldo Disponible**.
+
+## 8. Arquitectura y Diseño (UX/UI)
+- **Diseño Responsive (Mobile-First)**: Interfaz diseñada para **Móviles**, adaptable a **Escritorio**.
+- **Tecnologías**: Next.js (Frontend/Backend) + Base de Datos SQLite (Relacional).
 - **Despliegue Final**: QNAP TS-464 vía Container Station (Docker).
-- **Control de Versiones**: Se utilizará Git y se sincronizará con un repositorio en GitHub.
-
-## 7. Módulo de Autenticación y Perfiles
-El sistema contará con un acceso seguro diferenciando dos roles principales:
-- **Administrador**: Puede crear y dar de alta a otros usuarios, definiendo además si el nuevo usuario tendrá rol de administrador o no.
-- **Usuario Estándar**: Acceso limitado a las funciones operativas de la aplicación.
-- **Campos de Información del Usuario**:
-  - *Nombre y Apellidos* (Obligatorio)
-  - *Usuario* (Obligatorio)
-  - *Password* (Obligatorio)
-  - *Email* (Opcional)
-  - *Número de Móvil* (Opcional)
+- **Control de Versiones**: Git + GitHub.
