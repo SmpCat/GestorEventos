@@ -73,7 +73,6 @@ model PricingRule {
   eventId   String
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  // Las reglas de días son únicas por evento (ej. la regla de "5 días" solo existe una vez por evento)
   @@unique([eventId, days])
 }
 
@@ -82,7 +81,6 @@ model Expense {
   description  String
   store        String
   amount       Float
-  receiptImage String?
   date         DateTime @default(now())
   
   // Relaciones
@@ -91,6 +89,26 @@ model Expense {
   eventId      String
   event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   
+  // Soporte para tickets muy largos e inventario de productos (Extraídos por IA)
+  images       ExpenseImage[]
+  items        ExpenseItem[]
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model ExpenseImage {
+  id        String   @id @default(uuid())
+  url       String   // Ruta de la imagen (o varias si el ticket es largo)
+  expenseId String
+  expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+}
+
+model ExpenseItem {
+  id        String   @id @default(uuid())
+  name      String   // Nombre del producto (ej. "Cerveza Alhambra")
+  price     Float    // Precio del producto
+  quantity  Int      @default(1)
+  expenseId String
+  expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 }
