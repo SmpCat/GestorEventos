@@ -27,6 +27,7 @@ model User {
   // Relaciones
   eventAttendances EventAttendee[]
   expenses         Expense[]
+  shoppingTasks    ShoppingListItem[] // Tareas de compra asignadas
 }
 
 // ---------------------------------------------------------
@@ -43,9 +44,10 @@ model Event {
   updatedAt   DateTime @updatedAt
 
   // Relaciones
-  attendees    EventAttendee[]
-  pricingRules PricingRule[]
-  expenses     Expense[]
+  attendees       EventAttendee[]
+  pricingRules    PricingRule[]
+  expenses        Expense[]
+  shoppingList    ShoppingListItem[]
 }
 
 model EventAttendee {
@@ -74,6 +76,27 @@ model PricingRule {
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([eventId, days])
+}
+
+model ShoppingListItem {
+  id          String   @id @default(uuid())
+  name        String   // ej. "100 cervezas"
+  isPurchased Boolean  @default(false)
+  
+  // Relación con el Evento
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  // Asignado a alguien para que lo compre (Opcional)
+  assigneeId  String?
+  assignee    User?    @relation(fields: [assigneeId], references: [id])
+  
+  // Vinculado al ticket final cuando ya se ha comprado (Opcional)
+  expenseItemId String? @unique
+  expenseItem   ExpenseItem? @relation(fields: [expenseItemId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Expense {
@@ -111,4 +134,7 @@ model ExpenseItem {
   quantity  Int      @default(1)
   expenseId String
   expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  
+  // Relación inversa con la lista de la compra
+  shoppingListItem ShoppingListItem?
 }
