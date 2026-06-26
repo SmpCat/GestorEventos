@@ -1,0 +1,102 @@
+import { getSession } from '@/actions/auth';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import PricingAdmin from '@/components/PricingAdmin';
+import { getPricingRules, getAttendees } from '@/actions/attendance';
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
+
+export default async function AdminPricingPage() {
+  const session = await getSession();
+
+  if (!session) {
+    redirect('/');
+  }
+
+  // Buscar Evento Activo
+  const activeEvent = await prisma.event.findFirst({
+    where: { isActive: true }
+  });
+
+  if (!activeEvent) {
+    return (
+      <div className="text-center py-12">
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</h1>
+        <h2>Ningún evento operativo</h2>
+        <p className="text-secondary mt-2">No puedes gestionar tarifas si no hay un evento encendido.</p>
+      </div>
+    );
+  }
+
+  // Cargar datos
+  const [rulesRes, attRes] = await Promise.all([
+    getPricingRules(activeEvent.id),
+    getAttendees(activeEvent.id)
+  ]);
+
+  const rules = rulesRes.success && rulesRes.data ? rulesRes.data : [];
+  const attendees = attRes.success && attRes.data ? attRes.data : [];
+
+  // Obtener total gastado
+  const expensesAgg = await prisma.expense.aggregate({
+    _sum: { amount: true },
+    where: { eventId: activeEvent.id }
+  });
+  const totalGastado = expensesAgg._sum.amount || 0;
+
+  // Calcular lo recaudado y lo pendiente en base a los asistentes
+  let totalRecaudado = 0;
+  let totalPendiente = 0;
+  attendees.forEach((att: any) => {
+    if (att.expectedPayment !== null) {
+      if (att.hasPaid) totalRecaudado += att.expectedPayment;
+      else totalPendiente += att.expectedPayment;
+    }
+  });
+  
+  const saldoCaja = totalRecaudado - totalGastado;
+
+  return (
+    <div>
+      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+        <div>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Gestión de Cuotas</h1>
+          <p className="text-secondary">Evento Operativo: <strong style={{ color: 'var(--accent-primary)' }}>{activeEvent.name}</strong></p>
+        </div>
+        <Link href="/" className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          ← Volver al Dashboard
+        </Link>
+      </div>
+
+      {/* Resumen Financiero Global */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="glass-panel p-4 text-center">
+          <p className="text-secondary text-sm mb-1">Total Teórico</p>
+          <p className="text-2xl font-bold">{totalRecaudado + totalPendiente}€</p>
+        </div>
+        <div className="glass-panel p-4 text-center" style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+          <p className="text-secondary text-sm mb-1">Recaudado (Caja)</p>
+          <p className="text-2xl font-bold" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
+        </div>
+        <div className="glass-panel p-4 text-center" style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+          <p className="text-secondary text-sm mb-1">Total Gastado</p>
+          <p className="text-2xl font-bold" style={{ color: 'var(--accent-danger)' }}>{totalGastado}€</p>
+        </div>
+        <div className="glass-panel p-4 text-center" style={{ backgroundColor: saldoCaja >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)' }}>
+          <p className="text-secondary text-sm mb-1">Saldo Final</p>
+          <p className="text-2xl font-bold" style={{ color: saldoCaja >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
+            {saldoCaja >= 0 ? `+${saldoCaja}€` : `${saldoCaja}€`}
+          </p>
+        </div>
+      </div>
+
+      <PricingAdmin 
+        eventId={activeEvent.id} 
+        initialRules={rules} 
+        attendees={attendees} 
+        isAdmin={session.isAdmin}
+      />
+    </div>
+  );
+}

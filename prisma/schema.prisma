@@ -3,10 +3,12 @@
 
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 // ---------------------------------------------------------
@@ -55,6 +57,10 @@ model EventAttendee {
   daysAttending Int      @default(0)
   hasPaid       Boolean  @default(false)
   balance       Float    @default(0.0) // Saldo a favor en ESTE evento
+  
+  // Custom Pricing (Nuevos campos)
+  expectedPayment Float?   // Lo que tiene que pagar. Nulo = automático según tabla.
+  adminComment    String?  // Comentario del admin si sobrescribe el precio.
   
   // Relaciones
   userId        String
