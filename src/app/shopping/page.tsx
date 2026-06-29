@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ShoppingList from '@/components/ShoppingList';
 import { getShoppingList } from '@/actions/shopping';
+import ReceiptUploader from '@/components/ReceiptUploader';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,11 @@ export default async function ShoppingPage() {
   const items = result.success && result.data ? result.data : [];
 
   return (
-    <div className="px-4">
+    <div className="px-4 space-y-10">
+      {/* Escáner de Tickets con IA */}
+      <ReceiptUploader />
+
+      {/* Lista de la compra interactiva */}
       <ShoppingList 
         items={items} 
         eventId={activeEvent.id} 

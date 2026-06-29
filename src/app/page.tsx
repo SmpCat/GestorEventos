@@ -58,7 +58,7 @@ export default async function Home() {
             <h2 style={{ fontSize: '2rem', marginBottom: '1rem', color: 'var(--accent-warning)' }}>⚠️ Faltan las Tarifas</h2>
             <p className="text-secondary mb-6" style={{ fontSize: '1.1rem' }}>El evento <strong>{activeEvent.name}</strong> está operativo, pero aún no se han configurado los precios por día.</p>
             {session.isAdmin ? (
-              <Link href="/admin/pricing" className="btn btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '1.1rem', textDecoration: 'none' }}>
+              <Link href="/pricing" className="btn btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '1.1rem', textDecoration: 'none' }}>
                 Configurar Tarifas Ahora
               </Link>
             ) : (

@@ -17,7 +17,7 @@ export default function LoginForm() {
     const res = await login(formData);
 
     if (res.success) {
-      window.location.reload(); // Recargar para que el Server Component pille la sesión
+      window.location.href = '/'; // Redirigir explícitamente a la raíz en vez de recargar
     } else {
       setError(res.error || 'Fallo de autenticación.');
       setLoading(false);

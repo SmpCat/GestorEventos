@@ -14,8 +14,9 @@ const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
 
 export async function login(data: any) {
   try {
+    const normalizedUsername = data.username.toLowerCase();
     const user = await prisma.user.findUnique({
-      where: { username: data.username },
+      where: { username: normalizedUsername },
     });
 
     if (!user) {
@@ -45,7 +46,7 @@ export async function login(data: any) {
     cookieStore.set('session', sessionToken, {
       expires,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Forzar a false para que funcione en móviles por HTTP local
       sameSite: 'lax',
       path: '/',
     });
