@@ -66,29 +66,37 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
         {/* Acciones Secundarias */}
         <div className="flex flex-col gap-4">
-          <Link href="/shopping" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
-              <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Qué falta por comprar</p>
-            </div>
-            <div style={{ fontSize: '2rem' }}>🛒</div>
-          </Link>
+            <Link href="/shopping" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
+                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Qué falta por comprar</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>🛒</div>
+            </Link>
 
-          <Link href="/pricing" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes y Cuotas</h3>
-              <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Consulta quién viene a la fiesta</p>
-            </div>
-            <div style={{ fontSize: '2rem' }}>👥</div>
-          </Link>
+            <Link href="/pricing/results" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Cuenta de Resultados</h3>
+                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Resumen financiero</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>📈</div>
+            </Link>
 
-          <div className="glass-panel flex items-center justify-between p-6">
-            <div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Balance / Gastos</h3>
-              <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Quién debe a quién</p>
-            </div>
-            <div style={{ fontSize: '2rem' }}>⚖️</div>
-          </div>
+            <Link href="/pricing/rules" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h3>
+                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Reglas de precios</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>⚙️</div>
+            </Link>
+
+            <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes</h3>
+                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver y editar pagos</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>👥</div>
+            </Link>
         </div>
       </div>
 

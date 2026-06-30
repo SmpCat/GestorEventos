@@ -29,7 +29,9 @@ export async function savePricingRules(eventId: string, rules: { days: number, p
         });
       }
     });
-    revalidatePath('/admin/pricing');
+    revalidatePath('/pricing/rules');
+    revalidatePath('/pricing/attendees');
+    revalidatePath('/pricing/results');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: 'Error al guardar tarifas: ' + error.message };
@@ -112,7 +114,9 @@ export async function updateAttendeeAdmin(attendeeId: string, hasPaid: boolean, 
         adminComment,
       }
     });
-    revalidatePath('/admin/pricing');
+    revalidatePath('/pricing/rules');
+    revalidatePath('/pricing/attendees');
+    revalidatePath('/pricing/results');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: 'Error al actualizar asistente: ' + error.message };

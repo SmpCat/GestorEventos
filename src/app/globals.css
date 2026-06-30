@@ -156,6 +156,20 @@ p { color: var(--text-secondary); margin-bottom: 1rem; }
 .text-center { text-align: center; }
 .w-full { width: 100%; }
 
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .mobile-col { flex-direction: column !important; align-items: stretch !important; }
+  .mobile-hide { display: none !important; }
+  .mobile-w-full { width: 100% !important; }
+  .mobile-mt-2 { margin-top: 0.5rem !important; }
+  .mobile-mb-2 { margin-bottom: 0.5rem !important; }
+}
+
+@media (min-width: 769px) {
+  .desktop-hide { display: none !important; }
+  .desktop-row { flex-direction: row !important; }
+}
+
 /* Table / Grid */
 .table-wrapper {
   width: 100%;
