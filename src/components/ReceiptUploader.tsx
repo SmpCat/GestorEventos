@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { processReceiptAction, ReceiptData } from "@/actions/receipts";
+import { useRouter } from "next/navigation";
+import { processReceiptAction, saveExpenseAction, ReceiptData } from "@/actions/receipts";
 
 export default function ReceiptUploader() {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,11 +38,16 @@ export default function ReceiptUploader() {
     }
   };
 
-  const confirmReceipt = () => {
-    // Aquí conectaremos con otra Server Action para guardar definitivamente el gasto en Prisma.
-    // Por ahora, simulamos éxito.
-    alert("¡Ticket guardado en la Base de Datos!");
-    setReceiptData(null);
+  const confirmReceipt = async () => {
+    if (!receiptData) return;
+    setIsUploading(true);
+    const res = await saveExpenseAction(receiptData);
+    if (!res.success) {
+      alert(res.error);
+      setIsUploading(false);
+    } else {
+      router.push('/expenses');
+    }
   };
 
   return (

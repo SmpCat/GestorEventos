@@ -5,10 +5,14 @@ import { savePricingRules } from '@/actions/attendance';
 
 export default function RulesAdmin({ eventId, initialRules, isAdmin }: { eventId: string, initialRules: any[], isAdmin: boolean }) {
   const [rules, setRules] = useState<{ days: number, price: number }[]>(initialRules);
+  const [savedRulesJSON, setSavedRulesJSON] = useState<string>(JSON.stringify(initialRules));
   const [loading, setLoading] = useState<boolean>(false);
 
+  const hasChanges = JSON.stringify(rules) !== savedRulesJSON;
+
   const handleAddRule = () => {
-    setRules([...rules, { days: 1, price: 0 }]);
+    const nextDays = rules.length > 0 ? Math.max(...rules.map(r => r.days)) + 1 : 1;
+    setRules([...rules, { days: nextDays, price: 0 }]);
   };
 
   const handleRuleChange = (index: number, field: 'days' | 'price', value: number) => {
@@ -18,14 +22,23 @@ export default function RulesAdmin({ eventId, initialRules, isAdmin }: { eventId
   };
 
   const handleRemoveRule = (index: number) => {
-    setRules(rules.filter((_, i) => i !== index));
+    if (window.confirm('¿Seguro que quieres borrar esta regla de precio?')) {
+      setRules(rules.filter((_, i) => i !== index));
+    }
   };
 
   const handleSaveRules = async () => {
+    if (!window.confirm('¿Seguro que quieres guardar estas reglas? Esto podría recalcular las cuotas de los asistentes.')) {
+      return;
+    }
     setLoading(true);
     const res = await savePricingRules(eventId, rules);
-    if (!res.success) alert(res.error);
-    else alert('Tarifas guardadas correctamente.');
+    if (!res.success) {
+      alert(res.error);
+    } else {
+      setSavedRulesJSON(JSON.stringify(rules));
+      alert('Tarifas guardadas correctamente.');
+    }
     setLoading(false);
   };
 
@@ -84,8 +97,13 @@ export default function RulesAdmin({ eventId, initialRules, isAdmin }: { eventId
           <button onClick={handleAddRule} className="btn btn-secondary flex-1 py-3">
             + Añadir Regla de Precio
           </button>
-          <button onClick={handleSaveRules} className="btn btn-primary flex-1 py-3" disabled={loading}>
-            {loading ? 'Guardando...' : '💾 Guardar Tarifas'}
+          <button 
+            onClick={handleSaveRules} 
+            className={`btn flex-1 py-3 ${hasChanges ? 'btn-primary' : 'btn-secondary'}`} 
+            style={{ opacity: hasChanges ? 1 : 0.5 }}
+            disabled={loading || !hasChanges}
+          >
+            {loading ? 'Guardando...' : hasChanges ? '⚠️ Guardar Tarifas' : '✅ Guardado'}
           </button>
         </div>
       )}

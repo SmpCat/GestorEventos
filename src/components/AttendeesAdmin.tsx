@@ -20,6 +20,9 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
   };
 
   const saveAttendee = async (attId: string) => {
+    if (!window.confirm('¿Seguro que quieres guardar los cambios en la cuota de este asistente?')) {
+      return;
+    }
     setLoading(`att-${attId}`);
     const finalPrice = editPrice === '' ? null : Number(editPrice);
     const res = await updateAttendeeAdmin(attId, editHasPaid, finalPrice, editComment);

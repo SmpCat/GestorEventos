@@ -55,12 +55,8 @@ export default async function ResultsPage() {
     <div>
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Cuenta de Resultados</h1>
-          <p className="text-secondary">Evento Operativo: <strong style={{ color: 'var(--accent-primary)' }}>{activeEvent.name}</strong></p>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Cuentas</h1>
         </div>
-        <Link href="/" className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-          ← Volver al Dashboard
-        </Link>
       </div>
 
       {/* Resumen Financiero Global */}

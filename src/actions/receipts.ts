@@ -34,8 +34,77 @@ export async function processReceiptAction(formData: FormData) {
         imageUrl,
       } as ReceiptData,
     };
-  } catch (error: any) {
+} catch (error: any) {
     console.error("Error en processReceiptAction:", error);
     return { success: false, error: error.message || "Error desconocido procesando el ticket." };
+  }
+}
+
+import { prisma } from "@/lib/prisma";
+import { getSession } from "@/actions/auth";
+
+export async function saveExpenseAction(data: ReceiptData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+
+    const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
+    if (!activeEvent) return { success: false, error: "No hay evento activo" };
+
+    await prisma.expense.create({
+      data: {
+        description: `Compra en ${data.store}`,
+        store: data.store,
+        amount: data.amount,
+        date: new Date(data.date),
+        eventId: activeEvent.id,
+        purchaserId: session.id,
+        images: {
+          create: [{ url: data.imageUrl }]
+        },
+        items: {
+          create: data.items.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
+        }
+      }
+    });
+    
+    revalidatePath('/expenses');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error en saveExpenseAction:", err);
+    return { success: false, error: err.message || "Error al guardar el gasto en la base de datos." };
+  }
+}
+
+export async function deleteExpenseAction(expenseId: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+
+    const expense = await prisma.expense.findUnique({
+      where: { id: expenseId },
+      include: { images: true }
+    });
+
+    if (!expense) return { success: false, error: "Gasto no encontrado" };
+
+    // Permitir borrar si es Admin o si es el creador del gasto
+    if (!session.isAdmin && expense.purchaserId !== session.id) {
+      return { success: false, error: "No tienes permiso para borrar este gasto" };
+    }
+
+    await prisma.expense.delete({ where: { id: expenseId } });
+    
+    revalidatePath('/expenses');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error en deleteExpenseAction:", err);
+    return { success: false, error: err.message || "Error al borrar el gasto." };
   }
 }

@@ -1,13 +1,12 @@
 import { getSession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { getAttendees } from '@/actions/attendance';
 import Link from 'next/link';
-import AttendeesAdmin from '@/components/AttendeesAdmin';
+import ExpenseList from '@/components/ExpenseList';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AttendeesPage() {
+export default async function ExpensesPage() {
   const session = await getSession();
 
   if (!session) {
@@ -29,21 +28,29 @@ export default async function AttendeesPage() {
     );
   }
 
-  // Cargar datos
-  const attRes = await getAttendees(activeEvent.id);
-  const attendees = attRes.success && attRes.data ? attRes.data : [];
+  // Cargar Gastos
+  const expenses = await prisma.expense.findMany({
+    where: { eventId: activeEvent.id },
+    include: {
+      purchaser: { select: { name: true } },
+      items: true,
+      images: true,
+    },
+    orderBy: { date: 'desc' }
+  });
 
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Asistentes</h1>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Gastos Registrados</h1>
         </div>
       </div>
 
-      <AttendeesAdmin 
-        attendees={attendees} 
-        isAdmin={session.isAdmin}
+      <ExpenseList 
+        expenses={expenses} 
+        isAdmin={session.isAdmin} 
+        currentUserId={session.id} 
       />
     </div>
   );

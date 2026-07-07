@@ -5,6 +5,8 @@
   --accent-primary: #3b82f6; /* Blue 500 */
   --accent-primary-hover: #2563eb; /* Blue 600 */
   --accent-danger: #ef4444; /* Red 500 */
+  --accent-success: #22c55e; /* Green 500 */
+  --accent-warning: #eab308; /* Yellow 500 */
   --text-primary: #f8fafc; /* Slate 50 */
   --text-secondary: #94a3b8; /* Slate 400 */
   --glass-bg: rgba(30, 41, 59, 0.7);
@@ -150,6 +152,7 @@ p { color: var(--text-secondary); margin-bottom: 1rem; }
 .justify-between { justify-content: space-between; }
 .justify-end { justify-content: flex-end; }
 .gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
 .gap-4 { gap: 1rem; }
 .mt-4 { margin-top: 1rem; }
 .mt-6 { margin-top: 1.5rem; }

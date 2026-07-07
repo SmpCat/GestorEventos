@@ -37,12 +37,8 @@ export default async function RulesPage() {
     <div>
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h1>
-          <p className="text-secondary">Evento Operativo: <strong style={{ color: 'var(--accent-primary)' }}>{activeEvent.name}</strong></p>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Reglas de Precio</h1>
         </div>
-        <Link href="/" className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-          ← Volver al Dashboard
-        </Link>
       </div>
 
       <RulesAdmin 

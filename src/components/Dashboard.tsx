@@ -21,29 +21,34 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
             <p style={{ fontWeight: 'bold' }}>{session.name}</p>
           </div>
         </div>
-        <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.875rem' }}>
+        <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.875rem', fontWeight: 'bold' }}>
           Salir
         </button>
       </div>
 
-      <div className="glass-panel text-center" style={{ padding: '2rem 1rem', borderColor: 'var(--accent-primary)', boxShadow: '0 0 20px rgba(99, 102, 241, 0.15)' }}>
-        <p className="text-secondary mb-1" style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Evento Operativo Actual</p>
-        <h2 style={{ fontSize: '2rem', color: 'var(--accent-primary)', margin: 0 }}>
+      <div 
+        className="glass-panel text-center relative overflow-hidden" 
+        style={{ 
+          padding: '4rem 2rem', 
+          borderColor: 'rgba(255,255,255,0.1)', 
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%), url('/images/fiestas-valdeganga.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          borderRadius: '1.5rem'
+        }}
+      >
+        <h2 className="relative z-10" style={{ fontSize: '3.5rem', color: '#fff', margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.8)', fontWeight: '800', letterSpacing: '-1px' }}>
           {activeEvent ? activeEvent.name : 'Ningún evento activo'}
         </h2>
-        {activeEvent && activeEvent.endDate && (
-          <p className="mt-2 text-secondary" style={{ fontSize: '0.85rem' }}>
-            Termina el: {new Date(activeEvent.endDate).toLocaleDateString('es-ES')}
-          </p>
-        )}
 
         {/* Estado de la Cuota del Asistente */}
         {attendee && (
-          <div className="mt-6 p-4 rounded-lg flex flex-col md:flex-row items-center justify-center gap-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <p className="text-secondary" style={{ fontSize: '0.9rem' }}>
-              Tu cuota estimada: <strong className="text-white">{attendee.expectedPayment !== null ? `${attendee.expectedPayment}€` : 'Calculando...'}</strong>
+          <div className="mt-8 p-4 rounded-xl flex flex-col md:flex-row items-center justify-center gap-6 relative z-10 mx-auto" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', maxWidth: '600px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
+            <p style={{ fontSize: '1.1rem', color: '#fff', margin: 0 }}>
+              Tu cuota estimada: <strong style={{ color: 'var(--accent-primary)', fontSize: '1.3rem', textShadow: '0 0 10px rgba(99,102,241,0.5)' }}>{attendee.expectedPayment !== null ? `${attendee.expectedPayment}€` : 'Calculando...'}</strong>
             </p>
-            <div className={`badge ${attendee.hasPaid ? 'bg-success/20 text-success border border-success' : 'bg-danger/20 text-danger border border-danger'}`}>
+            <div className={`badge ${attendee.hasPaid ? 'bg-success/40 text-white border border-success' : 'bg-danger/40 text-white border border-danger'}`} style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', backdropFilter: 'blur(5px)' }}>
               {attendee.hasPaid ? '✅ Cuota Pagada' : '🔴 Pendiente de pago'}
             </div>
           </div>
@@ -52,52 +57,56 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
       <div className="grid gap-4 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
         
-        {/* Acción Principal: Subir Gasto */}
-        <div className="glass-panel text-center flex flex-col justify-center gap-4" style={{ padding: '3rem 2rem', background: 'rgba(99, 102, 241, 0.05)' }}>
-          <div style={{ fontSize: '3rem' }}>📸</div>
+        <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div>
-            <h3 style={{ marginBottom: '0.5rem' }}>Añadir Gasto</h3>
-            <p className="text-secondary" style={{ fontSize: '0.9rem' }}>Sube una foto del ticket o la lista del carnicero para registrarlo.</p>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes</h3>
+            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver y editar pagos</p>
           </div>
-          <button className="btn btn-primary mt-2" style={{ padding: '1rem', fontSize: '1.1rem' }} disabled={!activeEvent}>
-            Subir Ticket
-          </button>
-        </div>
+          <div style={{ fontSize: '2rem' }}>👥</div>
+        </Link>
 
-        {/* Acciones Secundarias */}
-        <div className="flex flex-col gap-4">
-            <Link href="/shopping" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
-                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Qué falta por comprar</p>
-              </div>
-              <div style={{ fontSize: '2rem' }}>🛒</div>
-            </Link>
+        <Link href="/pricing/rules" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h3>
+            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Reglas de precios</p>
+          </div>
+          <div style={{ fontSize: '2rem' }}>⚙️</div>
+        </Link>
 
-            <Link href="/pricing/results" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Cuenta de Resultados</h3>
-                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Resumen financiero</p>
-              </div>
-              <div style={{ fontSize: '2rem' }}>📈</div>
-            </Link>
+        <Link href="/pricing/results" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Cuenta de Resultados</h3>
+            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Resumen financiero</p>
+          </div>
+          <div style={{ fontSize: '2rem' }}>📈</div>
+        </Link>
 
-            <Link href="/pricing/rules" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h3>
-                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Reglas de precios</p>
-              </div>
-              <div style={{ fontSize: '2rem' }}>⚙️</div>
-            </Link>
+        <Link href="/shopping" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
+            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Qué falta por comprar</p>
+          </div>
+          <div style={{ fontSize: '2rem' }}>🛒</div>
+        </Link>
 
-            <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes</h3>
-                <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver y editar pagos</p>
-              </div>
-              <div style={{ fontSize: '2rem' }}>👥</div>
-            </Link>
-        </div>
+        {/* Gastos */}
+        {activeEvent ? (
+          <Link href="/expenses" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gastos Registrados</h3>
+              <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver listado y añadir tickets</p>
+            </div>
+            <div style={{ fontSize: '2rem' }}>📸</div>
+          </Link>
+        ) : (
+          <div className="glass-panel flex items-center justify-between p-6" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+            <div>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Añadir Gasto</h3>
+              <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Requiere evento activo</p>
+            </div>
+            <div style={{ fontSize: '2rem' }}>📸</div>
+          </div>
+        )}
       </div>
 
       {/* Zona VIP para Administradores */}

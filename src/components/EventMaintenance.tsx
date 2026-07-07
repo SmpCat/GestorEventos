@@ -53,16 +53,13 @@ export default function EventMaintenance({ events }: { events: any[] }) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Gestor de Eventos</h1>
-          <p className="text-secondary">Administra las diferentes fiestas y decide cuál está <strong style={{ color: 'var(--accent-success)' }}>Operativa</strong>.</p>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Mantenimiento</h1>
+          <p className="text-secondary">Gestión de Eventos / Viajes</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
           <button onClick={handleCreate} className="btn btn-primary" style={{ padding: '0.6rem 1.2rem' }}>
             + Añadir Evento
           </button>
-          <Link href="/" className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-            ← Volver al Dashboard
-          </Link>
         </div>
       </div>
 

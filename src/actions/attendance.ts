@@ -18,6 +18,15 @@ export async function getPricingRules(eventId: string) {
 }
 
 export async function savePricingRules(eventId: string, rules: { days: number, price: number }[]) {
+  // Validate uniqueness of days
+  const daysSet = new Set<number>();
+  for (const rule of rules) {
+    if (daysSet.has(rule.days)) {
+      return { success: false, error: `No puedes tener varias reglas para el mismo número de días (tiene repetido: ${rule.days} días).` };
+    }
+    daysSet.add(rule.days);
+  }
+
   try {
     await prisma.$transaction(async (tx) => {
       // Borrar anteriores

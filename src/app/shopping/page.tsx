@@ -2,8 +2,7 @@ import { getSession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ShoppingList from '@/components/ShoppingList';
-import { getShoppingList } from '@/actions/shopping';
-import ReceiptUploader from '@/components/ReceiptUploader';
+import { getShoppingList, getShoppingListEvidences } from '@/actions/shopping';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +24,6 @@ export default async function ShoppingPage() {
         <h1 style={{ fontSize: '4rem', marginBottom: '1rem' }}>📅</h1>
         <h2>No hay ningún evento activo</h2>
         <p className="text-secondary mt-2">Dile al Administrador que marque un evento como Operativo antes de planificar las compras.</p>
-        <a href="/" className="btn btn-primary mt-6">Volver al Dashboard</a>
       </div>
     );
   }
@@ -40,14 +38,17 @@ export default async function ShoppingPage() {
   const result = await getShoppingList(activeEvent.id);
   const items = result.success && result.data ? result.data : [];
 
+  // Obtener las evidencias (listas escaneadas)
+  const evidencesResult = await getShoppingListEvidences(activeEvent.id);
+  const evidences = evidencesResult.success && evidencesResult.data ? evidencesResult.data : [];
+
   return (
     <div className="px-4 space-y-10">
-      {/* Escáner de Tickets con IA */}
-      <ReceiptUploader />
 
       {/* Lista de la compra interactiva */}
       <ShoppingList 
         items={items} 
+        evidences={evidences}
         eventId={activeEvent.id} 
         users={users} 
         currentUser={session}
