@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import UserFormModal from './UserFormModal';
+import TrashIcon from './TrashIcon';
 import { deleteUser } from '@/actions/users';
 
 export default function UserMaintenance({ users }: { users: any[] }) {
@@ -83,8 +84,8 @@ export default function UserMaintenance({ users }: { users: any[] }) {
                       <button onClick={() => handleEdit(user)} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', marginRight: '0.5rem', fontSize: '0.875rem' }}>
                         Editar
                       </button>
-                      <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger" style={{ padding: '0.4rem 0.8rem', fontSize: '0.875rem' }}>
-                        Borrar
+                      <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger" style={{ padding: '0.4rem', fontSize: '0.875rem' }} title="Borrar">
+                        <TrashIcon />
                       </button>
                     </td>
                   </tr>

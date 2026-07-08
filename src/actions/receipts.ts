@@ -108,3 +108,20 @@ export async function deleteExpenseAction(expenseId: string) {
     return { success: false, error: err.message || "Error al borrar el gasto." };
   }
 }
+
+export async function deleteExpenseEvidence(evidenceId: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+
+    await prisma.expenseImage.delete({
+      where: { id: evidenceId }
+    });
+
+    revalidatePath('/expenses');
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error en deleteExpenseEvidence:", err);
+    return { success: false, error: err.message || "Error al eliminar la evidencia." };
+  }
+}

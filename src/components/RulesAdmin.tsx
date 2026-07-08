@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { savePricingRules } from '@/actions/attendance';
+import TrashIcon from './TrashIcon';
 
-export default function RulesAdmin({ eventId, initialRules, isAdmin }: { eventId: string, initialRules: any[], isAdmin: boolean }) {
+export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { eventId: string, initialRules: any[], isAdmin: boolean }) {
   const [rules, setRules] = useState<{ days: number, price: number }[]>(initialRules);
   const [savedRulesJSON, setSavedRulesJSON] = useState<string>(JSON.stringify(initialRules));
   const [loading, setLoading] = useState<boolean>(false);
@@ -81,10 +82,10 @@ export default function RulesAdmin({ eventId, initialRules, isAdmin }: { eventId
               {isAdmin && (
                 <button 
                   onClick={() => handleRemoveRule(idx)} 
-                  style={{ color: 'var(--accent-danger)', background: 'transparent', border: 'none', padding: '0 0.2rem', fontSize: '1.2rem', cursor: 'pointer', fontWeight: 'bold' }}
+                  className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center"
                   title="Borrar Regla"
                 >
-                  X
+                  <TrashIcon />
                 </button>
               )}
             </div>

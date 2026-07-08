@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { addShoppingItem, togglePurchased, assignItem, deleteItem, scanShoppingListAI, deleteShoppingListEvidence } from '@/actions/shopping';
+import TrashIcon from './TrashIcon';
 
 export default function ShoppingList({ items, evidences, eventId, users, currentUser }: { items: any[], evidences?: any[], eventId: string, users: any[], currentUser: any }) {
   const [newItemName, setNewItemName] = useState('');
-  const [loading, setLoading] = useState<string | null>(null); // Guardar ID de la acción en curso
+  const [loading, setLoading] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pending' | 'purchased'>('pending');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const pendingItems = items.filter(item => !item.isPurchased);
   const purchasedItems = items.filter(item => item.isPurchased);
@@ -22,11 +24,6 @@ export default function ShoppingList({ items, evidences, eventId, users, current
   };
 
   const handleToggle = async (itemId: string, currentStatus: boolean) => {
-    const actionText = currentStatus ? "devolver este producto a Pendientes" : "marcar este producto como Comprado";
-    if (!window.confirm(`¿Seguro que quieres ${actionText}?`)) {
-      return;
-    }
-    
     setLoading(`toggle-${itemId}`);
     await togglePurchased(itemId, !currentStatus);
     setLoading(null);
@@ -125,34 +122,48 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     return (
       <div 
         key={item.id} 
-        className="flex flex-col md:flex-row justify-between items-start md:items-center bg-black/20 p-3 rounded-lg transition-opacity"
+        className="flex flex-col bg-black/20 p-3 rounded-lg transition-opacity gap-2"
         style={{ opacity: isProcessing ? 0.5 : 1, border: '1px solid rgba(255,255,255,0.05)' }}
       >
-        {/* Lado Izquierdo: Checkbox y Nombre */}
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <input 
-            type="checkbox" 
-            checked={item.isPurchased}
-            onChange={() => handleToggle(item.id, item.isPurchased)}
-            disabled={isProcessing}
-            style={{ width: '1.5rem', height: '1.5rem', accentColor: 'var(--accent-success)' }}
-          />
-          <span style={{ 
-            fontSize: '1.05rem', 
-            fontWeight: '600',
-            textDecoration: item.isPurchased ? 'line-through' : 'none',
-            color: item.isPurchased ? 'var(--accent-success)' : 'var(--text-primary)'
-          }}>
-            {item.name}
-          </span>
+        {/* Primera fila: Checkbox, Nombre, Papelera */}
+        <div className="flex justify-between items-start w-full gap-3">
+          <div className="flex items-center gap-3">
+            <input 
+              type="checkbox" 
+              checked={item.isPurchased}
+              onChange={() => handleToggle(item.id, item.isPurchased)}
+              disabled={isProcessing}
+              className="shrink-0"
+              style={{ width: '1.5rem', height: '1.5rem', accentColor: 'var(--accent-success)' }}
+            />
+            <span style={{ 
+              fontSize: '1.05rem', 
+              fontWeight: '600',
+              textDecoration: item.isPurchased ? 'line-through' : 'none',
+              color: item.isPurchased ? 'var(--accent-success)' : 'var(--text-primary)'
+            }}>
+              {item.name}
+            </span>
+          </div>
+
+          {!item.isPurchased && (
+            <button 
+              onClick={() => handleDelete(item.id)} 
+              disabled={isProcessing}
+              className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center shrink-0 ml-2"
+              title="Borrar producto"
+            >
+              {isProcessing ? '⏳' : <TrashIcon />}
+            </button>
+          )}
         </div>
 
-        {/* Lado Derecho: Asignación y Borrar */}
-        <div className="flex items-center gap-3 mt-3 md:mt-0 w-full md:w-auto justify-end">
-          {!item.isPurchased && (
+        {/* Segunda fila: Selector de asignación */}
+        {!item.isPurchased && (
+          <div style={{ paddingLeft: '2.25rem' }} className="w-full">
             <select 
-              className="input-field" 
-              style={{ padding: '0.4rem', fontSize: '0.85rem', width: 'auto', background: 'rgba(255,255,255,0.05)' }}
+              className="input-field w-full" 
+              style={{ padding: '0.4rem', fontSize: '0.85rem', background: 'rgba(255,255,255,0.05)' }}
               value={item.assigneeId || 'UNASSIGN'}
               onChange={(e) => handleAssign(item.id, e.target.value)}
               disabled={isProcessing}
@@ -164,19 +175,8 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                 </option>
               ))}
             </select>
-          )}
-
-          {!item.isPurchased && (
-            <button 
-              onClick={() => handleDelete(item.id)} 
-              disabled={isProcessing}
-              style={{ color: 'var(--accent-danger)', background: 'transparent', border: 'none', padding: '0 0.4rem', fontSize: '1.3rem', cursor: 'pointer', fontWeight: 'bold' }}
-              title="Borrar producto"
-            >
-              X
-            </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -194,8 +194,8 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
 
       {/* Controles para Añadir Elementos (Arriba) */}
-      <h3 style={{ color: 'var(--accent-primary)', marginBottom: '1rem' }}>🛒 Añadir a la lista</h3>
-      <div className="glass-panel mb-10 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <h3 className="text-white font-bold text-lg" style={{ marginBottom: '1rem' }}>🛒 Añadir a la lista</h3>
+      <div className="glass-panel mb-16 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
         <div className="flex flex-col gap-4 max-w-md mx-auto">
           <form onSubmit={handleAdd} className="flex gap-3 w-full">
             <input 
@@ -244,6 +244,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
       </div>
 
       {/* Pestañas (Tabs) estilo Segmented Control */}
+      <h3 className="text-white font-bold text-lg" style={{ marginTop: '3rem', marginBottom: '1rem' }}>📋 Lista</h3>
       <div className="flex p-1 bg-black/40 rounded-xl mb-6" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
         <button 
           onClick={() => setActiveTab('pending')}
@@ -301,7 +302,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
       {/* Galería de Evidencias */}
       {evidences && evidences.length > 0 && (
         <div style={{ marginTop: '2.5rem' }}>
-          <h3 style={{ color: 'var(--accent-primary)', marginBottom: '1rem' }}>📷 Listas Originales</h3>
+          <h3 className="text-white font-bold text-lg" style={{ marginBottom: '1rem' }}>📷 Listas Originales</h3>
           <div className="glass-panel mb-10 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {evidences.map((ev: any) => {
@@ -312,23 +313,27 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                 });
                 return (
                   <div key={ev.id} className="flex flex-col gap-2 relative">
-                    <div className="flex justify-between items-center px-1">
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        🗓️ {dateStr}
-                      </span>
-                      <button
-                        onClick={() => handleDeleteEvidence(ev.id)}
-                        disabled={loading === `delete-ev-${ev.id}`}
-                        style={{ color: 'var(--accent-danger)', background: 'transparent', border: 'none', padding: '0', fontSize: '1.2rem', cursor: 'pointer', fontWeight: 'bold' }}
-                        title="Borrar foto"
+                      <div className="flex justify-between items-center px-1 mb-1">
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                          🗓️ {dateStr}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteEvidence(ev.id)}
+                          disabled={loading === `delete-ev-${ev.id}`}
+                          className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center shrink-0"
+                          title="Borrar foto"
+                        >
+                          {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
+                        </button>
+                      </div>
+                      <a 
+                        href={apiImageUrl}
+                        className="block border border-white/10 rounded overflow-hidden" 
+                        style={{ minHeight: '100px', opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1 }}
                       >
-                        X
-                      </button>
+                        <img src={apiImageUrl} alt="Ticket" className="w-full h-auto object-cover" style={{ aspectRatio: '1/1' }} />
+                      </a>
                     </div>
-                    <a href={apiImageUrl} target="_blank" rel="noreferrer" className="block border border-white/10 rounded overflow-hidden" style={{ minHeight: '100px', opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1 }}>
-                      <img src={apiImageUrl} alt="Evidencia" className="w-full h-auto object-cover" style={{ aspectRatio: '1/1' }} />
-                    </a>
-                  </div>
                 );
               })}
             </div>

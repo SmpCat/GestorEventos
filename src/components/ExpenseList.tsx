@@ -2,7 +2,8 @@
 
 import { useState, useRef } from 'react';
 import Link from 'next/link';
-import { deleteExpenseAction, processReceiptAction, saveExpenseAction, ReceiptData } from '@/actions/receipts';
+import { deleteExpenseAction, processReceiptAction, saveExpenseAction, deleteExpenseEvidence, ReceiptData } from '@/actions/receipts';
+import TrashIcon from './TrashIcon';
 
 export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expenses: any[], isAdmin: boolean, currentUserId: string }) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -11,11 +12,20 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
   const [error, setError] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleDelete = async (expenseId: string) => {
     if (window.confirm('¿Seguro que quieres borrar este gasto y su ticket asociado?')) {
       setLoading(expenseId);
       await deleteExpenseAction(expenseId);
+      setLoading(null);
+    }
+  };
+
+  const handleDeleteEvidence = async (evidenceId: string, expenseId: string) => {
+    if (window.confirm('¿Seguro que quieres borrar esta foto de evidencia?')) {
+      setLoading(`delete-ev-${evidenceId}`);
+      await deleteExpenseEvidence(evidenceId);
       setLoading(null);
     }
   };
@@ -61,10 +71,16 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
   return (
     <div className="max-w-3xl mx-auto py-6">
+      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+        <div>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Gastos Registrados</h1>
+          <p className="text-secondary">Gestiona y revisa los tickets escaneados del evento activo.</p>
+        </div>
+      </div>
 
       {/* Controles para Añadir Elementos (Arriba) */}
-      <h3 style={{ color: 'var(--accent-primary)', marginBottom: '1rem' }}>📸 Añadir Gasto</h3>
-      <div className="glass-panel mb-10 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <h3 className="text-white font-bold text-lg" style={{ marginBottom: '1rem' }}>🧾 Añadir Ticket</h3>
+      <div className="glass-panel mb-16 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
         <div className="flex flex-col gap-4 max-w-md mx-auto">
           <input
             type="file"
@@ -103,7 +119,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
       {/* Previsualización y Revisión del JSON devuelto */}
       {receiptData && (
-        <div className="glass-panel mb-10 overflow-hidden relative animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="glass-panel mb-16 overflow-hidden relative animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="p-4 md:p-6 border-b border-white/10 bg-emerald-500/10">
             <h3 className="font-bold text-emerald-400 text-lg flex items-center gap-2">
               <span>✨</span> Datos Extraídos con Éxito
@@ -121,41 +137,42 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                 </div>
               </div>
               
-              {/* Formulario */}
-              <div className="w-full md:w-2/3 flex flex-col gap-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1">Comercio</label>
+              {/* Formulario de Revisión */}
+              <div className="w-full md:w-2/3 flex flex-col gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1">Establecimiento</label>
                     <input 
                       type="text" 
-                      defaultValue={receiptData.store} 
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-primary transition-all appearance-none" 
+                      value={receiptData.store}
+                      onChange={(e) => setReceiptData({...receiptData, store: e.target.value})}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-primary transition-all" 
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1">Fecha</label>
                     <input 
                       type="date" 
-                      defaultValue={receiptData.date} 
+                      value={receiptData.date}
+                      onChange={(e) => setReceiptData({...receiptData, date: e.target.value})}
                       className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-primary transition-all appearance-none" 
                     />
                   </div>
                 </div>
-                
-                <div className="flex flex-col gap-2 mt-1">
-                  <label className="text-xs font-bold text-emerald-500/80 uppercase tracking-wider pl-1">Importe Total (€)</label>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1">Importe Total (€)</label>
                   <input 
                     type="number" 
                     step="0.01" 
-                    defaultValue={receiptData.amount} 
-                    className="w-full bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-400 font-bold text-2xl focus:outline-none focus:border-emerald-400 transition-all appearance-none" 
+                    value={receiptData.amount} 
+                    onChange={(e) => setReceiptData({...receiptData, amount: parseFloat(e.target.value) || 0})}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-primary transition-all font-mono text-lg" 
                   />
                 </div>
 
-                <div className="mt-2 bg-black/30 border border-white/5 rounded-xl p-4">
-                  <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">
-                    Desglose ({receiptData.items?.length || 0} artículos)
-                  </p>
+                <div className="flex flex-col gap-2 mt-2">
+                  <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1 border-b border-white/5 pb-2">Artículos Detectados ({receiptData.items?.length || 0})</label>
                   <div className="max-h-48 overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-2">
                     {receiptData.items?.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center bg-white/5 px-3 py-2.5 rounded-lg border border-white/5">
@@ -179,7 +196,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                 Cancelar y Descartar
               </button>
               <button 
-                onClick={confirmReceipt} 
+                onClick={handleConfirmReceipt} 
                 disabled={isUploading} 
                 className="btn btn-primary flex-[2] py-3 text-lg font-bold shadow-lg shadow-indigo-500/20"
               >
@@ -191,10 +208,14 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       )}
 
       {/* Listado de Elementos */}
+      <div className="flex justify-between items-end mb-4" style={{ marginTop: '3rem' }}>
+        <h3 className="text-white font-bold text-lg m-0">📊 Lista de Gastos</h3>
+        <div className="text-emerald-400 font-bold text-lg leading-none" style={{ paddingBottom: '0.1rem' }}>
+          {expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}&nbsp;€
+        </div>
+      </div>
       <div className="glass-panel p-4 md:p-6 mb-8">
-        <h3 className="mb-4 text-secondary font-bold text-lg border-b border-white/10 pb-2">Últimos Gastos Registrados</h3>
-        
-        <div className="mt-4">
+        <div className="flex flex-col">
           {expenses.length === 0 ? (
             <p className="text-secondary italic">Aún no se ha registrado ningún gasto.</p>
           ) : (
@@ -206,41 +227,57 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
               return (
                 <div key={expense.id} className="flex flex-col bg-black/40 border border-white/5 rounded-lg p-4 mb-3 relative overflow-hidden group hover:border-white/10 transition-colors">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-xl shrink-0">
-                        🛍️
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg leading-tight mb-1" style={{ color: 'var(--text-primary)' }}>{expense.store}</h3>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          {dateStr} • Subido por <strong className="text-white/80">{expense.purchaser.name}</strong>
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-xl font-bold text-emerald-400 ml-4 shrink-0">
-                      {expense.amount.toFixed(2)} €
-                    </div>
-                  </div>
                   
-                  <div className="text-sm mt-1 pl-14" style={{ color: 'var(--text-secondary)' }}>
-                    {expense.description}
-                  </div>
-
-                  <div className="flex gap-3 mt-3 pt-3 border-t border-white/5 justify-between items-center pl-14">
-                    <div className="text-xs text-secondary font-mono">
-                      {expense.items.length} artículos detectados
+                  {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete Button */}
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="flex items-center flex-1">
+                      <div className="text-sm leading-tight flex-1 flex flex-col gap-1">
+                        <div className="text-secondary">
+                          {dateStr} <span className="mx-1">•</span> <strong className="text-white/80">{expense.purchaser.name}</strong>
+                        </div>
+                        {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && (
+                          <div className="font-bold text-emerald-100 text-[15px]">{expense.store}</div>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex gap-2">
+                    
+                    {/* Delete Button */}
+                    <div className="shrink-0 ml-4">
                       {canDelete && (
                         <button 
                           onClick={() => handleDelete(expense.id)}
                           disabled={loading === expense.id}
-                          className="text-red-400 hover:text-red-300 font-bold px-3 py-1 bg-red-400/10 rounded"
+                          className="text-red-400/70 hover:text-red-400 transition-colors flex items-center justify-center p-1 bg-transparent border-none outline-none"
+                          title="Eliminar gasto"
                         >
-                          {loading === expense.id ? '...' : 'X'}
+                          {loading === expense.id ? '⏳' : <TrashIcon />}
                         </button>
                       )}
+                    </div>
+                  </div>
+                  
+                  {/* Description if present */}
+                  {expense.description && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
+                    <div className="text-xs mt-1 pl-10 text-secondary/70">
+                      {expense.description}
+                    </div>
+                  )}
+
+                  {/* Items and Total */}
+                  <div className="flex flex-col gap-1 w-full mt-2 pr-1">
+                    <div className="flex flex-col gap-1" style={{ marginLeft: '1.5rem' }}>
+                      {expense.items.map((item: any, idx: number) => (
+                        <div key={idx} className="flex justify-between text-sm text-slate-300">
+                          <span>{item.quantity}x {item.name}</span>
+                          {item.price > 0 && (
+                            <span className="font-mono text-white/70">{item.price.toFixed(2)}&nbsp;€</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-between items-center text-sm font-bold text-emerald-400 mt-2 pt-2 border-t border-white/5" style={{ marginLeft: '1.5rem' }}>
+                      <span>Total</span>
+                      <span className="font-mono">{expense.amount.toFixed(2)}&nbsp;€</span>
                     </div>
                   </div>
                 </div>
@@ -265,7 +302,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
         return (
           <div style={{ marginTop: '2.5rem' }}>
-            <h3 style={{ color: 'var(--accent-primary)', marginBottom: '1rem' }}>📷 Tickets Originales</h3>
+            <h3 className="text-white font-bold text-lg" style={{ marginBottom: '1rem' }}>📷 Tickets Originales</h3>
             <div className="glass-panel mb-10 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {allImages.map((ev: any) => {
@@ -276,12 +313,24 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                   });
                   return (
                     <div key={ev.id} className="flex flex-col gap-2 relative">
-                      <div className="flex justify-between items-center px-1">
+                      <div className="flex justify-between items-center px-1 mb-1">
                         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                           🗓️ {dateStr}
                         </span>
+                        <button
+                          onClick={() => handleDeleteEvidence(ev.id, ev.expenseId)}
+                          disabled={loading === `delete-ev-${ev.id}`}
+                          className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center shrink-0"
+                          title="Borrar foto"
+                        >
+                          {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
+                        </button>
                       </div>
-                      <a href={apiImageUrl} target="_blank" rel="noreferrer" className="block border border-white/10 rounded overflow-hidden" style={{ minHeight: '100px' }}>
+                      <a 
+                        href={apiImageUrl}
+                        className="block border border-white/10 rounded overflow-hidden" 
+                        style={{ minHeight: '100px' }}
+                      >
                         <img src={apiImageUrl} alt="Ticket" className="w-full h-auto object-cover" style={{ aspectRatio: '1/1' }} />
                       </a>
                     </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import EventFormModal from './EventFormModal';
+import TrashIcon from './TrashIcon';
 import { deleteEvent, setActiveEvent } from '@/actions/events';
 
 export default function EventMaintenance({ events }: { events: any[] }) {
@@ -125,11 +126,11 @@ export default function EventMaintenance({ events }: { events: any[] }) {
                 <button 
                   onClick={() => handleDelete(event.id, event.name, event.isActive)} 
                   className="btn btn-danger" 
-                  style={{ padding: '0.5rem', fontSize: '0.875rem' }}
-                  title="Borrar Evento"
+                  style={{ padding: '0.4rem', fontSize: '0.875rem' }}
+                  title="Borrar"
                   disabled={event.isActive || actionLoading !== null}
                 >
-                  🗑️
+                  <TrashIcon />
                 </button>
               </div>
             </div>
