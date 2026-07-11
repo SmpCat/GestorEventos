@@ -52,7 +52,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4" style={{ marginBottom: '2.5rem' }}>
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4" style={{ marginBottom: '1.5rem' }}>
         <div>
           <h1>Mantenimiento</h1>
           <p className="subtitle">Gestión de Eventos / Viajes</p>
@@ -64,7 +64,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+      <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         {events.length === 0 ? (
           <div className="glass-panel text-center col-span-full py-8">
             <p className="text-secondary">No hay eventos creados. Pulsa en Añadir Evento para empezar.</p>
