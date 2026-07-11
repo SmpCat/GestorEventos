@@ -13,7 +13,7 @@ export default function Navbar({ session }: { session: any }) {
 
   return (
     <nav className="sticky top-0 z-50 pt-4 px-4 max-w-[1200px] mx-auto w-full mb-4">
-      <div className="flex justify-between items-center bg-black/30 p-5 rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
+      <div className="flex justify-between items-center bg-black/30 rounded-xl" style={{ padding: '1.25rem 2rem', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
         
         {isDashboard ? (
            <div className="flex items-center gap-3">

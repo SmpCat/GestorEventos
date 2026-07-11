@@ -16,11 +16,15 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
         style={{ 
           padding: '2.5rem 1rem', 
           borderColor: 'rgba(255,255,255,0.1)', 
+          borderBottom: 'none',
           boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
           backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%), url('/images/fiestas-valdeganga.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          borderRadius: '1.5rem'
+          borderTopLeftRadius: '1.5rem',
+          borderTopRightRadius: '1.5rem',
+          borderBottomLeftRadius: '1.5rem',
+          borderBottomRightRadius: '1.5rem'
         }}
       >
         <h2 className="relative z-10" style={{ fontSize: '2.8rem', color: '#fff', margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.8)', fontWeight: '800', letterSpacing: '-1px' }}>
@@ -96,7 +100,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
       {/* Zona VIP para Administradores */}
       {session.isAdmin && (
-        <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ marginTop: '3.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <h3 className="mb-6 text-white">👑 Zona de Administración</h3>
           <div className="grid" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
             <Link href="/admin/events" className="glass-panel flex flex-col items-center justify-center p-6 transition-colors" style={{ color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
