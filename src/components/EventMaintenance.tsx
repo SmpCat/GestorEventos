@@ -77,7 +77,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
               style={{
                 border: '1px solid rgba(255, 255, 255, 0.8)',
                 boxShadow: 'none',
-                background: event.isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.1)',
+                background: event.isActive ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.25)',
                 transition: 'all 0.3s ease',
               }}
             >
