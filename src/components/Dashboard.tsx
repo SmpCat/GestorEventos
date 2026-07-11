@@ -40,7 +40,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
         )}
       </div>
 
-      <div className="grid mt-2" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+      <div className="grid mt-6" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         
         <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
@@ -96,14 +96,14 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
       {/* Zona VIP para Administradores */}
       {session.isAdmin && (
-        <div className="mt-8 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <h3 className="mb-4" style={{ color: 'var(--accent-warning)' }}>👑 Zona de Administración</h3>
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-            <Link href="/admin/events" className="glass-panel flex flex-col items-center justify-center p-6 transition-colors" style={{ color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.03)' }}>
+        <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <h3 className="mb-6 text-white">👑 Zona de Administración</h3>
+          <div className="grid" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+            <Link href="/admin/events" className="glass-panel flex flex-col items-center justify-center p-6 transition-colors" style={{ color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
               <span style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</span>
               <strong style={{ fontSize: '1.1rem' }}>Gestión de Eventos</strong>
             </Link>
-            <Link href="/admin/users" className="glass-panel flex flex-col items-center justify-center p-6 transition-colors" style={{ color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.03)' }}>
+            <Link href="/admin/users" className="glass-panel flex flex-col items-center justify-center p-6 transition-colors" style={{ color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
               <span style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>👥</span>
               <strong style={{ fontSize: '1.1rem' }}>Usuarios</strong>
             </Link>
