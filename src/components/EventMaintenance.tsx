@@ -77,7 +77,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
               style={{
                 borderColor: event.isActive ? 'var(--accent-success)' : 'var(--accent-danger)',
                 boxShadow: event.isActive ? '0 0 15px rgba(16, 185, 129, 0.2)' : '0 0 15px rgba(239, 68, 68, 0.15)',
-                backgroundColor: event.isActive ? '' : 'rgba(100, 116, 139, 0.2)',
+                background: event.isActive ? '' : 'rgba(128, 128, 128, 0.15)',
                 opacity: event.isActive ? 1 : 0.65,
                 filter: event.isActive ? 'none' : 'grayscale(60%)',
                 transform: event.isActive ? 'scale(1.02)' : 'scale(1)',
