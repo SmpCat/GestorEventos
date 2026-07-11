@@ -60,20 +60,20 @@ export default async function ResultsPage() {
       </div>
 
       {/* Resumen Financiero Global */}
-      <div className="grid grid-cols-1 md:grid-cols-2 mb-8" style={{ gap: '1.5rem' }}>
-        <div className="glass-panel p-6 text-center" style={{ border: '1px solid rgba(255, 255, 255, 0.8)' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 mb-8" style={{ display: 'grid', gap: '1.5rem' }}>
+        <div className="glass-panel p-6 text-center">
           <p className="text-white text-lg mb-2">Total Teórico</p>
           <p className="text-4xl font-bold">{totalRecaudado + totalPendiente}€</p>
         </div>
-        <div className="glass-panel p-6 text-center" style={{ border: '1px solid rgba(255, 255, 255, 0.8)' }}>
+        <div className="glass-panel p-6 text-center">
           <p className="text-white text-lg mb-2">Recaudado (Caja)</p>
           <p className="text-4xl font-bold" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
         </div>
-        <div className="glass-panel p-6 text-center" style={{ border: '1px solid rgba(255, 255, 255, 0.8)' }}>
+        <div className="glass-panel p-6 text-center">
           <p className="text-white text-lg mb-2">Total Gastado</p>
           <p className="text-4xl font-bold" style={{ color: 'var(--accent-danger)' }}>{totalGastado}€</p>
         </div>
-        <div className="glass-panel p-6 text-center" style={{ backgroundColor: saldoCaja >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(255, 255, 255, 0.8)' }}>
+        <div className="glass-panel p-6 text-center" style={{ backgroundColor: saldoCaja >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)' }}>
           <p className="text-white text-lg mb-2">Saldo Final</p>
           <p className="text-4xl font-bold" style={{ color: saldoCaja >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
             {saldoCaja >= 0 ? `+${saldoCaja}€` : `${saldoCaja}€`}
