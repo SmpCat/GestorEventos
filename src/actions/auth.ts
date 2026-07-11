@@ -53,6 +53,7 @@ export async function login(data: any) {
 
     return { success: true };
   } catch (error: any) {
+    console.error("LOGIN ERROR DETAILED: ", error);
     return { success: false, error: 'Error interno en el login.' };
   }
 }

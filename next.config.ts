@@ -12,10 +12,10 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   serverExternalPackages: [],
-  allowedDevOrigins: ['192.168.178.73', '192.168.178.73:3000'],
+  allowedDevOrigins: ['192.168.178.73', '192.168.178.73:3000', '192.168.178.22', '192.168.178.22:3000'],
   experimental: {
     serverActions: {
-      allowedOrigins: ['192.168.178.73:3000', 'localhost:3000'],
+      allowedOrigins: ['192.168.178.73:3000', 'localhost:3000', '192.168.178.22:3000'],
       bodySizeLimit: '20mb',
     },
   },
