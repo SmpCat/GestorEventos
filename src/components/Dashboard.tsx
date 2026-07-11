@@ -11,21 +11,6 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center bg-black/30 p-4 rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/20 p-2 rounded-full border border-primary/30">
-            👤
-          </div>
-          <div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Bienvenido/a</p>
-            <p style={{ fontWeight: 'bold' }}>{session.name}</p>
-          </div>
-        </div>
-        <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.875rem', fontWeight: 'bold' }}>
-          Salir
-        </button>
-      </div>
-
       <div 
         className="glass-panel text-center relative overflow-hidden" 
         style={{ 

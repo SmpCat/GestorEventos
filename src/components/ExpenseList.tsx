@@ -73,8 +73,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
     <div className="max-w-3xl mx-auto py-6">
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Gastos Registrados</h1>
-          <p className="text-secondary">Gestiona y revisa los tickets escaneados del evento activo.</p>
+          <h1>Gastos Registrados</h1>
+          <p className="subtitle">Gestiona y revisa los tickets escaneados del evento activo.</p>
         </div>
       </div>
 
@@ -188,17 +188,17 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-3 mt-4 pt-6 border-t border-white/10">
+            <div className="flex mobile-col gap-3 mt-4 pt-6 border-t border-white/10">
               <button 
                 onClick={() => setReceiptData(null)} 
-                className="btn btn-secondary flex-1 py-3"
+                className="btn btn-secondary mobile-w-full py-3"
               >
                 Cancelar y Descartar
               </button>
               <button 
-                onClick={handleConfirmReceipt} 
+                onClick={confirmReceipt} 
                 disabled={isUploading} 
-                className="btn btn-primary flex-[2] py-3 text-lg font-bold shadow-lg shadow-indigo-500/20"
+                className="btn btn-primary mobile-w-full py-3 text-lg font-bold shadow-lg shadow-indigo-500/20"
               >
                 {isUploading ? '⏳ Guardando...' : '✅ Confirmar y Guardar Gasto'}
               </button>

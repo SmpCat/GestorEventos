@@ -28,11 +28,11 @@ export default function LoginForm() {
     <div className="flex flex-col items-center justify-center min-h-[80vh]">
       <div className="text-center mb-8">
         <h1 style={{ fontSize: '3rem', color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>GestorEventos</h1>
-        <p className="text-secondary" style={{ fontSize: '1.2rem' }}>La plataforma privada para tu grupo</p>
+        <p className="subtitle">La plataforma privada para tu grupo</p>
       </div>
 
       <div className="glass-panel" style={{ width: '100%', maxWidth: '400px' }}>
-        <h2 className="text-center mb-6" style={{ fontSize: '1.5rem' }}>Iniciar Sesión</h2>
+        <h2 className="text-center mb-6">Iniciar Sesión</h2>
         
         {error && <p style={{ color: 'var(--accent-danger)', marginBottom: '1.5rem', fontSize: '0.875rem', textAlign: 'center' }}>{error}</p>}
 

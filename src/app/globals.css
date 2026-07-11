@@ -57,7 +57,17 @@ h1, h2, h3 {
 
 h1 { font-size: 2rem; }
 h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
 p { color: var(--text-secondary); margin-bottom: 1rem; }
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.text-secondary { color: var(--text-secondary); }
 
 /* Forms & Inputs */
 .input-group {

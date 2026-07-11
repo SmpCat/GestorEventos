@@ -83,18 +83,11 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
       where: { eventId_days: { eventId, days: daysAttending } }
     });
 
-    // Si no hay regla exacta, buscar la mayor inferior o dejar a 0 (el admin puede ajustar luego)
-    let expectedPayment = 0;
-    if (rule) {
-      expectedPayment = rule.price;
-    } else {
-      // Intento heurístico: si no hay regla de N días, coger la máxima disponible
-      const maxRule = await prisma.pricingRule.findFirst({
-        where: { eventId },
-        orderBy: { days: 'desc' }
-      });
-      if (maxRule) expectedPayment = maxRule.price;
+    if (!rule) {
+      return { success: false, error: `No hay una tarifa configurada para ${daysAttending} días. Por favor, revisa los días o contacta al administrador.` };
     }
+
+    const expectedPayment = rule.price;
 
     const attendee = await prisma.eventAttendee.create({
       data: {

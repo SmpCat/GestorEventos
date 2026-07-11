@@ -94,8 +94,8 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
             />
           </div>
 
-          <div className="flex gap-4">
-            <div className="input-group w-full">
+          <div className="flex mobile-col gap-4">
+            <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Usuario *</label>
               <input 
                 type="text" 
@@ -105,7 +105,7 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
                 onChange={e => setFormData({...formData, username: e.target.value})}
               />
             </div>
-            <div className="input-group w-full">
+            <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Contraseña {user ? '(Dejar vacía para no cambiar)' : '*'}</label>
               <input 
                 type="password" 
@@ -117,8 +117,8 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <div className="input-group w-full">
+          <div className="flex mobile-col gap-4">
+            <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Email (Opcional)</label>
               <input 
                 type="email" 
@@ -128,7 +128,7 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
                 onChange={e => setFormData({...formData, email: e.target.value})}
               />
             </div>
-            <div className="input-group w-full">
+            <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Teléfono (Opcional)</label>
               <input 
                 type="text" 
@@ -150,14 +150,14 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
               />
               Otorgar permisos de Administrador
             </label>
-            <p style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>Los administradores pueden gestionar eventos y facturas de todos.</p>
+            <p className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>Los administradores pueden gestionar eventos y facturas de todos.</p>
           </div>
 
-          <div className="flex justify-end gap-2 mt-6">
-            <button type="button" onClick={onClose} className="btn btn-secondary">Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
+          <div className="flex mobile-col justify-end gap-3 mt-6">
+            <button type="submit" className="btn btn-primary mobile-w-full" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Usuario'}
             </button>
+            <button type="button" onClick={onClose} className="btn btn-secondary mobile-w-full">Cancelar</button>
           </div>
         </form>
       </div>

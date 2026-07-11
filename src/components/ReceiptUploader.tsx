@@ -141,7 +141,7 @@ export default function ReceiptUploader() {
             </div>
 
             <div className="p-4 bg-black/20">
-              <button onClick={confirmReceipt} className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all hover:scale-[1.02]">
+              <button onClick={confirmReceipt} className="btn btn-primary mobile-w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all hover:scale-[1.02]">
                 Confirmar y Guardar Gasto
               </button>
             </div>

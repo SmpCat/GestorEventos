@@ -95,12 +95,12 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
 
       {isAdmin && (
         <div className="flex mobile-col gap-4">
-          <button onClick={handleAddRule} className="btn btn-secondary flex-1 py-3">
+          <button onClick={handleAddRule} className="btn btn-secondary mobile-w-full py-3">
             + Añadir Regla de Precio
           </button>
           <button 
             onClick={handleSaveRules} 
-            className={`btn flex-1 py-3 ${hasChanges ? 'btn-primary' : 'btn-secondary'}`} 
+            className={`btn mobile-w-full py-3 ${hasChanges ? 'btn-primary' : 'btn-secondary'}`} 
             style={{ opacity: hasChanges ? 1 : 0.5 }}
             disabled={loading || !hasChanges}
           >

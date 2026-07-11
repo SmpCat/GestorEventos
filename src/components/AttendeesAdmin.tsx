@@ -94,11 +94,11 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         value={editComment}
                         onChange={e => setEditComment(e.target.value)}
                       />
-                      <div className="flex gap-2 mt-1">
-                        <button onClick={() => saveAttendee(att.id)} className="btn btn-primary flex-1 py-1.5 text-sm" disabled={isProcessing}>
+                      <div className="flex mobile-col gap-2 mt-1">
+                        <button onClick={() => saveAttendee(att.id)} className="btn btn-primary mobile-w-full py-1.5 text-sm" disabled={isProcessing}>
                           {isProcessing ? '...' : '💾 Guardar'}
                         </button>
-                        <button onClick={() => setEditingAttendee(null)} className="btn btn-secondary flex-1 py-1.5 text-sm">
+                        <button onClick={() => setEditingAttendee(null)} className="btn btn-secondary mobile-w-full py-1.5 text-sm">
                           Cancelar
                         </button>
                       </div>
@@ -114,8 +114,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
           </div>
 
           {/* VISTA ESCRITORIO (Tabla original) */}
-          <div className="mobile-hide overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="table-wrapper mobile-hide">
+            <table className="table">
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                   <th className="pb-3 px-2">Usuario</th>
@@ -183,9 +183,9 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               value={editComment}
                               onChange={e => setEditComment(e.target.value)}
                             />
-                            <div className="flex gap-2">
-                              <button onClick={() => setEditingAttendee(null)} className="btn btn-secondary flex-1 py-1 text-xs">Cancelar</button>
-                              <button onClick={() => saveAttendee(att.id)} className="btn btn-primary flex-1 py-1 text-xs" disabled={isProcessing}>
+                            <div className="flex mobile-col gap-2">
+                              <button onClick={() => setEditingAttendee(null)} className="btn btn-secondary mobile-w-full py-1 text-xs">Cancelar</button>
+                              <button onClick={() => saveAttendee(att.id)} className="btn btn-primary mobile-w-full py-1 text-xs" disabled={isProcessing}>
                                 Guardar
                               </button>
                             </div>

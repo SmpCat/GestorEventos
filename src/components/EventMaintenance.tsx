@@ -54,11 +54,11 @@ export default function EventMaintenance({ events }: { events: any[] }) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Mantenimiento</h1>
-          <p className="text-secondary">Gestión de Eventos / Viajes</p>
+          <h1>Mantenimiento</h1>
+          <p className="subtitle">Gestión de Eventos / Viajes</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
-          <button onClick={handleCreate} className="btn btn-primary" style={{ padding: '0.6rem 1.2rem' }}>
+          <button onClick={handleCreate} className="btn btn-primary mobile-w-full">
             + Añadir Evento
           </button>
         </div>
@@ -102,12 +102,12 @@ export default function EventMaintenance({ events }: { events: any[] }) {
                 </div>
               </div>
 
-              <div className="flex gap-2 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="flex mobile-col gap-2 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 {!event.isActive && (
                   <button 
                     onClick={() => handleActivate(event.id, event.name)} 
-                    className="btn btn-primary w-full" 
-                    style={{ padding: '0.5rem', fontSize: '0.875rem', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', border: '1px solid #10b981' }}
+                    className="btn btn-primary mobile-w-full" 
+                    style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', border: '1px solid #10b981' }}
                     disabled={actionLoading !== null}
                   >
                     {actionLoading === `activate-${event.id}` ? 'Activando...' : 'Hacer Operativo'}
@@ -116,8 +116,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
                 
                 <button 
                   onClick={() => handleEdit(event)} 
-                  className="btn btn-secondary w-full" 
-                  style={{ padding: '0.5rem', fontSize: '0.875rem' }}
+                  className="btn btn-secondary mobile-w-full" 
                   disabled={actionLoading !== null}
                 >
                   Editar
@@ -125,8 +124,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
                 
                 <button 
                   onClick={() => handleDelete(event.id, event.name, event.isActive)} 
-                  className="btn btn-danger" 
-                  style={{ padding: '0.4rem', fontSize: '0.875rem' }}
+                  className="btn btn-danger mobile-w-full" 
                   title="Borrar"
                   disabled={event.isActive || actionLoading !== null}
                 >

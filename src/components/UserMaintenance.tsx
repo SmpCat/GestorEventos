@@ -30,11 +30,11 @@ export default function UserMaintenance({ users }: { users: any[] }) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Mantenimiento</h1>
-          <p className="text-secondary">Gestión de Usuarios del Sistema</p>
+          <h1>Mantenimiento</h1>
+          <p className="subtitle">Gestión de Usuarios del Sistema</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
-          <button onClick={handleCreate} className="btn btn-primary" style={{ padding: '0.6rem 1.2rem' }}>
+          <button onClick={handleCreate} className="btn btn-primary mobile-w-full">
             + Añadir Usuario
           </button>
         </div>
@@ -81,10 +81,10 @@ export default function UserMaintenance({ users }: { users: any[] }) {
                       )}
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <button onClick={() => handleEdit(user)} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', marginRight: '0.5rem', fontSize: '0.875rem' }}>
+                      <button onClick={() => handleEdit(user)} className="btn btn-secondary" style={{ marginRight: '0.5rem' }}>
                         Editar
                       </button>
-                      <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger" style={{ padding: '0.4rem', fontSize: '0.875rem' }} title="Borrar">
+                      <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger" title="Borrar">
                         <TrashIcon />
                       </button>
                     </td>
