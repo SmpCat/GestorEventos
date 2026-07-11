@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { addShoppingItem, togglePurchased, assignItem, deleteItem, scanShoppingListAI, deleteShoppingListEvidence } from '@/actions/shopping';
 import TrashIcon from './TrashIcon';
 
 export default function ShoppingList({ items, evidences, eventId, users, currentUser }: { items: any[], evidences?: any[], eventId: string, users: any[], currentUser: any }) {
+  const router = useRouter();
   const [newItemName, setNewItemName] = useState('');
   const [loading, setLoading] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pending' | 'purchased'>('pending');
@@ -19,6 +21,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     if (!newItemName.trim()) return;
     setLoading('add');
     await addShoppingItem(eventId, newItemName);
+    router.refresh();
     setNewItemName('');
     setLoading(null);
   };
@@ -31,6 +34,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     if (window.confirm(msg)) {
       setLoading(`toggle-${itemId}`);
       await togglePurchased(itemId, !currentStatus);
+      router.refresh();
       setLoading(null);
     }
   };
@@ -38,6 +42,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
   const handleAssign = async (itemId: string, userId: string) => {
     setLoading(`assign-${itemId}`);
     await assignItem(itemId, userId === 'UNASSIGN' ? null : userId);
+    router.refresh();
     setLoading(null);
   };
 
@@ -45,6 +50,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     if (window.confirm('¿Seguro que quieres borrar esto de la lista?')) {
       setLoading(`delete-${itemId}`);
       await deleteItem(itemId);
+      router.refresh();
       setLoading(null);
     }
   };
@@ -53,6 +59,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     if (window.confirm('¿Seguro que quieres borrar esta foto? Se eliminará definitivamente.')) {
       setLoading(`delete-ev-${evidenceId}`);
       await deleteShoppingListEvidence(evidenceId);
+      router.refresh();
       setLoading(null);
     }
   };
