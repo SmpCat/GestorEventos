@@ -52,7 +52,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between md:items-center mb-12 gap-4">
         <div>
           <h1>Mantenimiento</h1>
           <p className="subtitle">Gestión de Eventos / Viajes</p>
@@ -64,7 +64,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
         </div>
       </div>
 
-      <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+      <div className="grid gap-12" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         {events.length === 0 ? (
           <div className="glass-panel text-center col-span-full py-8">
             <p className="text-secondary">No hay eventos creados. Pulsa en Añadir Evento para empezar.</p>
@@ -75,21 +75,13 @@ export default function EventMaintenance({ events }: { events: any[] }) {
               key={event.id} 
               className="glass-panel relative overflow-hidden flex flex-col justify-between"
               style={{
-                borderColor: event.isActive ? 'var(--accent-success)' : 'var(--accent-danger)',
-                boxShadow: event.isActive ? '0 0 15px rgba(16, 185, 129, 0.2)' : '0 0 15px rgba(239, 68, 68, 0.15)',
-                background: event.isActive ? '' : 'rgba(128, 128, 128, 0.15)',
-                opacity: event.isActive ? 1 : 0.65,
-                filter: event.isActive ? 'none' : 'grayscale(60%)',
+                border: '1px solid rgba(255, 255, 255, 0.8)',
+                boxShadow: 'none',
+                background: event.isActive ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.1)',
                 transform: event.isActive ? 'scale(1.02)' : 'scale(1)',
                 transition: 'all 0.3s ease',
               }}
             >
-              {/* Barra superior de color (Verde para activo, Roja para inactivo) */}
-              <div style={{ 
-                position: 'absolute', top: 0, left: 0, right: 0, height: '4px', 
-                background: event.isActive ? 'var(--accent-success)' : 'var(--accent-danger)' 
-              }} />
-
               <div>
                 <div className="flex justify-between items-start mb-2">
                   <h3 style={{ margin: 0, fontSize: '1.25rem', color: event.isActive ? 'var(--accent-success)' : 'inherit' }}>
