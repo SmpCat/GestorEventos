@@ -91,8 +91,8 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="input-group flex-1">
+          <div className="flex mobile-col gap-4">
+            <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Fecha de Inicio (Opcional)</label>
               <input 
                 type="date" 
@@ -102,7 +102,7 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
                 style={{ colorScheme: 'dark' }}
               />
             </div>
-            <div className="input-group flex-1">
+            <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Fecha de Fin (Opcional)</label>
               <input 
                 type="date" 
@@ -114,11 +114,11 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 mt-6">
-            <button type="button" onClick={onClose} className="btn btn-secondary">Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
+          <div className="flex mobile-col justify-end gap-3 mt-6">
+            <button type="submit" className="btn btn-primary mobile-w-full" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Evento'}
             </button>
+            <button type="button" onClick={onClose} className="btn btn-secondary mobile-w-full">Cancelar</button>
           </div>
         </form>
       </div>
