@@ -75,14 +75,15 @@ export default function EventMaintenance({ events }: { events: any[] }) {
               key={event.id} 
               className="glass-panel relative overflow-hidden flex flex-col justify-between"
               style={{
-                borderColor: event.isActive ? 'var(--accent-success)' : 'rgba(255, 255, 255, 0.1)',
-                boxShadow: event.isActive ? '0 0 15px rgba(16, 185, 129, 0.2)' : 'none',
+                borderColor: event.isActive ? 'var(--accent-success)' : 'var(--accent-danger)',
+                boxShadow: event.isActive ? '0 0 15px rgba(16, 185, 129, 0.2)' : '0 0 15px rgba(239, 68, 68, 0.15)',
               }}
             >
-              {/* Barra verde superior para el activo */}
-              {event.isActive && (
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--accent-success)' }} />
-              )}
+              {/* Barra superior de color (Verde para activo, Roja para inactivo) */}
+              <div style={{ 
+                position: 'absolute', top: 0, left: 0, right: 0, height: '4px', 
+                background: event.isActive ? 'var(--accent-success)' : 'var(--accent-danger)' 
+              }} />
 
               <div>
                 <div className="flex justify-between items-start mb-2">
