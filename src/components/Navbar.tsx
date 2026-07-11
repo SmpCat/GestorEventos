@@ -12,8 +12,8 @@ export default function Navbar({ session }: { session: any }) {
   const isDashboard = pathname === '/';
 
   return (
-    <nav className="sticky top-0 z-50 pt-4 px-4 max-w-[1200px] mx-auto w-full mb-2">
-      <div className="flex justify-between items-center bg-black/30 p-4 rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
+    <nav className="sticky top-0 z-50 pt-4 px-4 max-w-[1200px] mx-auto w-full mb-4">
+      <div className="flex justify-between items-center bg-black/30 p-5 rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
         
         {isDashboard ? (
            <div className="flex items-center gap-3">
@@ -34,7 +34,7 @@ export default function Navbar({ session }: { session: any }) {
               await logout();
             }}
             className="btn btn-danger"
-            style={{ padding: '0.4rem 0.8rem', fontSize: '0.875rem', fontWeight: 'bold' }}
+            style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', fontWeight: 'bold' }}
           >
             Salir
           </button>
@@ -42,7 +42,7 @@ export default function Navbar({ session }: { session: any }) {
           <button 
             onClick={() => router.push('/')}
             className="btn btn-secondary"
-            style={{ padding: '0.4rem 0.8rem', fontSize: '0.875rem', fontWeight: 'bold' }}
+            style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', fontWeight: 'bold' }}
           >
             Volver
           </button>
