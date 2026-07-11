@@ -64,7 +64,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
         </div>
       </div>
 
-      <div className="grid" style={{ gap: '2rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+      <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         {events.length === 0 ? (
           <div className="glass-panel text-center col-span-full py-8">
             <p className="text-secondary">No hay eventos creados. Pulsa en Añadir Evento para empezar.</p>
