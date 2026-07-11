@@ -24,9 +24,15 @@ export default function ShoppingList({ items, evidences, eventId, users, current
   };
 
   const handleToggle = async (itemId: string, currentStatus: boolean) => {
-    setLoading(`toggle-${itemId}`);
-    await togglePurchased(itemId, !currentStatus);
-    setLoading(null);
+    const msg = currentStatus 
+      ? '¿Devolver este artículo a la lista de pendientes?' 
+      : '¿Marcar este artículo como comprado?';
+      
+    if (window.confirm(msg)) {
+      setLoading(`toggle-${itemId}`);
+      await togglePurchased(itemId, !currentStatus);
+      setLoading(null);
+    }
   };
 
   const handleAssign = async (itemId: string, userId: string) => {
