@@ -5,8 +5,10 @@ import Link from 'next/link';
 import EventFormModal from './EventFormModal';
 import TrashIcon from './TrashIcon';
 import { deleteEvent, setActiveEvent } from '@/actions/events';
+import { useRouter } from 'next/navigation';
 
 export default function EventMaintenance({ events }: { events: any[] }) {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -30,7 +32,11 @@ export default function EventMaintenance({ events }: { events: any[] }) {
     if (window.confirm(`¿Estás seguro de que deseas eliminar el evento "${name}"? Se perderán todos sus gastos asociados.`)) {
       setActionLoading(`delete-${id}`);
       const res = await deleteEvent(id);
-      if (!res.success) alert(res.error);
+      if (!res.success) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
       setActionLoading(null);
     }
   };
@@ -39,7 +45,11 @@ export default function EventMaintenance({ events }: { events: any[] }) {
     if (window.confirm(`¿Quieres marcar "${name}" como el Evento Operativo? Todos los demás eventos pasarán a estar inactivos.`)) {
       setActionLoading(`activate-${id}`);
       const res = await setActiveEvent(id);
-      if (!res.success) alert(res.error);
+      if (!res.success) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
       setActionLoading(null);
     }
   };
