@@ -91,8 +91,8 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
             />
           </div>
 
-          <div className="flex gap-4">
-            <div className="input-group w-full">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="input-group flex-1">
               <label className="input-label">Fecha de Inicio (Opcional)</label>
               <input 
                 type="date" 
@@ -102,7 +102,7 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
                 style={{ colorScheme: 'dark' }}
               />
             </div>
-            <div className="input-group w-full">
+            <div className="input-group flex-1">
               <label className="input-label">Fecha de Fin (Opcional)</label>
               <input 
                 type="date" 
