@@ -14,7 +14,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
       <div 
         className="glass-panel text-center relative overflow-hidden" 
         style={{ 
-          padding: '4rem 2rem', 
+          padding: '2.5rem 1rem', 
           borderColor: 'rgba(255,255,255,0.1)', 
           boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
           backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%), url('/images/fiestas-valdeganga.jpg')`,
@@ -23,7 +23,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
           borderRadius: '1.5rem'
         }}
       >
-        <h2 className="relative z-10" style={{ fontSize: '3.5rem', color: '#fff', margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.8)', fontWeight: '800', letterSpacing: '-1px' }}>
+        <h2 className="relative z-10" style={{ fontSize: '2.8rem', color: '#fff', margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.8)', fontWeight: '800', letterSpacing: '-1px' }}>
           {activeEvent ? activeEvent.name : 'Ningún evento activo'}
         </h2>
 
@@ -40,9 +40,9 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
         )}
       </div>
 
-      <div className="grid gap-4 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+      <div className="grid mt-2" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         
-        <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes</h3>
             <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver y editar pagos</p>
@@ -50,7 +50,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
           <div style={{ fontSize: '2rem' }}>👥</div>
         </Link>
 
-        <Link href="/pricing/rules" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link href="/pricing/rules" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h3>
             <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Reglas de precios</p>
@@ -58,7 +58,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
           <div style={{ fontSize: '2rem' }}>⚙️</div>
         </Link>
 
-        <Link href="/pricing/results" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link href="/pricing/results" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
             <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Resumen financiero</p>
@@ -66,7 +66,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
           <div style={{ fontSize: '2rem' }}>📈</div>
         </Link>
 
-        <Link href="/shopping" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link href="/shopping" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
             <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Qué falta por comprar</p>
@@ -76,7 +76,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
         {/* Gastos */}
         {activeEvent ? (
-          <Link href="/expenses" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link href="/expenses" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
             <div>
               <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gastos Registrados</h3>
               <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver listado y añadir tickets</p>
@@ -84,7 +84,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
             <div style={{ fontSize: '2rem' }}>📸</div>
           </Link>
         ) : (
-          <div className="glass-panel flex items-center justify-between p-6" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+          <div className="glass-panel flex items-center justify-between p-6" style={{ opacity: 0.5, cursor: 'not-allowed', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
             <div>
               <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Añadir Gasto</h3>
               <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Requiere evento activo</p>
