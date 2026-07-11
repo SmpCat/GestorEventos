@@ -60,7 +60,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
         <Link href="/pricing/results" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Cuenta de Resultados</h3>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
             <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Resumen financiero</p>
           </div>
           <div style={{ fontSize: '2rem' }}>📈</div>
