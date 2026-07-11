@@ -70,13 +70,14 @@ export default function EventMaintenance({ events }: { events: any[] }) {
             <p className="text-secondary">No hay eventos creados. Pulsa en Añadir Evento para empezar.</p>
           </div>
         ) : (
-          events.map(event => (
+          [...events].sort((a, b) => (a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1)).map(event => (
             <div 
               key={event.id} 
               className="glass-panel relative overflow-hidden flex flex-col justify-between"
               style={{
                 borderColor: event.isActive ? 'var(--accent-success)' : 'var(--accent-danger)',
                 boxShadow: event.isActive ? '0 0 15px rgba(16, 185, 129, 0.2)' : '0 0 15px rgba(239, 68, 68, 0.15)',
+                backgroundColor: event.isActive ? '' : 'rgba(100, 116, 139, 0.2)',
                 opacity: event.isActive ? 1 : 0.65,
                 filter: event.isActive ? 'none' : 'grayscale(60%)',
                 transform: event.isActive ? 'scale(1.02)' : 'scale(1)',
