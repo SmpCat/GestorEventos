@@ -77,6 +77,10 @@ export default function EventMaintenance({ events }: { events: any[] }) {
               style={{
                 borderColor: event.isActive ? 'var(--accent-success)' : 'var(--accent-danger)',
                 boxShadow: event.isActive ? '0 0 15px rgba(16, 185, 129, 0.2)' : '0 0 15px rgba(239, 68, 68, 0.15)',
+                opacity: event.isActive ? 1 : 0.65,
+                filter: event.isActive ? 'none' : 'grayscale(60%)',
+                transform: event.isActive ? 'scale(1.02)' : 'scale(1)',
+                transition: 'all 0.3s ease',
               }}
             >
               {/* Barra superior de color (Verde para activo, Roja para inactivo) */}
