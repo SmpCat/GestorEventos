@@ -94,23 +94,33 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
           <div className="flex mobile-col gap-4">
             <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Fecha de Inicio (Opcional)</label>
-              <input 
-                type="date" 
-                className="input-field" 
-                value={formData.startDate}
-                onChange={e => setFormData({...formData, startDate: e.target.value})}
-                style={{ colorScheme: 'dark' }}
-              />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input 
+                  type="date" 
+                  className="input-field" 
+                  value={formData.startDate}
+                  onChange={e => setFormData({...formData, startDate: e.target.value})}
+                  style={{ colorScheme: 'dark', flex: 1 }}
+                />
+                {formData.startDate && (
+                  <button type="button" onClick={() => setFormData({...formData, startDate: ''})} className="btn btn-secondary" style={{ padding: '0 0.75rem' }} title="Borrar fecha">✕</button>
+                )}
+              </div>
             </div>
             <div className="input-group" style={{ flex: 1 }}>
               <label className="input-label">Fecha de Fin (Opcional)</label>
-              <input 
-                type="date" 
-                className="input-field" 
-                value={formData.endDate}
-                onChange={e => setFormData({...formData, endDate: e.target.value})}
-                style={{ colorScheme: 'dark' }}
-              />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input 
+                  type="date" 
+                  className="input-field" 
+                  value={formData.endDate}
+                  onChange={e => setFormData({...formData, endDate: e.target.value})}
+                  style={{ colorScheme: 'dark', flex: 1 }}
+                />
+                {formData.endDate && (
+                  <button type="button" onClick={() => setFormData({...formData, endDate: ''})} className="btn btn-secondary" style={{ padding: '0 0.75rem' }} title="Borrar fecha">✕</button>
+                )}
+              </div>
             </div>
           </div>
 
