@@ -2,6 +2,7 @@ import { getSession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getAttendees } from '@/actions/attendance';
+import { getActiveEventCached } from '@/lib/cache';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -14,9 +15,7 @@ export default async function ResultsPage() {
   }
 
   // Buscar Evento Activo
-  const activeEvent = await prisma.event.findFirst({
-    where: { isActive: true }
-  });
+  const activeEvent = await getActiveEventCached();
 
   if (!activeEvent) {
     return (

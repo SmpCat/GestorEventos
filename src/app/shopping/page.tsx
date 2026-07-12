@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ShoppingList from '@/components/ShoppingList';
 import { getShoppingList, getShoppingListEvidences } from '@/actions/shopping';
+import { getActiveEventCached } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,10 +14,8 @@ export default async function ShoppingPage() {
     redirect('/');
   }
 
-  // Buscar Evento Activo
-  const activeEvent = await prisma.event.findFirst({
-    where: { isActive: true }
-  });
+  // Comprobar evento activo
+  const activeEvent = await getActiveEventCached();
 
   if (!activeEvent) {
     return (

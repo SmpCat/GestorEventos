@@ -4,6 +4,8 @@ import LoginForm from '@/components/LoginForm';
 import Dashboard from '@/components/Dashboard';
 import JoinEventBanner from '@/components/JoinEventBanner';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getActiveEventCached } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,29 +16,26 @@ export default async function Home() {
     return <LoginForm />;
   }
 
-  // Buscar Evento Activo
-  let activeEvent = null;
+  const activeEvent = await getActiveEventCached();
+
   let attendee = null;
   let pricingRules: any[] = [];
 
   try {
-    activeEvent = await prisma.event.findFirst({
-      where: { isActive: true }
-    });
-
     if (activeEvent) {
-      // Comprobar si el usuario está apuntado
-      attendee = await prisma.eventAttendee.findUnique({
-        where: { userId_eventId: { userId: session.id, eventId: activeEvent.id } }
-      });
-
-      // Si no está apuntado, cargar las tarifas para el Banner
-      if (!attendee) {
-        pricingRules = await prisma.pricingRule.findMany({
+      // Usamos Promise.all para cargar en paralelo si el usuario no tiene caché
+      const [attendeeRes, rulesRes] = await Promise.all([
+        prisma.eventAttendee.findUnique({
+          where: { userId_eventId: { userId: session.id, eventId: activeEvent.id } }
+        }),
+        prisma.pricingRule.findMany({
           where: { eventId: activeEvent.id },
           orderBy: { days: 'asc' }
-        });
-      }
+        })
+      ]);
+      
+      attendee = attendeeRes;
+      pricingRules = rulesRes;
     }
   } catch (error) {
     console.error("Error obteniendo datos del dashboard", error);

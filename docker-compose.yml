@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  gestor-eventos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gestoreventos_prod
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./public/uploads:/app/public/uploads
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/prod.db
+      - NEXT_PUBLIC_BASE_URL=https://eventos-smp.duckdns.org
+      - JWT_SECRET=cambia_esta_clave_por_una_super_segura_para_el_nas
+    # Redirigimos el contenedor a la red del proxy maestro
+    networks:
+      - proxy_network
+
+# --------------------------------------------------------
+# CONEXIÓN A RED EXTERNA (Core-Proxy)
+# --------------------------------------------------------
+networks:
+  proxy_network:
+    external: true

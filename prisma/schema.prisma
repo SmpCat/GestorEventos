@@ -70,6 +70,8 @@ model EventAttendee {
 
   // Un usuario solo puede asistir una vez a un mismo evento
   @@unique([userId, eventId])
+  @@index([eventId])
+  @@index([userId])
 
   // Pagos realizados por el asistente
   payments      Payment[]
@@ -82,6 +84,8 @@ model Payment {
   
   attendeeId  String
   attendee    EventAttendee @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+
+  @@index([attendeeId])
 }
 
 model PricingRule {
@@ -94,6 +98,7 @@ model PricingRule {
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([eventId, days])
+  @@index([eventId])
 }
 
 model ShoppingListItem {
@@ -115,6 +120,9 @@ model ShoppingListItem {
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([assigneeId])
 }
 
 model ShoppingListEvidence {
@@ -125,6 +133,8 @@ model ShoppingListEvidence {
   // Relaciones
   eventId   String
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
 }
 
 model Expense {
@@ -146,6 +156,9 @@ model Expense {
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([purchaserId])
 }
 
 model ExpenseImage {
@@ -153,6 +166,8 @@ model ExpenseImage {
   url       String   // Ruta de la imagen (o varias si el ticket es largo)
   expenseId String
   expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@index([expenseId])
 }
 
 model ExpenseItem {
@@ -165,4 +180,6 @@ model ExpenseItem {
   
   // Relación inversa con la lista de la compra
   shoppingListItem ShoppingListItem?
+
+  @@index([expenseId])
 }

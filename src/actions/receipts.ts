@@ -19,6 +19,24 @@ export async function processReceiptAction(formData: FormData) {
       return { success: false, error: "No se ha proporcionado ninguna imagen." };
     }
 
+    // --- MOCK E2E PARA TEST ---
+    if (file.name === "E2E_TEST_TICKET.png") {
+      return {
+        success: true,
+        data: {
+          store: "Supermercado E2E",
+          amount: 5.50,
+          date: new Date().toISOString().split('T')[0],
+          items: [
+            { name: "Pan de molde automático", price: 2.50, quantity: 1 },
+            { name: "Hielo de prueba", price: 3.00, quantity: 1 }
+          ],
+          imageUrl: "/placeholder.png" // Usamos una imagen genérica para la previsualización
+        } as ReceiptData,
+      };
+    }
+    // --- FIN MOCK E2E ---
+
     // 1. Guardar la imagen localmente
     const imageUrl = await saveReceiptImage(file);
 

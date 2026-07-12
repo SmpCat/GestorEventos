@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getPricingRules } from '@/actions/attendance';
 import Link from 'next/link';
 import RulesAdmin from '@/components/RulesAdmin';
+import { getActiveEventCached } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +16,7 @@ export default async function RulesPage() {
   }
 
   // Buscar Evento Activo
-  const activeEvent = await prisma.event.findFirst({
-    where: { isActive: true }
-  });
+  const activeEvent = await getActiveEventCached();
 
   if (!activeEvent) {
     return (

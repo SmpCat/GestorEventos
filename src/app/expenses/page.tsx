@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import ExpenseList from '@/components/ExpenseList';
+import { getActiveEventCached } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,9 +15,7 @@ export default async function ExpensesPage() {
   }
 
   // Buscar Evento Activo
-  const activeEvent = await prisma.event.findFirst({
-    where: { isActive: true }
-  });
+  const activeEvent = await getActiveEventCached();
 
   if (!activeEvent) {
     return (

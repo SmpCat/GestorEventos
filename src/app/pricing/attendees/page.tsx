@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getAttendees } from '@/actions/attendance';
 import Link from 'next/link';
 import AttendeesAdmin from '@/components/AttendeesAdmin';
+import { getActiveEventCached } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,10 +15,8 @@ export default async function AttendeesPage() {
     redirect('/');
   }
 
-  // Buscar Evento Activo
-  const activeEvent = await prisma.event.findFirst({
-    where: { isActive: true }
-  });
+  // Buscar Evento Activo usando caché
+  const activeEvent = await getActiveEventCached();
 
   if (!activeEvent) {
     return (

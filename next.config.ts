@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '20mb',
     },
   },
+  output: 'standalone',
   turbopack: {},
 };
 
