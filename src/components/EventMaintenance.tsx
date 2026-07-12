@@ -7,7 +7,7 @@ import TrashIcon from './TrashIcon';
 import { deleteEvent, setActiveEvent } from '@/actions/events';
 import { useRouter } from 'next/navigation';
 
-export default function EventMaintenance({ events }: { events: any[] }) {
+export default function EventMaintenance({ events, session }: { events: any[], session: any }) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
@@ -33,8 +33,9 @@ export default function EventMaintenance({ events }: { events: any[] }) {
       setActionLoading(`delete-${id}`);
       const res = await deleteEvent(id);
       if (!res.success) {
-        alert(res.error);
+        alert(res.error || 'Error al eliminar evento.');
       } else {
+        alert(`Evento "${name}" eliminado correctamente.`);
         router.refresh();
       }
       setActionLoading(null);
@@ -46,8 +47,9 @@ export default function EventMaintenance({ events }: { events: any[] }) {
       setActionLoading(`activate-${id}`);
       const res = await setActiveEvent(id);
       if (!res.success) {
-        alert(res.error);
+        alert(res.error || 'Error al activar evento.');
       } else {
+        alert(`Evento "${name}" marcado como operativo.`);
         router.refresh();
       }
       setActionLoading(null);
@@ -147,6 +149,7 @@ export default function EventMaintenance({ events }: { events: any[] }) {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         event={editingEvent} 
+        session={session}
         onSaved={() => {}}
       />
     </div>

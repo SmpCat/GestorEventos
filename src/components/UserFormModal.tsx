@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createUser, updateUser } from '@/actions/users';
 
-export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOpen: boolean, onClose: () => void, user?: any, onSaved: () => void }) {
+export default function UserFormModal({ isOpen, onClose, user, onSaved, session }: { isOpen: boolean, onClose: () => void, user?: any, onSaved: () => void, session?: any }) {
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -14,7 +14,6 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
   });
   
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -36,7 +35,6 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
         isAdmin: false
       });
     }
-    setError('');
   }, [user, isOpen]);
 
   if (!isOpen) return null;
@@ -44,17 +42,16 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     // Validación básica
     if (!formData.name || !formData.username) {
-      setError('Nombre y Usuario son obligatorios.');
+      alert('Nombre y Usuario son obligatorios.');
       setLoading(false);
       return;
     }
     
     if (!user && !formData.password) {
-      setError('La contraseña es obligatoria para nuevos usuarios.');
+      alert('La contraseña es obligatoria para nuevos usuarios.');
       setLoading(false);
       return;
     }
@@ -64,23 +61,35 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
       : await createUser(formData);
 
     if (res.success) {
+      alert(user ? 'Usuario actualizado correctamente.' : 'Usuario creado correctamente.');
       onSaved();
       onClose();
     } else {
-      setError(res.error || 'Ocurrió un error inesperado.');
+      alert(res.error || 'Ocurrió un error inesperado.');
     }
     setLoading(false);
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="glass-panel modal-content">
-        <div className="flex justify-between items-center mb-4">
-          <h2>{user ? 'Editar Usuario' : 'Nuevo Usuario'}</h2>
-          <button onClick={onClose} className="btn btn-secondary" style={{ padding: '0.25rem 0.75rem' }}>✕</button>
+    <div className="modal-overlay" style={{ paddingBottom: '2rem', flexDirection: 'column' }}>
+      
+      {/* Banner extraído fuera del panel para que ocupe el mismo ancho que el Navbar */}
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: '0.25rem', paddingBottom: '0.25rem', width: '100%', maxWidth: '1200px', margin: '0 auto', flexShrink: 0 }}>
+        <div className="flex justify-between items-center rounded-xl" style={{ padding: '0.25rem 1rem', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+           <div className="flex items-center gap-3">
+             <div className="bg-black/30 p-1 px-2 rounded-full border border-white/5 text-xl flex items-center justify-center opacity-70">👤</div>
+             <div>
+               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{session?.name || 'Admin'}</p>
+               <p style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>@{session?.username || 'admin'}</p>
+             </div>
+           </div>
+           <button type="button" onClick={onClose} className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.9rem', fontWeight: 'bold' }}>
+             Volver
+           </button>
         </div>
-        
-        {error && <p style={{ color: 'var(--accent-danger)', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</p>}
+      </div>
+
+      <div className="glass-panel modal-content" style={{ paddingBottom: '2rem', marginTop: '1rem' }}>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="input-group">
@@ -153,11 +162,10 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved }: { isOp
             <p className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>Los administradores pueden gestionar eventos y facturas de todos.</p>
           </div>
 
-          <div className="flex mobile-col justify-end gap-3 mt-6">
-            <button type="submit" className="btn btn-primary mobile-w-full" disabled={loading}>
+          <div className="flex mobile-col justify-end gap-3 mt-2">
+            <button type="submit" className="btn btn-primary mobile-w-full py-3 text-lg" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Usuario'}
             </button>
-            <button type="button" onClick={onClose} className="btn btn-secondary mobile-w-full">Cancelar</button>
           </div>
         </form>
       </div>

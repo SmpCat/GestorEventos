@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createEvent, updateEvent } from '@/actions/events';
 
-export default function EventFormModal({ isOpen, onClose, event, onSaved }: { isOpen: boolean, onClose: () => void, event?: any, onSaved: () => void }) {
+export default function EventFormModal({ isOpen, onClose, event, onSaved, session }: { isOpen: boolean, onClose: () => void, event?: any, onSaved: () => void, session?: any }) {
   const [formData, setFormData] = useState({
     name: '',
     startDate: '',
@@ -11,7 +11,6 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
   });
   
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   // Helper to format Date to YYYY-MM-DD for input[type="date"]
   const formatDateForInput = (dateString?: string) => {
@@ -34,7 +33,6 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
         endDate: ''
       });
     }
-    setError('');
   }, [event, isOpen]);
 
   if (!isOpen) return null;
@@ -42,10 +40,9 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     if (!formData.name) {
-      setError('El nombre del evento es obligatorio.');
+      alert('El nombre del evento es obligatorio.');
       setLoading(false);
       return;
     }
@@ -61,23 +58,35 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
       : await createEvent(payload);
 
     if (res.success) {
+      alert(event ? 'Evento actualizado correctamente.' : 'Evento creado correctamente.');
       onSaved();
       onClose();
     } else {
-      setError(res.error || 'Ocurrió un error inesperado.');
+      alert(res.error || 'Ocurrió un error inesperado.');
     }
     setLoading(false);
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="glass-panel modal-content">
-        <div className="flex justify-between items-center mb-4">
-          <h2>{event ? 'Editar Evento' : 'Nuevo Evento'}</h2>
-          <button onClick={onClose} className="btn btn-secondary" style={{ padding: '0.25rem 0.75rem' }}>✕</button>
+    <div className="modal-overlay" style={{ paddingBottom: '2rem', flexDirection: 'column' }}>
+      
+      {/* Banner extraído fuera del panel para que ocupe el mismo ancho que el Navbar */}
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: '0.25rem', paddingBottom: '0.25rem', width: '100%', maxWidth: '1200px', margin: '0 auto', flexShrink: 0 }}>
+        <div className="flex justify-between items-center rounded-xl" style={{ padding: '0.25rem 1rem', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+           <div className="flex items-center gap-3">
+             <div className="bg-black/30 p-1 px-2 rounded-full border border-white/5 text-xl flex items-center justify-center opacity-70">👤</div>
+             <div>
+               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{session?.name || 'Admin'}</p>
+               <p style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>@{session?.username || 'admin'}</p>
+             </div>
+           </div>
+           <button type="button" onClick={onClose} className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.9rem', fontWeight: 'bold' }}>
+             Volver
+           </button>
         </div>
-        
-        {error && <p style={{ color: 'var(--accent-danger)', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</p>}
+      </div>
+
+      <div className="glass-panel modal-content" style={{ paddingBottom: '2rem', marginTop: '1rem' }}>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="input-group">
@@ -124,11 +133,10 @@ export default function EventFormModal({ isOpen, onClose, event, onSaved }: { is
             </div>
           </div>
 
-          <div className="flex mobile-col justify-end gap-3 mt-6">
-            <button type="submit" className="btn btn-primary mobile-w-full" disabled={loading}>
+          <div className="flex mobile-col justify-end gap-3 mt-2">
+            <button type="submit" className="btn btn-primary mobile-w-full py-3 text-lg" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Evento'}
             </button>
-            <button type="button" onClick={onClose} className="btn btn-secondary mobile-w-full">Cancelar</button>
           </div>
         </form>
       </div>

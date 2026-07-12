@@ -35,7 +35,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
     setLoading(true);
     const res = await savePricingRules(eventId, rules);
     if (!res.success) {
-      alert(res.error);
+      alert(res.error || 'Error al guardar las tarifas.');
     } else {
       setSavedRulesJSON(JSON.stringify(rules));
       alert('Tarifas guardadas correctamente.');

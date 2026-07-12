@@ -73,6 +73,17 @@ export async function updateUser(id: string, data: any) {
 // Eliminar un usuario
 export async function deleteUser(id: string) {
   try {
+    // CASO 5: Integridad Financiera - Bloqueo si tiene transacciones
+    const expensesCount = await prisma.expense.count({ where: { purchaserId: id } });
+    if (expensesCount > 0) {
+      return { success: false, error: 'No se puede eliminar al usuario porque tiene tickets de gastos a su nombre. Elimina sus gastos primero.' };
+    }
+
+    const paymentsCount = await prisma.payment.count({ where: { attendee: { userId: id } } });
+    if (paymentsCount > 0) {
+      return { success: false, error: 'No se puede eliminar al usuario porque tiene pagos registrados en el bote. Elimina su historial de pagos primero.' };
+    }
+
     await prisma.user.delete({
       where: { id },
     });

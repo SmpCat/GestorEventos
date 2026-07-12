@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { updateAttendeeAdmin } from '@/actions/attendance';
+import { updateAttendeeAdmin, addPayment, deletePayment } from '@/actions/attendance';
 
 export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[], isAdmin: boolean }) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -10,13 +10,15 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
   const [editingAttendee, setEditingAttendee] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState<number | ''>('');
   const [editComment, setEditComment] = useState('');
-  const [editHasPaid, setEditHasPaid] = useState(false);
+  
+  // Nuevo pago
+  const [newPaymentAmount, setNewPaymentAmount] = useState<number | ''>('');
 
   const startEditing = (att: any) => {
     setEditingAttendee(att.id);
     setEditPrice(att.expectedPayment !== null ? att.expectedPayment : '');
     setEditComment(att.adminComment || '');
-    setEditHasPaid(att.hasPaid);
+    setNewPaymentAmount('');
   };
 
   const saveAttendee = async (attId: string) => {
@@ -25,11 +27,37 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
     }
     setLoading(`att-${attId}`);
     const finalPrice = editPrice === '' ? null : Number(editPrice);
-    const res = await updateAttendeeAdmin(attId, editHasPaid, finalPrice, editComment);
+    const res = await updateAttendeeAdmin(attId, finalPrice, editComment);
     if (res.success) {
+      alert('Cuota guardada correctamente.');
       setEditingAttendee(null);
     } else {
-      alert(res.error);
+      alert(res.error || 'Error al guardar.');
+    }
+    setLoading(null);
+  };
+
+  const handleAddPayment = async (attId: string) => {
+    if (newPaymentAmount === '' || Number(newPaymentAmount) <= 0) return;
+    setLoading(`pay-${attId}`);
+    const res = await addPayment(attId, Number(newPaymentAmount));
+    if (res.success) {
+      alert(`Pago de ${newPaymentAmount}€ registrado.`);
+      setNewPaymentAmount('');
+    } else {
+      alert(res.error || 'Error al añadir pago.');
+    }
+    setLoading(null);
+  };
+
+  const handleDeletePayment = async (paymentId: string) => {
+    if (!window.confirm('¿Borrar este registro de pago?')) return;
+    setLoading(`del-pay-${paymentId}`);
+    const res = await deletePayment(paymentId);
+    if (res.success) {
+      alert('Pago eliminado.');
+    } else {
+      alert(res.error || 'Error al borrar el pago.');
     }
     setLoading(null);
   };
@@ -44,7 +72,11 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
           <div className="desktop-hide flex flex-col gap-4">
             {attendees.map((att: any) => {
               const isEditing = editingAttendee === att.id;
-              const isProcessing = loading === `att-${att.id}`;
+              const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
+              const amountPaid = att.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+              const currentQuota = att.expectedPayment !== null ? att.expectedPayment : 0; 
+              const balance = currentQuota - amountPaid;
+
               return (
                 <div key={`mobile-${att.id}`} className="bg-black/30 p-3 rounded-lg border flex flex-col gap-2" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
                   <div className="flex justify-between items-center">
@@ -57,34 +89,33 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                   </div>
                   
                   {!isEditing ? (
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="bg-black/40 px-2 py-1 rounded"><strong>{att.daysAttending}</strong>d</span>
-                      <span className="bg-black/40 px-2 py-1 rounded" style={{ color: att.adminComment ? 'var(--accent-warning)' : 'inherit' }}>
-                        <strong>{att.expectedPayment !== null ? `${att.expectedPayment}€` : '??€'}</strong>
-                      </span>
-                      <span className={`px-2 py-1 rounded ${att.hasPaid ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'}`} style={{ fontSize: '0.8rem' }}>
-                        {att.hasPaid ? '✅ Pagado' : '❌ Pendiente'}
-                      </span>
+                    <div className="flex flex-col gap-2 text-sm mt-1">
+                      <div className="flex justify-between">
+                        <span className="text-secondary">Cuota Asignada ({att.daysAttending}d):</span>
+                        <span className="font-bold">{att.expectedPayment !== null ? `${att.expectedPayment}€` : '??€'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-secondary">Total Pagado:</span>
+                        <span className="text-success">{amountPaid}€</span>
+                      </div>
+                      <div className="flex justify-between p-2 rounded bg-black/40 border border-white/5">
+                        <span className="font-bold">Pendiente Bote:</span>
+                        <span className={`font-bold ${balance > 0 ? 'text-danger' : balance < 0 ? 'text-success' : 'text-secondary'}`}>
+                          {balance > 0 ? `${balance}€` : balance < 0 ? `Bote te debe ${Math.abs(balance)}€` : '0€'}
+                        </span>
+                      </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-2 mt-1">
+                    <div className="flex flex-col gap-3 mt-2 border-t border-white/10 pt-2">
+                      <div className="text-sm font-bold text-warning mb-1">Ajuste de Cuota</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm">Cuota:</span>
+                        <span className="text-sm text-secondary">Fijar Cuota (€):</span>
                         <input 
                           type="number" 
-                          className="input-field text-sm p-1 text-center" 
-                          style={{ width: '4rem' }}
+                          className="input-field text-sm p-1 text-center flex-1" 
                           value={editPrice}
                           onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
-                          placeholder="Auto"
-                        />
-                        <span className="text-sm">€</span>
-                        <span className="text-sm ml-2">Pagado:</span>
-                        <input 
-                          type="checkbox" 
-                          checked={editHasPaid}
-                          onChange={e => setEditHasPaid(e.target.checked)}
-                          style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--accent-success)' }}
+                          placeholder="Automático"
                         />
                       </div>
                       <input 
@@ -96,11 +127,37 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       />
                       <div className="flex mobile-col gap-2 mt-1">
                         <button onClick={() => saveAttendee(att.id)} className="btn btn-primary mobile-w-full py-1.5 text-sm" disabled={isProcessing}>
-                          {isProcessing ? '...' : '💾 Guardar'}
+                          💾 Guardar Cuota
                         </button>
                         <button onClick={() => setEditingAttendee(null)} className="btn btn-secondary mobile-w-full py-1.5 text-sm">
-                          Cancelar
+                          Cerrar
                         </button>
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t border-white/10">
+                        <div className="text-sm font-bold text-success mb-2">Historial de Pagos</div>
+                        {att.payments?.map((p: any) => (
+                          <div key={p.id} className="flex justify-between items-center text-xs bg-black/40 p-2 rounded mb-1">
+                            <span className="text-secondary">{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
+                            <span className="font-bold text-success">+{p.amount}€</span>
+                            <button onClick={() => handleDeletePayment(p.id)} className="text-danger px-2 py-0.5 rounded hover:bg-danger/20" disabled={isProcessing}>❌</button>
+                          </div>
+                        ))}
+                        {(!att.payments || att.payments.length === 0) && (
+                          <div className="text-xs text-secondary italic mb-2">Ningún pago registrado.</div>
+                        )}
+                        <div className="flex gap-2 mt-2">
+                          <input 
+                            type="number" 
+                            className="input-field text-sm p-1.5 text-center flex-1" 
+                            value={newPaymentAmount}
+                            onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                            placeholder="Cantidad €"
+                          />
+                          <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-4" disabled={isProcessing || newPaymentAmount === ''}>
+                            + Pago
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -113,26 +170,30 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
             })}
           </div>
 
-          {/* VISTA ESCRITORIO (Tabla original) */}
+          {/* VISTA ESCRITORIO (Tabla) */}
           <div className="table-wrapper mobile-hide">
             <table className="table">
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                  <th className="pb-3 px-2">Usuario</th>
+                  <th className="pb-3 px-2">Asistente</th>
                   <th className="pb-3 px-2 text-center">Días</th>
-                  <th className="pb-3 px-2 text-right">Cuota (€)</th>
-                  <th className="pb-3 px-2 text-center">Pagado</th>
-                  <th className="pb-3 px-2">Acciones</th>
+                  <th className="pb-3 px-2 text-right">Cuota Base</th>
+                  <th className="pb-3 px-2 text-right">Pagado</th>
+                  <th className="pb-3 px-2 text-right">Balance</th>
+                  <th className="pb-3 px-2">Acciones / Historial</th>
                 </tr>
               </thead>
               <tbody>
                 {attendees.map((att: any) => {
                   const isEditing = editingAttendee === att.id;
-                  const isProcessing = loading === `att-${att.id}`;
+                  const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
+                  const amountPaid = att.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+                  const currentQuota = att.expectedPayment !== null ? att.expectedPayment : 0;
+                  const balance = currentQuota - amountPaid;
 
                   return (
                     <tr key={att.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <td className="py-3 px-2">
+                      <td className="py-3 px-2 align-top">
                         <strong>{att.user.name}</strong>
                         <br/>
                         <span className="text-secondary text-xs">@{att.user.username}</span>
@@ -140,9 +201,9 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           <p className="text-xs mt-1 p-1 rounded bg-warning/20 text-warning inline-block">📝 {att.adminComment}</p>
                         )}
                       </td>
-                      <td className="py-3 px-2 text-center text-secondary">{att.daysAttending}</td>
+                      <td className="py-3 px-2 text-center text-secondary align-top">{att.daysAttending}</td>
                       
-                      <td className="py-3 px-2 text-right">
+                      <td className="py-3 px-2 text-right align-top">
                         {isEditing ? (
                           <input 
                             type="number" 
@@ -153,49 +214,72 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           />
                         ) : (
                           <span style={{ color: att.adminComment ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>
-                            {att.expectedPayment !== null ? `${att.expectedPayment}€` : 'Pendiente'}
+                            {att.expectedPayment !== null ? `${att.expectedPayment}€` : '??'}
                           </span>
                         )}
                       </td>
 
-                      <td className="py-3 px-2 text-center">
-                        {isEditing ? (
-                          <input 
-                            type="checkbox" 
-                            checked={editHasPaid}
-                            onChange={e => setEditHasPaid(e.target.checked)}
-                            style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--accent-success)' }}
-                          />
-                        ) : (
-                          <span className={`badge ${att.hasPaid ? 'bg-success/20 text-success border border-success' : 'bg-danger/20 text-danger border border-danger'}`}>
-                            {att.hasPaid ? 'SÍ' : 'NO'}
-                          </span>
-                        )}
+                      <td className="py-3 px-2 text-right align-top text-success font-bold">
+                        {amountPaid > 0 ? `${amountPaid}€` : '-'}
                       </td>
 
-                      <td className="py-3 px-2">
+                      <td className="py-3 px-2 text-right align-top">
+                        <span className={`badge ${balance > 0 ? 'bg-danger/20 text-danger border border-danger' : balance < 0 ? 'bg-success/20 text-success border border-success' : 'bg-black/40 text-secondary border border-white/10'}`}>
+                          {balance > 0 ? `Debe ${balance}€` : balance < 0 ? `Bote debe ${Math.abs(balance)}€` : 'Pagado'}
+                        </span>
+                      </td>
+
+                      <td className="py-3 px-2 align-top">
                         {isEditing && isAdmin ? (
-                          <div className="flex flex-col gap-2 min-w-[200px]">
-                            <input 
-                              type="text" 
-                              className="input-field text-xs p-2" 
-                              placeholder="Comentario interno (opcional)"
-                              value={editComment}
-                              onChange={e => setEditComment(e.target.value)}
-                            />
-                            <div className="flex mobile-col gap-2">
-                              <button onClick={() => setEditingAttendee(null)} className="btn btn-secondary mobile-w-full py-1 text-xs">Cancelar</button>
-                              <button onClick={() => saveAttendee(att.id)} className="btn btn-primary mobile-w-full py-1 text-xs" disabled={isProcessing}>
-                                Guardar
-                              </button>
+                          <div className="flex flex-col gap-3 min-w-[280px]">
+                            <div className="bg-black/30 p-2 rounded border border-white/5">
+                              <div className="text-xs text-warning mb-1">Ajuste Cuota</div>
+                              <input 
+                                type="text" 
+                                className="input-field text-xs p-2 mb-2 w-full" 
+                                placeholder="Comentario (opcional)"
+                                value={editComment}
+                                onChange={e => setEditComment(e.target.value)}
+                              />
+                              <div className="flex gap-2">
+                                <button onClick={() => setEditingAttendee(null)} className="btn btn-secondary flex-1 py-1 text-xs">Cerrar</button>
+                                <button onClick={() => saveAttendee(att.id)} className="btn btn-primary flex-1 py-1 text-xs" disabled={isProcessing}>
+                                  Guardar
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-black/30 p-2 rounded border border-white/5">
+                              <div className="text-xs text-success mb-1">Pagos</div>
+                              {att.payments?.map((p: any) => (
+                                <div key={p.id} className="flex justify-between items-center text-xs bg-black/40 p-1.5 rounded mb-1">
+                                  <span className="text-secondary">{new Date(p.date).toLocaleDateString('es-ES')}</span>
+                                  <span className="font-bold text-success">+{p.amount}€</span>
+                                  <button onClick={() => handleDeletePayment(p.id)} className="text-danger hover:text-white" disabled={isProcessing}>❌</button>
+                                </div>
+                              ))}
+                              <div className="flex gap-1 mt-2">
+                                <input 
+                                  type="number" 
+                                  className="input-field text-xs p-1 text-center w-20" 
+                                  value={newPaymentAmount}
+                                  onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                                  placeholder="€"
+                                />
+                                <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs flex-1" disabled={isProcessing || newPaymentAmount === ''}>
+                                  Añadir
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ) : (
                           isAdmin ? (
-                            <button onClick={() => startEditing(att)} className="btn btn-secondary py-1 px-3 text-xs">
-                              Editar Ajustes
+                            <button onClick={() => startEditing(att)} className="btn btn-secondary py-1 px-3 text-xs w-full">
+                              Gestionar Pagos y Cuota
                             </button>
-                          ) : null
+                          ) : (
+                             <div className="text-xs text-secondary">Contacta al admin para cambios</div>
+                          )
                         )}
                       </td>
                     </tr>

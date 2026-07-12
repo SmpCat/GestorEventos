@@ -9,6 +9,18 @@ export async function getEvents() {
     const events = await prisma.event.findMany({
       orderBy: { createdAt: 'desc' },
     });
+
+    // AUTO-HEAL: Detectar si hay más de un evento activo (causado por conflictos de Git)
+    const activeEvents = events.filter(e => e.isActive);
+    if (activeEvents.length > 1) {
+      // Dejamos solo el primero activo, apagamos el resto
+      for (let i = 1; i < activeEvents.length; i++) {
+        await prisma.event.update({ where: { id: activeEvents[i].id }, data: { isActive: false } });
+        const eventIndex = events.findIndex(e => e.id === activeEvents[i].id);
+        if (eventIndex !== -1) events[eventIndex].isActive = false;
+      }
+    }
+
     return { success: true, data: events };
   } catch (error: any) {
     return { success: false, error: 'Error al obtener eventos: ' + error.message };

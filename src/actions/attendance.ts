@@ -27,6 +27,17 @@ export async function savePricingRules(eventId: string, rules: { days: number, p
     daysSet.add(rule.days);
   }
 
+  // CASO 4: Bloqueo Estricto si se intentan borrar tarifas en uso
+  const attendees = await prisma.eventAttendee.findMany({ where: { eventId } });
+  for (const att of attendees) {
+    if (!daysSet.has(att.daysAttending)) {
+      return { 
+        success: false, 
+        error: `No puedes borrar la tarifa de ${att.daysAttending} días porque hay asistentes apuntados con esos días. Por favor, cambia a esas personas primero.` 
+      };
+    }
+  }
+
   try {
     await prisma.$transaction(async (tx) => {
       // Borrar anteriores
@@ -55,6 +66,7 @@ export async function getAttendees(eventId: string) {
       where: { eventId },
       include: {
         user: { select: { id: true, name: true, username: true } },
+        payments: { orderBy: { date: 'desc' } },
       },
       orderBy: { user: { name: 'asc' } },
     });
@@ -106,12 +118,11 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
 }
 
 // Admin actualiza a un asistente
-export async function updateAttendeeAdmin(attendeeId: string, hasPaid: boolean, customPrice: number | null, adminComment: string | null) {
+export async function updateAttendeeAdmin(attendeeId: string, customPrice: number | null, adminComment: string | null) {
   try {
     await prisma.eventAttendee.update({
       where: { id: attendeeId },
       data: {
-        hasPaid,
         expectedPayment: customPrice,
         adminComment,
       }
@@ -122,5 +133,36 @@ export async function updateAttendeeAdmin(attendeeId: string, hasPaid: boolean, 
     return { success: true };
   } catch (error: any) {
     return { success: false, error: 'Error al actualizar asistente: ' + error.message };
+  }
+}
+
+// --- GESTIÓN DE PAGOS ---
+
+export async function addPayment(attendeeId: string, amount: number) {
+  if (amount <= 0) {
+    return { success: false, error: 'El importe del pago debe ser mayor que 0.' };
+  }
+  try {
+    await prisma.payment.create({
+      data: { attendeeId, amount }
+    });
+    revalidatePath('/pricing/attendees');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: 'Error al registrar pago: ' + error.message };
+  }
+}
+
+export async function deletePayment(paymentId: string) {
+  try {
+    await prisma.payment.delete({
+      where: { id: paymentId }
+    });
+    revalidatePath('/pricing/attendees');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: 'Error al eliminar pago: ' + error.message };
   }
 }

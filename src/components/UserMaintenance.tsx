@@ -6,9 +6,10 @@ import UserFormModal from './UserFormModal';
 import TrashIcon from './TrashIcon';
 import { deleteUser } from '@/actions/users';
 
-export default function UserMaintenance({ users }: { users: any[] }) {
+export default function UserMaintenance({ users, session }: { users: any[], session: any }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const handleCreate = () => {
     setEditingUser(null);
@@ -22,7 +23,14 @@ export default function UserMaintenance({ users }: { users: any[] }) {
 
   const handleDelete = async (id: string, name: string) => {
     if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario "${name}"? Esta acción no se puede deshacer.`)) {
-      await deleteUser(id);
+      setActionLoading(id);
+      const res = await deleteUser(id);
+      if (res.success) {
+        alert(`Usuario "${name}" eliminado correctamente.`);
+      } else {
+        alert(res.error || 'Error al eliminar usuario.');
+      }
+      setActionLoading(null);
     }
   };
 
@@ -72,11 +80,11 @@ export default function UserMaintenance({ users }: { users: any[] }) {
                   </div>
 
                   <div className="flex gap-2 mt-2">
-                    <button onClick={() => handleEdit(user)} className="btn btn-secondary flex-1 py-2 text-sm flex items-center justify-center gap-2">
+                    <button onClick={() => handleEdit(user)} className="btn btn-secondary flex-1 py-2 text-sm flex items-center justify-center gap-2" disabled={actionLoading !== null}>
                       ✏️ Editar
                     </button>
-                    <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger flex-1 py-2 text-sm flex items-center justify-center gap-2">
-                      <TrashIcon /> Borrar
+                    <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger flex-1 py-2 text-sm flex items-center justify-center gap-2" disabled={actionLoading !== null}>
+                      {actionLoading === user.id ? '...' : <><TrashIcon /> Borrar</>}
                     </button>
                   </div>
                 </div>
@@ -117,11 +125,11 @@ export default function UserMaintenance({ users }: { users: any[] }) {
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <button onClick={() => handleEdit(user)} className="btn btn-secondary" style={{ marginRight: '0.5rem' }}>
+                        <button onClick={() => handleEdit(user)} className="btn btn-secondary" style={{ marginRight: '0.5rem' }} disabled={actionLoading !== null}>
                           Editar
                         </button>
-                        <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger" title="Borrar">
-                          <TrashIcon />
+                        <button onClick={() => handleDelete(user.id, user.name)} className="btn btn-danger" title="Borrar" disabled={actionLoading !== null}>
+                          {actionLoading === user.id ? '...' : <TrashIcon />}
                         </button>
                       </td>
                     </tr>
@@ -137,6 +145,7 @@ export default function UserMaintenance({ users }: { users: any[] }) {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         user={editingUser} 
+        session={session}
         onSaved={() => {
           // El server action ya hace revalidatePath, así que la tabla se actualizará sola
         }}
