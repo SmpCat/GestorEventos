@@ -19,6 +19,10 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 - Creado un `Dockerfile` (Multi-stage Alpine) optimizado, copiando los binarios precompilados de Prisma y el entorno `standalone`.
 - Creado `docker-compose.yml` local para integrarse a la red `proxy_network` expuesta por el Core-Proxy.
 
+### 4. Pruebas Automatizadas (Playwright E2E)
+- **Instalación de Playwright:** Hemos implementado y configurado el framework de testing *Playwright* en el proyecto.
+- **Suite de Pruebas Superada:** Hemos diseñado y ejecutado con éxito un juego de pruebas de ciclo completo (`e2e-cycle.spec.ts` y `dashboard.spec.ts`) que simula a un usuario real creando un evento, asignando precios, comprando en el supermercado, validando la asistencia (1 día = 20€) y añadiendo gastos con ticket (subida de imagen). Todo superado en verde.
+
 ## ⚠️ Instrucciones para el Agente Windows al iniciar:
 1. El proyecto local de desarrollo sigue siendo idéntico. Ejecuta `npm install` o `npm run dev` normalmente si necesitas probar algo.
 2. Si vas a testear migraciones de base de datos, ten en cuenta que el modo WAL crea archivos temporales (`dev.db-wal` y `dev.db-shm`). No los elimines ni los ignores en tus despliegues.
