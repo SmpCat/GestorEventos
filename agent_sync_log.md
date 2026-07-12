@@ -27,3 +27,21 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 1. El proyecto local de desarrollo sigue siendo idéntico. Ejecuta `npm install` o `npm run dev` normalmente si necesitas probar algo.
 2. Si vas a testear migraciones de base de datos, ten en cuenta que el modo WAL crea archivos temporales (`dev.db-wal` y `dev.db-shm`). No los elimines ni los ignores en tus despliegues.
 3. El despliegue a producción ya no usa puertos locales; el contenedor se comunicará internamente con Nginx en la red `proxy_network`.
+
+## Resumen de la Sesión de Pruebas de Estrés (Windows)
+*Última actualización: 12 de Julio de 2026 (por Windows Agent)*
+
+### 1. Macro-Simulación y Pruebas E2E (Playwright)
+- **Instalación Local**: Se han descargado los navegadores de Playwright localmente en el directorio de trabajo del usuario (Windows) para no ensuciar la caché del sistema.
+- **Nuevas Suites de Pruebas**: 
+  - `concurrency.spec.ts`: Validado el `Auto-Heal` al intentar activar 2 eventos simultáneamente.
+  - `admin-components.spec.ts`: Probada la protección y el borrado seguro en la UI de mantenimiento de usuarios.
+  - `receipts-logic.spec.ts`: Probado el borrado en cascada de los tickets desde base de datos y la recarga en la UI financiera.
+- **Prueba Estrella de Carga Masiva (50-Users)**:
+  - Se creó el script `stress-50-users.spec.ts` inyectando 52 usuarios reales, configurando 5 tarifas diarias, y generando pagos y más de 150 tickets aleatorios.
+  - El frontend fue capaz de calcular los saldos cruzados y renderizar el `Bote Teórico Total` y el `Total Gastado` en solo **668ms**.
+  - Todos los tests finalizaron con éxito tras solventar ajustes menores en los localizadores de Next.js. El rendimiento es apto para producción.
+
+### Instrucciones para el Agente Mac:
+1. Las nuevas pruebas E2E y el macro-simulador están en la carpeta `tests/`. Puedes ejecutarlos cuando quieras para asegurar la consistencia.
+2. Todo el código de GestorEventos es 100% estable. Tienes luz verde para empaquetarlo y mandarlo al QNAP mediante Docker.

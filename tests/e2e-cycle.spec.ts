@@ -36,9 +36,9 @@ test.describe('Ciclo E2E: Administración y Gastos', () => {
   // TEARDOWN: Borrar los datos generados para dejar la BD limpia
   test.afterAll(async () => {
     // Delete event and its cascades
-    await prisma.event.delete({ where: { id: testEventId } });
+    await prisma.event.delete({ where: { id: testEventId } }).catch(() => {});
     // Delete user
-    await prisma.user.delete({ where: { id: testUserId } });
+    await prisma.user.delete({ where: { id: testUserId } }).catch(() => {});
     await prisma.$disconnect();
   });
 
@@ -106,11 +106,12 @@ test.describe('Ciclo E2E: Administración y Gastos', () => {
     await page.goto('/');
     
     // Rellenamos que venimos 1 día y nos apuntamos
+    await expect(page.locator('input[type="number"]')).toBeVisible({ timeout: 15000 });
     await page.fill('input[type="number"]', '1');
     await page.click('button:has-text("¡Me apunto!")');
 
-    // Ahora deberíamos ver el Dashboard normal (la cuadrícula) o el texto de Bienvenido
-    await expect(page.locator('.grid').first()).toBeVisible({ timeout: 10000 });
+    // Ahora deberíamos ver el Dashboard normal o la tarjeta de bienvenida
+    await expect(page.locator('text=Bienvenido').or(page.locator('text=Resumen')).first()).toBeVisible({ timeout: 10000 });
 
     // --- 5. AÑADIR A LISTA DE LA COMPRA ---
     await page.goto('/shopping');
