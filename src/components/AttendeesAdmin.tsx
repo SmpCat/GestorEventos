@@ -124,14 +124,18 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                     <div className="flex flex-col gap-3 mt-2 border-t border-white/10 pt-2">
                       <div className="text-sm font-bold text-warning mb-1">Ajuste de Cuota</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-secondary">Fijar Cuota (€):</span>
-                        <input 
-                          type="number" 
-                          className="input-field text-sm p-1 text-center flex-1" 
-                          value={editPrice}
-                          onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
-                          placeholder="€"
-                        />
+                        <span className="text-sm text-secondary">Fijar Cuota:</span>
+                        <div className="relative flex-1">
+                          <input 
+                            type="number" 
+                            className="input-field text-sm p-1 text-center w-full" 
+                            style={{ paddingRight: '1.5rem' }}
+                            value={editPrice}
+                            onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
+                            placeholder="Automático"
+                          />
+                          <span className="absolute right-2 top-1/2 text-secondary font-bold text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                        </div>
                       </div>
                       <input 
                         type="text" 
@@ -147,8 +151,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       </div>
 
                       <div className="mt-6 pt-5 border-t border-white/10">
-                        <div className="text-sm font-bold mb-4">Historial de Pagos</div>
-                        <div className="flex flex-col" style={{ gap: '0.75rem' }}>
+                        <div className="text-sm font-bold" style={{ marginBottom: '1.5rem' }}>Historial de Pagos</div>
+                        <div className="flex flex-col" style={{ gap: '0.35rem' }}>
                           {att.payments?.map((p: any) => (
                             <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
                               <span className="text-secondary" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
@@ -163,15 +167,19 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           <div className="text-xs text-secondary italic mb-2">Ningún pago registrado.</div>
                         )}
                         <div className="mt-6 flex items-center gap-2">
-                          <span className="text-sm text-secondary">Añadir Pago (€):</span>
-                          <input 
-                            type="number" 
-                            className="input-field text-sm p-1 text-center flex-1" 
-                            value={newPaymentAmount}
-                            onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
-                            placeholder="€"
-                          />
-                          <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: 'var(--accent-success)', color: '#fff', width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
+                          <span className="text-sm text-secondary">Añadir Pago:</span>
+                          <div className="relative flex-1">
+                            <input 
+                              type="number" 
+                              className="input-field text-sm p-1 text-center w-full" 
+                              style={{ paddingRight: '1.5rem' }}
+                              value={newPaymentAmount}
+                              onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                              placeholder="0"
+                            />
+                            <span className="absolute right-2 top-1/2 text-secondary font-bold text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                          </div>
+                          <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: '#000', color: 'var(--accent-success)', width: '32px', height: '32px', padding: 0, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
                             +
                           </button>
                         </div>
@@ -232,13 +240,17 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       
                       <td className="py-3 px-2 text-right align-top">
                         {isEditing ? (
-                          <input 
-                            type="number" 
-                            className="input-field w-20 text-right text-sm" 
-                            value={editPrice}
-                            onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
-                            placeholder="€"
-                          />
+                          <div className="relative inline-block w-20">
+                            <input 
+                              type="number" 
+                              className="input-field text-right text-sm w-full" 
+                              style={{ paddingRight: '1.2rem', paddingLeft: '0.2rem' }}
+                              value={editPrice}
+                              onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
+                              placeholder="Auto"
+                            />
+                            <span className="absolute right-1 top-1/2 text-secondary text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                          </div>
                         ) : (
                           <span style={{ color: att.adminComment ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>
                             {att.expectedPayment !== null ? `${att.expectedPayment}€` : '??'}
@@ -276,8 +288,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             </div>
                             
                             <div className="bg-black/30 p-2 rounded border border-white/5">
-                              <div className="text-xs font-bold mb-4">Pagos</div>
-                              <div className="flex flex-col" style={{ gap: '0.75rem' }}>
+                              <div className="text-xs font-bold" style={{ marginBottom: '1.5rem' }}>Pagos</div>
+                              <div className="flex flex-col" style={{ gap: '0.35rem' }}>
                                 {att.payments?.map((p: any) => (
                                   <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
                                     <span className="text-secondary" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{new Date(p.date).toLocaleDateString('es-ES')}</span>
@@ -292,15 +304,19 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 <div className="text-xs text-secondary italic mb-2">Ningún pago.</div>
                               )}
                               <div className="mt-6 flex items-center gap-2">
-                                <span className="text-sm text-secondary">Añadir Pago (€):</span>
-                                <input 
-                                  type="number" 
-                                  className="input-field text-sm p-1 text-center flex-1" 
-                                  value={newPaymentAmount}
-                                  onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
-                                  placeholder="€"
-                                />
-                                <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: 'var(--accent-success)', color: '#fff', width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
+                                <span className="text-sm text-secondary">Añadir Pago:</span>
+                                <div className="relative flex-1">
+                                  <input 
+                                    type="number" 
+                                    className="input-field text-sm p-1 text-center w-full" 
+                                    style={{ paddingRight: '1.5rem' }}
+                                    value={newPaymentAmount}
+                                    onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                                    placeholder="0"
+                                  />
+                                  <span className="absolute right-2 top-1/2 text-secondary font-bold text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                                </div>
+                                <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: '#000', color: 'var(--accent-success)', width: '32px', height: '32px', padding: 0, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
                                   +
                                 </button>
                               </div>
