@@ -29,6 +29,33 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
     }
   };
 
+  const handleSaveOnly = async () => {
+    if (rules.some(r => r.days === '' || r.price === '')) {
+      alert('Por favor, rellena la tarifa que tienes a medias (o bórrala) antes de guardar.');
+      return;
+    }
+    if (rules.some(r => Number(r.days) <= 0)) {
+      alert('Corrije el error: no se pueden crear tarifas de 0 días.');
+      return;
+    }
+
+    if (!window.confirm('¿Seguro que quieres guardar estas reglas? Esto podría recalcular las cuotas de los asistentes.')) {
+      return;
+    }
+    
+    setLoading(true);
+    const validRules = rules as { days: number, price: number }[];
+    const res = await savePricingRules(eventId, validRules);
+    setLoading(false);
+    
+    if (!res.success) {
+      alert(res.error || 'Error al guardar las tarifas.');
+    } else {
+      setSavedRulesJSON(JSON.stringify(validRules));
+      alert('Tarifas guardadas correctamente.');
+    }
+  };
+
   const handleSaveAndAddRule = async () => {
     // Validar que las reglas actuales están completas
     if (rules.some(r => r.days === '' || r.price === '')) {
@@ -120,7 +147,15 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
             className="btn btn-secondary mobile-w-full py-3" 
             disabled={loading}
           >
-            {loading ? 'Guardando...' : '+ Añadir Regla de Precio'}
+            {loading ? 'Guardando...' : '+ Añadir Tarifa'}
+          </button>
+          <button 
+            onClick={handleSaveOnly} 
+            className={`btn mobile-w-full py-3 ${hasChanges ? 'btn-primary' : 'btn-secondary'}`} 
+            style={{ opacity: hasChanges ? 1 : 0.5 }}
+            disabled={loading || !hasChanges}
+          >
+            {loading ? 'Guardando...' : hasChanges ? '⚠️ Guardar Tarifas' : '✅ Guardado'}
           </button>
         </div>
       )}
