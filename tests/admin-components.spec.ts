@@ -40,15 +40,19 @@ test.describe('Componentes Admin y Mantenimiento', () => {
   test('Validación de Formularios de Usuario y Bloqueo', async ({ page }) => {
     await page.goto('/admin/users');
 
-    // Localizamos la tarjeta o fila del usuario a borrar. "User Delete" es el nombre que le dimos al crearlo.
-    const deleteBtn = page.locator('.mobile-hide button[title="Borrar"]').first();
+    // Localizamos la fila de la tabla de escritorio del usuario a borrar.
+    const userRow = page.locator('tr').filter({ hasText: `${prefix}_user` });
+    const deleteBtn = userRow.locator('button[title="Borrar"]');
     
     // Aceptar cualquier dialog de confirmación o alerta que salga
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', async dialog => {
+      console.log('DIALOG MESSAGE:', dialog.message());
+      await dialog.accept();
+    });
     
     await deleteBtn.click({ force: true });
     
-    // Verificar que desapareció
-    await expect(page.locator('.glass-panel').filter({ hasText: `${prefix}_user` })).toHaveCount(0);
+    // Verificar que desapareció de la tabla
+    await expect(page.locator('tr').filter({ hasText: `${prefix}_user` })).toHaveCount(0, { timeout: 15000 });
   });
 });
