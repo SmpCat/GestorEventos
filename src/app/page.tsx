@@ -40,7 +40,8 @@ export default async function Home() {
         const currentQuota = attendeeRes.expectedPayment || 0;
         attendee = {
           ...attendeeRes,
-          hasPaid: currentQuota > 0 && amountPaid >= currentQuota
+          amountPaid,
+          currentQuota
         };
       }
       pricingRules = rulesRes;

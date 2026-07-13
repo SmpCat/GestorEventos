@@ -37,9 +37,32 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
             <p style={{ fontSize: '1.1rem', color: '#fff', margin: 0 }}>
               Tu cuota estimada: <strong style={{ color: 'var(--accent-primary)', fontSize: '1.3rem', textShadow: '0 0 10px rgba(99,102,241,0.5)' }}>{attendee.expectedPayment !== null ? `${attendee.expectedPayment}€` : 'Calculando...'}</strong>
             </p>
-            <div className={`badge ${attendee.hasPaid ? 'bg-success/40 text-white border border-success' : 'bg-danger/40 text-white border border-danger'}`} style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', backdropFilter: 'blur(5px)' }}>
-              {attendee.hasPaid ? '✅ Cuota Pagada' : '🔴 Pendiente de pago'}
-            </div>
+            {(() => {
+              const amountPaid = attendee.amountPaid || 0;
+              const quota = attendee.currentQuota || 0;
+              let label = '';
+              let badgeClass = '';
+              
+              if (amountPaid === 0) {
+                label = '🔴 Pendiente de Pago';
+                badgeClass = 'bg-danger/40 text-white border border-danger';
+              } else if (amountPaid < quota) {
+                label = `🟠 Pendiente de ${quota - amountPaid}€`;
+                badgeClass = 'bg-warning/40 text-white border border-warning';
+              } else if (amountPaid === quota) {
+                label = '✅ Cuota Pagada';
+                badgeClass = 'bg-success/40 text-white border border-success';
+              } else {
+                label = `🔵 Se te debe ${amountPaid - quota}€`;
+                badgeClass = 'bg-info/40 text-white border border-info';
+              }
+
+              return (
+                <div className={`badge ${badgeClass}`} style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', backdropFilter: 'blur(5px)' }}>
+                  {label}
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
