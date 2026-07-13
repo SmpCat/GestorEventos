@@ -11,13 +11,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "GestorEventos",
+  title: process.env.NODE_ENV === 'development' ? "Eventos-Dev" : "GestorEventos",
   description: "Aplicación de tesorería y gestión para eventos",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "GestorEventos",
+    title: process.env.NODE_ENV === 'development' ? "Eventos-Dev" : "GestorEventos",
   },
 };
 
@@ -30,6 +29,14 @@ export default async function RootLayout({
   
   return (
     <html lang="es">
+      <head>
+        {process.env.NODE_ENV === 'development' && (
+          <>
+            <link rel="icon" href="/images/fiestas-valdeganga.jpg" type="image/jpeg" sizes="any" />
+            <link rel="apple-touch-icon" href="/images/fiestas-valdeganga.jpg" />
+          </>
+        )}
+      </head>
       <body className={inter.className}>
         <Navbar session={session} />
         <main style={{ padding: '0 1rem 2rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
