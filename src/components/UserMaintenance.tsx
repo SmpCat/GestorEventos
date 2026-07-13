@@ -83,7 +83,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                     <button onClick={() => handleEdit(user)} className="btn btn-secondary flex-1 py-2 text-sm flex items-center justify-center gap-2" disabled={actionLoading !== null}>
                       ✏️ Editar
                     </button>
-                    <button onClick={() => handleDelete(user.id, user.name)} style={{ color: 'rgba(255, 255, 255, 0.7)', background: 'transparent', border: 'none', cursor: 'pointer' }} className="flex-1 py-2 text-sm flex items-center justify-center gap-2" disabled={actionLoading !== null}>
+                    <button onClick={() => handleDelete(user.id, user.name)} style={{ color: 'rgba(255, 255, 255, 0.7)', background: 'transparent', border: 'none', cursor: 'pointer' }} className="flex-1 py-2 text-sm flex items-center justify-center gap-2" title="Borrar" disabled={actionLoading !== null}>
                       {actionLoading === user.id ? '...' : <><TrashIcon /> Borrar</>}
                     </button>
                   </div>

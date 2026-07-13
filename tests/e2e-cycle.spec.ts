@@ -86,7 +86,7 @@ test.describe('Ciclo E2E: Administración y Gastos', () => {
     // --- 3. CREAR TARIFA ---
     await page.goto('/pricing/rules');
     // Asumimos que la página detecta el evento activo
-    await page.click('text=+ Añadir Regla de Precio');
+    await page.click('text=+ Añadir Tarifa');
     
     // Rellenar formulario
     const daysInput = page.locator('input[type="number"]').first();
@@ -96,7 +96,7 @@ test.describe('Ciclo E2E: Administración y Gastos', () => {
     
     // Playwright maneja las alertas cancelándolas. El botón de guardar pregunta confirmación.
     page.once('dialog', dialog => dialog.accept());
-    await page.click('text=Guardar Tarifas');
+    await page.locator('button', { hasText: 'Guardar Tarifas' }).click();
     
     // Esperar a que el botón cambie a guardado
     await expect(page.locator('button', { hasText: 'Guardado' })).toBeVisible({ timeout: 10000 });
