@@ -162,15 +162,15 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         )}
                         <div className="bg-black/20 p-2 rounded border border-white/5 mt-6 flex items-center gap-2">
                           <span className="text-[10px] text-secondary uppercase tracking-wider flex-none">Añadir:</span>
-                          <div className="flex gap-2 flex-1">
+                          <div className="flex gap-2">
                             <input 
                               type="number" 
-                              className="input-field text-sm p-1.5 text-center w-1/2" 
+                              className="input-field text-sm p-1.5 text-center w-24" 
                               value={newPaymentAmount}
                               onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                               placeholder="€"
                             />
-                            <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-0 w-1/2 whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
+                            <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-0 w-24 whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
                               + Pago
                             </button>
                           </div>
@@ -291,15 +291,15 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               )}
                               <div className="bg-black/20 p-1.5 rounded border border-white/5 mt-5 flex items-center gap-2">
                                 <span className="text-[10px] text-secondary uppercase tracking-wider flex-none">Añadir:</span>
-                                <div className="flex gap-1 flex-1">
+                                <div className="flex gap-2">
                                   <input 
                                     type="number" 
-                                    className="input-field text-xs p-1 text-center w-1/2" 
+                                    className="input-field text-xs p-1 text-center w-20" 
                                     value={newPaymentAmount}
                                     onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                                     placeholder="€"
                                   />
-                                  <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs px-0 w-1/2 whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
+                                  <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs px-0 w-20 whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
                                     + Pago
                                   </button>
                                 </div>
