@@ -147,13 +147,13 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       </div>
 
                       <div className="mt-6 pt-5 border-t border-white/10">
-                        <div className="text-sm font-bold text-success mb-4">Historial de Pagos</div>
-                        <div className="flex flex-col gap-10">
+                        <div className="text-sm font-bold mb-4" style={{ color: 'var(--accent-success)' }}>Historial de Pagos</div>
+                        <div className="flex flex-col" style={{ gap: '2rem' }}>
                           {att.payments?.map((p: any) => (
-                            <div key={p.id} className="flex justify-between items-center gap-4 text-xs bg-black/40 py-3 px-3 rounded">
-                              <span className="text-secondary truncate">{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
-                              <span className="font-bold text-success flex-1 text-right text-base">+{p.amount}€</span>
-                              <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors flex-none p-2" disabled={isProcessing} title="Borrar Pago">
+                            <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
+                              <span className="text-secondary" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
+                              <span className="font-bold flex-1 text-right" style={{ color: 'var(--accent-success)', fontSize: '1rem' }}>+{p.amount}€</span>
+                              <button onClick={() => handleDeletePayment(p.id)} style={{ color: 'rgba(248, 113, 113, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }} disabled={isProcessing} title="Borrar Pago">
                                 <TrashIcon />
                               </button>
                             </div>
@@ -171,8 +171,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                             placeholder="0"
                           />
-                          <button onClick={() => handleAddPayment(att.id)} className="bg-success/20 text-success border border-success/30 hover:bg-success/30 transition-colors rounded px-4 py-1 text-sm font-bold whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
-                            + Pago
+                          <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: 'var(--accent-success)', color: '#fff', width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
+                            +
                           </button>
                         </div>
                       </div>
@@ -276,13 +276,13 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             </div>
                             
                             <div className="bg-black/30 p-2 rounded border border-white/5">
-                              <div className="text-xs text-success mb-4">Pagos</div>
-                              <div className="flex flex-col gap-10">
+                              <div className="text-xs mb-4" style={{ color: 'var(--accent-success)' }}>Pagos</div>
+                              <div className="flex flex-col" style={{ gap: '2rem' }}>
                                 {att.payments?.map((p: any) => (
-                                  <div key={p.id} className="flex justify-between items-center gap-4 text-xs bg-black/40 py-3 px-3 rounded">
-                                    <span className="text-secondary truncate">{new Date(p.date).toLocaleDateString('es-ES')}</span>
-                                    <span className="font-bold text-success flex-1 text-right text-base">+{p.amount}€</span>
-                                    <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors flex-none p-2" disabled={isProcessing} title="Borrar Pago">
+                                  <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
+                                    <span className="text-secondary" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{new Date(p.date).toLocaleDateString('es-ES')}</span>
+                                    <span className="font-bold flex-1 text-right" style={{ color: 'var(--accent-success)', fontSize: '1rem' }}>+{p.amount}€</span>
+                                    <button onClick={() => handleDeletePayment(p.id)} style={{ color: 'rgba(248, 113, 113, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }} disabled={isProcessing} title="Borrar Pago">
                                       <TrashIcon />
                                     </button>
                                   </div>
@@ -300,8 +300,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                   onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                                   placeholder="0"
                                 />
-                                <button onClick={() => handleAddPayment(att.id)} className="bg-success/20 text-success border border-success/30 hover:bg-success/30 transition-colors rounded px-4 py-1 text-sm font-bold whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
-                                  + Pago
+                                <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: 'var(--accent-success)', color: '#fff', width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
+                                  +
                                 </button>
                               </div>
                             </div>
