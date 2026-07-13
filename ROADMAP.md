@@ -8,9 +8,9 @@ Lista de tareas pendientes que abordaremos en las próximas sesiones para remata
 - [ ] Asegurarnos de que el icono luce profesional y nativo en iOS y Android.
 
 ### 2. 🚀 DevOps: Despliegue Automatizado (CI/CD)
-- [ ] Configurar un sistema de despliegue continuo (ej. Watchtower o Portainer webhooks).
-- [ ] Conectar el NAS a GitHub para que detecte los `git push`.
-- [ ] Automatizar la compilación y el redespliegue sin necesidad de lanzar el script `deploy_to_nas.sh` manualmente desde el Mac.
+- [x] Configurar un sistema de despliegue continuo (ej. Watchtower o Portainer webhooks).
+- [x] Conectar el NAS a GitHub para que detecte los `git push`.
+- [x] Automatizar la compilación y el redespliegue sin necesidad de lanzar el script `deploy_to_nas.sh` manualmente desde el Mac.
 
 ### 3. 🛡️ Infraestructura Doméstica (Homelab)
 - [ ] Investigar la API o el panel del router **FritzBox**.
