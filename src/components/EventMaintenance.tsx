@@ -133,7 +133,7 @@ export default function EventMaintenance({ events, session }: { events: any[], s
                 
                 <button 
                   onClick={() => handleDelete(event.id, event.name, event.isActive)} 
-                  className="btn btn-danger mobile-w-full" 
+                  style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   title="Borrar"
                   disabled={event.isActive || actionLoading !== null}
                 >

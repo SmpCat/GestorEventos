@@ -133,7 +133,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
               {isAdmin && (
                 <button 
                   onClick={() => handleRemoveRule(idx)} 
-                  className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center"
+                  style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   title="Borrar Regla"
                 >
                   <TrashIcon />

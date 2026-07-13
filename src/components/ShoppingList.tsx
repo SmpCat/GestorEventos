@@ -163,7 +163,8 @@ export default function ShoppingList({ items, evidences, eventId, users, current
             <button 
               onClick={() => handleDelete(item.id)} 
               disabled={isProcessing}
-              className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center shrink-0 ml-2"
+              className="flex items-center justify-center shrink-0 ml-2"
+              style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }}
               title="Borrar producto"
             >
               {isProcessing ? '⏳' : <TrashIcon />}
@@ -333,7 +334,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                         <button
                           onClick={() => handleDeleteEvidence(ev.id)}
                           disabled={loading === `delete-ev-${ev.id}`}
-                          className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center shrink-0"
+                          style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }}
                           title="Borrar foto"
                         >
                           {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}

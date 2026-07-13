@@ -247,7 +247,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                         <button 
                           onClick={() => handleDelete(expense.id)}
                           disabled={loading === expense.id}
-                          className="text-red-400/70 hover:text-red-400 transition-colors flex items-center justify-center p-1 bg-transparent border-none outline-none"
+                          className="flex items-center justify-center p-1"
+                          style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }}
                           title="Eliminar gasto"
                         >
                           {loading === expense.id ? '⏳' : <TrashIcon />}
@@ -320,7 +321,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                         <button
                           onClick={() => handleDeleteEvidence(ev.id, ev.expenseId)}
                           disabled={loading === `delete-ev-${ev.id}`}
-                          className="text-red-400/70 hover:text-red-400 transition-colors bg-transparent border-none outline-none p-1 flex items-center justify-center shrink-0"
+                          className="flex items-center justify-center shrink-0"
+                          style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }}
                           title="Borrar foto"
                         >
                           {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
