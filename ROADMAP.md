@@ -1,12 +1,18 @@
-# Roadmap y Futuras Mejoras 🚀
+# 📋 Roadmap General (GestorEventos & Homelab)
 
-Este documento sirve como registro de ideas, características y mejoras que se han planteado para implementar en futuras versiones de la aplicación Gestor de Eventos.
+Lista de tareas pendientes que abordaremos en las próximas sesiones para rematar la infraestructura y la aplicación:
 
-## 📌 Historial de Eventos (Modo Solo Lectura)
-**Objetivo:** Permitir a los usuarios estándar consultar la información de eventos pasados sin riesgo de que modifiquen datos.
-**Descripción:** 
-- En el futuro, un usuario (no administrador) podrá ver una lista con el historial de eventos a los que ha asistido en años anteriores (ej. Fiestas 2024, Viaje 2025).
-- Al seleccionar uno de esos eventos antiguos, la aplicación cargará el "contexto" de ese evento.
-- El usuario podrá navegar por todas las pestañas (Lista de Compra, Gastos, Cuotas, etc.) para consultar la información, pero la interfaz aplicará un modo de **Solo Lectura**.
-- En modo Solo Lectura, los botones de acción (Añadir gasto, subir ticket, marcar como pagado, borrar elemento) estarán ocultos o deshabilitados.
-- **Viabilidad Técnica:** Muy alta. La arquitectura ya es *Multi-Tenant* (basada en la ID del evento), por lo que solo se requiere añadir un conmutador de evento en la interfaz y pasar un flag booleano (`isReadOnly`) a los componentes para ocultar los controles de edición.
+### 1. 🎨 Personalización de la App (GestorEventos)
+- [ ] Diseñar y generar el icono oficial de la aplicación.
+- [ ] Crear el `favicon`, el `apple-touch-icon` y los iconos para el manifiesto PWA.
+- [ ] Asegurarnos de que el icono luce profesional y nativo en iOS y Android.
+
+### 2. 🚀 DevOps: Despliegue Automatizado (CI/CD)
+- [ ] Configurar un sistema de despliegue continuo (ej. Watchtower o Portainer webhooks).
+- [ ] Conectar el NAS a GitHub para que detecte los `git push`.
+- [ ] Automatizar la compilación y el redespliegue sin necesidad de lanzar el script `deploy_to_nas.sh` manualmente desde el Mac.
+
+### 3. 🛡️ Infraestructura Doméstica (Homelab)
+- [ ] Investigar la API o el panel del router **FritzBox**.
+- [ ] Programar un script automático que haga una copia de seguridad periódica de la configuración del router.
+- [ ] Guardar esas copias de seguridad de forma segura en el NAS QNAP.
