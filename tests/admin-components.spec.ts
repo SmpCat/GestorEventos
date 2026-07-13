@@ -41,7 +41,7 @@ test.describe('Componentes Admin y Mantenimiento', () => {
     await page.goto('/admin/users');
 
     // Localizamos la tarjeta o fila del usuario a borrar. "User Delete" es el nombre que le dimos al crearlo.
-    const deleteBtn = page.locator('button[title="Borrar"]').first();
+    const deleteBtn = page.locator('.mobile-hide button[title="Borrar"]').first();
     
     // Debería salir un dialog confirmando. Lo aceptamos
     page.once('dialog', dialog => dialog.accept());
