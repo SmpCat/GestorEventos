@@ -69,7 +69,14 @@ export async function getAttendees(eventId: string) {
     const attendees = await prisma.eventAttendee.findMany({
       where: { eventId },
       include: {
-        user: { select: { id: true, name: true, username: true } },
+        user: { 
+          select: { 
+            id: true, 
+            name: true, 
+            username: true,
+            expenses: { where: { eventId } }
+          } 
+        },
         payments: { orderBy: { date: 'desc' } },
       },
       orderBy: { user: { name: 'asc' } },
@@ -180,10 +187,22 @@ export async function deleteAttendee(attId: string) {
     const session = await getSession();
     if (!session || !session.isAdmin) return { success: false, error: 'No autorizado' };
 
-    // Delete associated payments first to avoid foreign key constraints (if any, though cascade might handle it)
-    await prisma.payment.deleteMany({
+    const attendee = await prisma.eventAttendee.findUnique({ where: { id: attId } });
+    if (!attendee) return { success: false, error: 'Asistente no encontrado' };
+
+    const paymentsCount = await prisma.payment.count({
       where: { attendeeId: attId }
     });
+    if (paymentsCount > 0) {
+      return { success: false, error: 'No se puede expulsar porque tiene pagos registrados. Borra sus pagos primero.' };
+    }
+
+    const expensesCount = await prisma.expense.count({
+      where: { purchaserId: attendee.userId, eventId: attendee.eventId }
+    });
+    if (expensesCount > 0) {
+      return { success: false, error: 'No se puede expulsar porque tiene tickets registrados. Borra o reasigna sus tickets primero.' };
+    }
 
     await prisma.eventAttendee.delete({
       where: { id: attId }

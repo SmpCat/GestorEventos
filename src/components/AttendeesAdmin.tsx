@@ -189,7 +189,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           onClick={() => handleDeleteAttendee(att.id)} 
                           className="btn flex items-center justify-center gap-2 w-full py-2 font-bold" 
                           style={{ backgroundColor: 'var(--accent-danger)', color: '#fff', borderColor: 'var(--accent-danger)' }}
-                          disabled={isProcessing}
+                          disabled={isProcessing || (att.payments && att.payments.length > 0) || (att.user?.expenses && att.user.expenses.length > 0)}
+                          title={(att.payments && att.payments.length > 0) ? 'Debes borrar todos sus pagos registrados antes de poder expulsarlo' : (att.user?.expenses && att.user.expenses.length > 0) ? 'Debes borrar o reasignar todos sus tickets de compra antes de poder expulsarlo' : 'Expulsar Asistente'}
                         >
                           <TrashIcon /> Expulsar Asistente
                         </button>
@@ -326,7 +327,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 onClick={() => handleDeleteAttendee(att.id)} 
                                 className="btn flex items-center justify-center gap-2 w-full py-1.5 text-xs font-bold" 
                                 style={{ backgroundColor: 'var(--accent-danger)', color: '#fff', borderColor: 'var(--accent-danger)' }}
-                                disabled={isProcessing}
+                                disabled={isProcessing || (att.payments && att.payments.length > 0) || (att.user?.expenses && att.user.expenses.length > 0)}
+                                title={(att.payments && att.payments.length > 0) ? 'Debes borrar todos sus pagos registrados antes de poder expulsarlo' : (att.user?.expenses && att.user.expenses.length > 0) ? 'Debes borrar o reasignar todos sus tickets de compra antes de poder expulsarlo' : 'Expulsar Asistente'}
                               >
                                 <TrashIcon /> Expulsar Asistente
                               </button>
