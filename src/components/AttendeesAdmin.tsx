@@ -176,17 +176,15 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           </div>
                         </div>
                       </div>
-                      <div className="mt-4 flex justify-center">
-                        <div className="bg-black/20 p-2 rounded border border-white/5 w-full">
-                          <button 
-                            onClick={() => handleDeleteAttendee(att.id)} 
-                            className="btn flex items-center justify-center gap-2 w-full py-2" 
-                            style={{ borderColor: 'rgba(239, 68, 68, 0.3)', color: 'rgb(239, 68, 68)', backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
-                            disabled={isProcessing}
-                          >
-                            <TrashIcon /> Expulsar Asistente
-                          </button>
-                        </div>
+                      <div className="mt-4 pt-3 border-t border-white/10 flex justify-center">
+                        <button 
+                          onClick={() => handleDeleteAttendee(att.id)} 
+                          className="btn flex items-center justify-center gap-2 w-full py-2" 
+                          style={{ borderColor: 'rgba(239, 68, 68, 0.3)', color: 'rgb(239, 68, 68)', backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
+                          disabled={isProcessing}
+                        >
+                          <TrashIcon /> Expulsar Asistente
+                        </button>
                       </div>
                     </div>
                   )}
@@ -307,17 +305,15 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 </div>
                               </div>
                             </div>
-                            <div className="mt-3 flex justify-center">
-                              <div className="bg-black/20 p-1.5 rounded border border-white/5 w-full">
-                                <button 
-                                  onClick={() => handleDeleteAttendee(att.id)} 
-                                  className="btn flex items-center justify-center gap-2 w-full py-1.5 text-xs" 
-                                  style={{ borderColor: 'rgba(239, 68, 68, 0.3)', color: 'rgb(239, 68, 68)', backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
-                                  disabled={isProcessing}
-                                >
-                                  <TrashIcon /> Expulsar Asistente
-                                </button>
-                              </div>
+                            <div className="mt-3 pt-3 border-t border-white/10 flex justify-center">
+                              <button 
+                                onClick={() => handleDeleteAttendee(att.id)} 
+                                className="btn flex items-center justify-center gap-2 w-full py-1.5 text-xs" 
+                                style={{ borderColor: 'rgba(239, 68, 68, 0.3)', color: 'rgb(239, 68, 68)', backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
+                                disabled={isProcessing}
+                              >
+                                <TrashIcon /> Expulsar Asistente
+                              </button>
                             </div>
                           </div>
                         ) : (
