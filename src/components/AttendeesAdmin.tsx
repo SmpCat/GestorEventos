@@ -135,8 +135,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                   ) : (
                     <div className="flex flex-col gap-3 mt-2 border-t border-white/10 pt-2">
                       <div className="text-sm font-bold text-warning mb-1">Ajuste de Cuota</div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-secondary">Fijar Cuota:</span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm text-secondary">Cuota de {att.daysAttending} días:</span>
                         <div style={{ position: 'relative', flex: 1 }}>
                           <input 
                             type="number" 
