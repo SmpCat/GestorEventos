@@ -40,26 +40,23 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
             {(() => {
               const amountPaid = attendee.amountPaid || 0;
               const quota = attendee.currentQuota || 0;
-              let label = '';
-              let badgeClass = '';
+              const diff = amountPaid - quota; 
               
-              if (amountPaid === 0) {
-                label = '🔴 Pendiente de Pago';
-                badgeClass = 'bg-danger/40 text-white border border-danger';
-              } else if (amountPaid < quota) {
-                label = `🟠 Pendiente de ${quota - amountPaid}€`;
-                badgeClass = 'bg-warning/40 text-white border border-warning';
-              } else if (amountPaid === quota) {
-                label = '✅ Cuota Pagada';
-                badgeClass = 'bg-success/40 text-white border border-success';
-              } else {
-                label = `🔵 Se te debe ${amountPaid - quota}€`;
-                badgeClass = 'bg-info/40 text-white border border-info';
-              }
+              let saldoColor = 'text-white';
+              if (diff < 0) saldoColor = 'text-danger'; // Debe dinero
+              else if (diff > 0) saldoColor = 'text-success'; // Le deben dinero
+              else saldoColor = 'text-success'; // Clavado
 
               return (
-                <div className={`badge ${badgeClass}`} style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', backdropFilter: 'blur(5px)' }}>
-                  {label}
+                <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10" style={{ backdropFilter: 'blur(5px)' }}>
+                  <div className="text-white">
+                    <span className="text-secondary text-sm">Pagado:</span> <strong className="text-lg">{amountPaid}€</strong>
+                  </div>
+                  <div className="w-px h-8 bg-white/20"></div>
+                  <div className={`font-bold ${saldoColor}`}>
+                    <span className="text-secondary text-sm font-normal text-white/70 mr-1">Saldo:</span>
+                    <span className="text-lg">{diff === 0 ? '0€' : `${diff > 0 ? '+' : ''}${diff}€`}</span>
+                  </div>
                 </div>
               );
             })()}
