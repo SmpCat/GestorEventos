@@ -3,9 +3,9 @@
 Lista de tareas pendientes que abordaremos en las próximas sesiones para rematar la infraestructura y la aplicación:
 
 ### 1. 🎨 Personalización de la App (GestorEventos)
-- [ ] Diseñar y generar el icono oficial de la aplicación.
-- [ ] Crear el `favicon`, el `apple-touch-icon` y los iconos para el manifiesto PWA.
-- [ ] Asegurarnos de que el icono luce profesional y nativo en iOS y Android.
+- [x] Diseñar y generar el icono oficial de la aplicación.
+- [x] Crear el `favicon`, el `apple-touch-icon` y los iconos para el manifiesto PWA.
+- [x] Asegurarnos de que el icono luce profesional y nativo en iOS y Android.
 
 ### 2. 🚀 DevOps: Despliegue Automatizado (CI/CD)
 - [x] Configurar un sistema de despliegue continuo (ej. Watchtower o Portainer webhooks).
