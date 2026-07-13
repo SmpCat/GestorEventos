@@ -117,7 +117,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
         <div className="flex mobile-col gap-4">
           <button 
             onClick={handleSaveAndAddRule} 
-            className="btn btn-primary mobile-w-full py-3" 
+            className="btn btn-secondary mobile-w-full py-3" 
             disabled={loading}
           >
             {loading ? 'Guardando...' : '+ Añadir Regla de Precio'}
