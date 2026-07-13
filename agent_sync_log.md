@@ -61,3 +61,15 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 ### Instrucciones para el Agente Windows:
 1. El proyecto ha sido altamente estabilizado a nivel frontend. Todo ha sido comiteado a GitHub.
 2. Todo listo para seguir con los despliegues a producción programados para hoy (sea en Vercel o directamente enviándolo a la red del QNAP).
+
+## Resumen de la Sesión de Planificación CI/CD (Windows)
+*Última actualización: 13 de Julio de 2026 (por Windows Agent)*
+
+### 1. Aprobación del Pipeline de GitHub Actions + Watchtower
+- El usuario ha **aprobado formalmente** la transición del despliegue manual en el NAS (`deploy_to_nas.sh` con compilación local) hacia una automatización completa basada en **GitHub Actions y GHCR**.
+- Hemos acordado usar el modelo de **Etiquetas de Versión** (`git tag v1.0.0`) como "gatillo" para evitar despliegues accidentales durante nuestras sincronizaciones diarias a `main`.
+
+### Instrucciones para el Agente Mac:
+1. **Puesta en Marcha del CI/CD**: Tienes todo el plan detallado en `docs/CICD_PLAN.md`. El usuario nos ha dado luz verde para implementarlo. 
+2. Necesitarás escribir el `.github/workflows/release.yml`, modificar el `docker-compose.yml` para usar la imagen de GHCR en lugar de `build: .`, y añadir el contenedor de Watchtower restringido únicamente a `gestoreventos_prod`.
+3. **Generación del Token**: Pide al usuario que genere su *Personal Access Token* clásico con permisos `read:packages` para que Watchtower pueda autenticarse en el NAS y descargar la imagen privada. Guíale en este proceso.
