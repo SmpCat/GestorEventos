@@ -5,20 +5,19 @@ import { savePricingRules } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
 
 export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { eventId: string, initialRules: any[], isAdmin: boolean }) {
-  const [rules, setRules] = useState<{ days: number, price: number }[]>(initialRules);
+  const [rules, setRules] = useState<{ days: number | '', price: number | '' }[]>(initialRules);
   const [savedRulesJSON, setSavedRulesJSON] = useState<string>(JSON.stringify(initialRules));
   const [loading, setLoading] = useState<boolean>(false);
 
   const hasChanges = JSON.stringify(rules) !== savedRulesJSON;
 
   const handleAddRule = () => {
-    const nextDays = rules.length > 0 ? Math.max(...rules.map(r => r.days)) + 1 : 1;
-    setRules([...rules, { days: nextDays, price: 0 }]);
+    setRules([...rules, { days: '', price: '' }]);
   };
 
-  const handleRuleChange = (index: number, field: 'days' | 'price', value: number) => {
+  const handleRuleChange = (index: number, field: 'days' | 'price', value: string) => {
     const newRules = [...rules];
-    newRules[index][field] = value;
+    newRules[index][field] = value === '' ? '' : Number(value);
     setRules(newRules);
   };
 
@@ -29,11 +28,17 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
   };
 
   const handleSaveRules = async () => {
+    if (rules.some(r => r.days === '' || r.price === '')) {
+      alert('Por favor, rellena todos los campos o borra las reglas incompletas.');
+      return;
+    }
+    
     if (!window.confirm('¿Seguro que quieres guardar estas reglas? Esto podría recalcular las cuotas de los asistentes.')) {
       return;
     }
     setLoading(true);
-    const res = await savePricingRules(eventId, rules);
+    const validRules = rules as { days: number, price: number }[];
+    const res = await savePricingRules(eventId, validRules);
     if (!res.success) {
       alert(res.error || 'Error al guardar las tarifas.');
     } else {
@@ -57,7 +62,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
                 className="input-field text-center" 
                 style={{ width: '2.5rem', padding: '0.4rem 0.1rem' }}
                 value={rule.days}
-                onChange={e => handleRuleChange(idx, 'days', Number(e.target.value))}
+                onChange={e => handleRuleChange(idx, 'days', e.target.value)}
               />
             ) : (
               <strong className="text-center" style={{ width: '2rem' }}>{rule.days}</strong>
@@ -71,7 +76,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
                 className="input-field text-center" 
                 style={{ width: '2.5rem', padding: '0.4rem 0.2rem' }}
                 value={rule.price}
-                onChange={e => handleRuleChange(idx, 'price', Number(e.target.value))}
+                onChange={e => handleRuleChange(idx, 'price', e.target.value)}
               />
             ) : (
               <strong className="text-center text-success" style={{ width: '3rem' }}>{rule.price}</strong>
