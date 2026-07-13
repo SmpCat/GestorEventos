@@ -147,7 +147,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       </div>
 
                       <div className="mt-6 pt-5 border-t border-white/10">
-                        <div className="text-sm font-bold mb-4" style={{ color: 'var(--accent-success)' }}>Historial de Pagos</div>
+                        <div className="text-sm font-bold mb-4">Historial de Pagos</div>
                         <div className="flex flex-col" style={{ gap: '0.75rem' }}>
                           {att.payments?.map((p: any) => (
                             <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
@@ -276,7 +276,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             </div>
                             
                             <div className="bg-black/30 p-2 rounded border border-white/5">
-                              <div className="text-xs mb-4" style={{ color: 'var(--accent-success)' }}>Pagos</div>
+                              <div className="text-xs font-bold mb-4">Pagos</div>
                               <div className="flex flex-col" style={{ gap: '0.75rem' }}>
                                 {att.payments?.map((p: any) => (
                                   <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
