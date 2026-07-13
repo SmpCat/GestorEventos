@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { getSession } from '@/actions/auth';
 
 // --- GESTIÓN DE TARIFAS (ADMIN) ---
 
