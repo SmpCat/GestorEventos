@@ -125,7 +125,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       <div className="text-sm font-bold text-warning mb-1">Ajuste de Cuota</div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-secondary">Fijar Cuota:</span>
-                        <div className="relative flex-1">
+                        <div style={{ position: 'relative', flex: 1 }}>
                           <input 
                             type="number" 
                             className="input-field text-sm p-1 text-center w-full" 
@@ -134,7 +134,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
                             placeholder="Automático"
                           />
-                          <span className="absolute right-2 top-1/2 text-secondary font-bold text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                          <span className="text-secondary font-bold text-sm" style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>€</span>
                         </div>
                       </div>
                       <input 
@@ -151,7 +151,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       </div>
 
                       <div className="mt-6 pt-5 border-t border-white/10">
-                        <div className="text-sm font-bold" style={{ marginBottom: '1.5rem' }}>Historial de Pagos</div>
+                        <div className="text-sm font-bold" style={{ marginBottom: '0.35rem' }}>Historial de Pagos</div>
                         <div className="flex flex-col" style={{ gap: '0.35rem' }}>
                           {att.payments?.map((p: any) => (
                             <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
@@ -168,7 +168,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         )}
                         <div className="mt-6 flex items-center gap-2">
                           <span className="text-sm text-secondary">Añadir Pago:</span>
-                          <div className="relative flex-1">
+                          <div style={{ position: 'relative', flex: 1 }}>
                             <input 
                               type="number" 
                               className="input-field text-sm p-1 text-center w-full" 
@@ -177,7 +177,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                               placeholder="0"
                             />
-                            <span className="absolute right-2 top-1/2 text-secondary font-bold text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                            <span className="text-secondary font-bold text-sm" style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>€</span>
                           </div>
                           <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: '#000', color: 'var(--accent-success)', width: '32px', height: '32px', padding: 0, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
                             +
@@ -240,7 +240,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       
                       <td className="py-3 px-2 text-right align-top">
                         {isEditing ? (
-                          <div className="relative inline-block w-20">
+                          <div style={{ position: 'relative', display: 'inline-block', width: '5rem' }}>
                             <input 
                               type="number" 
                               className="input-field text-right text-sm w-full" 
@@ -249,7 +249,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
                               placeholder="Auto"
                             />
-                            <span className="absolute right-1 top-1/2 text-secondary text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                            <span className="text-secondary text-sm" style={{ position: 'absolute', right: '0.25rem', top: '50%', transform: 'translateY(-50%)' }}>€</span>
                           </div>
                         ) : (
                           <span style={{ color: att.adminComment ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>
@@ -288,7 +288,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             </div>
                             
                             <div className="bg-black/30 p-2 rounded border border-white/5">
-                              <div className="text-xs font-bold" style={{ marginBottom: '1.5rem' }}>Pagos</div>
+                              <div className="text-xs font-bold" style={{ marginBottom: '0.35rem' }}>Pagos</div>
                               <div className="flex flex-col" style={{ gap: '0.35rem' }}>
                                 {att.payments?.map((p: any) => (
                                   <div key={p.id} className="flex justify-between items-center gap-4" style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
@@ -305,7 +305,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               )}
                               <div className="mt-6 flex items-center gap-2">
                                 <span className="text-sm text-secondary">Añadir Pago:</span>
-                                <div className="relative flex-1">
+                                <div style={{ position: 'relative', flex: 1 }}>
                                   <input 
                                     type="number" 
                                     className="input-field text-sm p-1 text-center w-full" 
@@ -314,7 +314,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                     onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                                     placeholder="0"
                                   />
-                                  <span className="absolute right-2 top-1/2 text-secondary font-bold text-sm" style={{ transform: 'translateY(-50%)' }}>€</span>
+                                  <span className="text-secondary font-bold text-sm" style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>€</span>
                                 </div>
                                 <button onClick={() => handleAddPayment(att.id)} className="flex items-center justify-center btn" style={{ backgroundColor: '#000', color: 'var(--accent-success)', width: '32px', height: '32px', padding: 0, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '1.25rem', fontWeight: 'bold' }} disabled={isProcessing || newPaymentAmount === ''} title="Añadir Pago">
                                   +
