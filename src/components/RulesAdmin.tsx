@@ -11,10 +11,6 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
 
   const hasChanges = JSON.stringify(rules) !== savedRulesJSON;
 
-  const handleAddRule = () => {
-    setRules([...rules, { days: '', price: '' }]);
-  };
-
   const handleRuleChange = (index: number, field: 'days' | 'price', value: string) => {
     const newRules = [...rules];
     newRules[index][field] = value === '' ? '' : Number(value);
@@ -27,25 +23,36 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
     }
   };
 
-  const handleSaveRules = async () => {
+  const handleSaveAndAddRule = async () => {
+    // Validar que las reglas actuales están completas
     if (rules.some(r => r.days === '' || r.price === '')) {
-      alert('Por favor, rellena todos los campos o borra las reglas incompletas.');
+      alert('Por favor, rellena la tarifa que tienes a medias (o bórrala) antes de añadir otra nueva.');
       return;
     }
-    
-    if (!window.confirm('¿Seguro que quieres guardar estas reglas? Esto podría recalcular las cuotas de los asistentes.')) {
+    if (rules.some(r => Number(r.days) <= 0)) {
+      alert('Corrije el error: no se pueden crear tarifas de 0 días.');
       return;
     }
-    setLoading(true);
-    const validRules = rules as { days: number, price: number }[];
-    const res = await savePricingRules(eventId, validRules);
-    if (!res.success) {
-      alert(res.error || 'Error al guardar las tarifas.');
-    } else {
-      setSavedRulesJSON(JSON.stringify(rules));
-      alert('Tarifas guardadas correctamente.');
+
+    // Si hay cambios sin guardar, guardarlos primero en base de datos
+    if (hasChanges) {
+      if (!window.confirm('Se van a guardar los cambios antes de añadir una nueva tarifa. ¿Continuar?')) {
+        return;
+      }
+      setLoading(true);
+      const validRules = rules as { days: number, price: number }[];
+      const res = await savePricingRules(eventId, validRules);
+      setLoading(false);
+      
+      if (!res.success) {
+        alert(res.error || 'Error al guardar las tarifas.');
+        return; // Detenemos la ejecución, no abrimos la nueva fila
+      }
+      setSavedRulesJSON(JSON.stringify(validRules));
     }
-    setLoading(false);
+
+    // Si todo está correcto y guardado (o no había cambios), abrimos una nueva fila vacía
+    setRules(prev => [...prev, { days: '', price: '' }]);
   };
 
   return (
@@ -102,16 +109,12 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
 
       {isAdmin && (
         <div className="flex mobile-col gap-4">
-          <button onClick={handleAddRule} className="btn btn-secondary mobile-w-full py-3">
-            + Añadir Regla de Precio
-          </button>
           <button 
-            onClick={handleSaveRules} 
-            className={`btn mobile-w-full py-3 ${hasChanges ? 'btn-primary' : 'btn-secondary'}`} 
-            style={{ opacity: hasChanges ? 1 : 0.5 }}
-            disabled={loading || !hasChanges}
+            onClick={handleSaveAndAddRule} 
+            className="btn btn-primary mobile-w-full py-3" 
+            disabled={loading}
           >
-            {loading ? 'Guardando...' : hasChanges ? '⚠️ Guardar Tarifas' : '✅ Guardado'}
+            {loading ? 'Guardando...' : '+ Añadir Regla de Precio'}
           </button>
         </div>
       )}
