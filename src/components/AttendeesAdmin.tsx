@@ -171,7 +171,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                             placeholder="0"
                           />
-                          <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary py-1 px-4 text-sm whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
+                          <button onClick={() => handleAddPayment(att.id)} className="bg-success/20 text-success border border-success/30 hover:bg-success/30 transition-colors rounded px-4 py-1 text-sm font-bold whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
                             + Pago
                           </button>
                         </div>
@@ -300,7 +300,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                   onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                                   placeholder="0"
                                 />
-                                <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary py-1 px-4 text-sm whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
+                                <button onClick={() => handleAddPayment(att.id)} className="bg-success/20 text-success border border-success/30 hover:bg-success/30 transition-colors rounded px-4 py-1 text-sm font-bold whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
                                   + Pago
                                 </button>
                               </div>
