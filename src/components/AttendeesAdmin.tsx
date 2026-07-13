@@ -169,7 +169,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                             placeholder="€"
                           />
-                          <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-3 flex-none" disabled={isProcessing || newPaymentAmount === ''}>
+                          <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-3 flex-1 min-w-0" disabled={isProcessing || newPaymentAmount === ''}>
                             + Pago
                           </button>
                         </div>
@@ -291,12 +291,12 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 <span className="text-[10px] text-secondary uppercase tracking-wider flex-none">Añadir:</span>
                                 <input 
                                   type="number" 
-                                  className="input-field text-xs p-1 text-center w-16" 
+                                  className="input-field text-xs p-1 text-center flex-1 min-w-0" 
                                   value={newPaymentAmount}
                                   onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
                                   placeholder="€"
                                 />
-                                <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs flex-1" disabled={isProcessing || newPaymentAmount === ''}>
+                                <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs flex-1 min-w-0" disabled={isProcessing || newPaymentAmount === ''}>
                                   + Pago
                                 </button>
                               </div>
