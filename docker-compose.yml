@@ -26,7 +26,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       # Mapeamos el archivo de autenticación de Docker del NAS para acceder a GHCR
-      - /root/.docker/config.json:/config.json:ro
+      - /share/CACHEDEV1_DATA/.qpkg/container-station/homes/admin/.docker/config.json:/config.json:ro
     environment:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_POLL_INTERVAL=300 # Comprueba cada 5 minutos
