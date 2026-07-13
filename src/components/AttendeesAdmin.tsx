@@ -145,8 +145,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         onChange={e => setEditComment(e.target.value)}
                       />
                       <div className="flex mobile-col gap-2 mt-1">
-                        <button onClick={() => saveAttendee(att.id)} className="btn btn-primary mobile-w-full py-1.5 text-sm" disabled={isProcessing}>
-                          💾 Guardar Cuota
+                        <button onClick={() => saveAttendee(att.id)} className="btn mobile-w-full py-1.5 text-sm font-bold" style={{ backgroundColor: '#fff', color: '#000', border: 'none' }} disabled={isProcessing}>
+                          Guardar Ajustes
                         </button>
                       </div>
 
@@ -188,7 +188,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         <button 
                           onClick={() => handleDeleteAttendee(att.id)} 
                           className="btn flex items-center justify-center gap-2 w-full py-2 font-bold" 
-                          style={{ backgroundColor: 'var(--accent-danger)', color: '#fff', borderColor: 'var(--accent-danger)' }}
+                          style={{ backgroundColor: 'transparent', color: 'var(--accent-danger)', border: '1px solid rgba(248, 113, 113, 0.3)' }}
                           disabled={isProcessing || (att.payments && att.payments.length > 0) || (att.user?.expenses && att.user.expenses.length > 0)}
                           title={(att.payments && att.payments.length > 0) ? 'Debes borrar todos sus pagos registrados antes de poder expulsarlo' : (att.user?.expenses && att.user.expenses.length > 0) ? 'Debes borrar o reasignar todos sus tickets de compra antes de poder expulsarlo' : 'Expulsar Asistente'}
                         >
@@ -282,8 +282,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 onChange={e => setEditComment(e.target.value)}
                               />
                               <div className="flex gap-2">
-                                <button onClick={() => saveAttendee(att.id)} className="btn btn-primary w-full py-1 text-xs" disabled={isProcessing}>
-                                  Guardar Cuota
+                                <button onClick={() => saveAttendee(att.id)} className="btn px-3 text-xs font-bold" style={{ backgroundColor: '#fff', color: '#000', border: 'none' }} disabled={isProcessing}>
+                                  Guardar
                                 </button>
                               </div>
                             </div>
@@ -326,7 +326,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               <button 
                                 onClick={() => handleDeleteAttendee(att.id)} 
                                 className="btn flex items-center justify-center gap-2 w-full py-1.5 text-xs font-bold" 
-                                style={{ backgroundColor: 'var(--accent-danger)', color: '#fff', borderColor: 'var(--accent-danger)' }}
+                                style={{ backgroundColor: 'transparent', color: 'var(--accent-danger)', border: '1px solid rgba(248, 113, 113, 0.3)' }}
                                 disabled={isProcessing || (att.payments && att.payments.length > 0) || (att.user?.expenses && att.user.expenses.length > 0)}
                                 title={(att.payments && att.payments.length > 0) ? 'Debes borrar todos sus pagos registrados antes de poder expulsarlo' : (att.user?.expenses && att.user.expenses.length > 0) ? 'Debes borrar o reasignar todos sus tickets de compra antes de poder expulsarlo' : 'Expulsar Asistente'}
                               >
