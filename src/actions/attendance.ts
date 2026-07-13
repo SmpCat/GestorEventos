@@ -159,13 +159,40 @@ export async function addPayment(attendeeId: string, amount: number) {
 
 export async function deletePayment(paymentId: string) {
   try {
+    const session = await getSession();
+    if (!session || !session.isAdmin) return { success: false, error: 'No autorizado' };
+
     await prisma.payment.delete({
       where: { id: paymentId }
     });
+
     revalidatePath('/pricing/attendees');
     revalidatePath('/pricing/results');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: 'Error al eliminar pago: ' + error.message };
+  }
+}
+
+export async function deleteAttendee(attId: string) {
+  try {
+    const session = await getSession();
+    if (!session || !session.isAdmin) return { success: false, error: 'No autorizado' };
+
+    // Delete associated payments first to avoid foreign key constraints (if any, though cascade might handle it)
+    await prisma.payment.deleteMany({
+      where: { attendeeId: attId }
+    });
+
+    await prisma.eventAttendee.delete({
+      where: { id: attId }
+    });
+
+    revalidatePath('/pricing/attendees');
+    revalidatePath('/pricing/rules');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: 'Error al eliminar asistente: ' + error.message };
   }
 }

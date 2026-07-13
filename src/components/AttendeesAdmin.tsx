@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { updateAttendeeAdmin, addPayment, deletePayment } from '@/actions/attendance';
+import { updateAttendeeAdmin, addPayment, deletePayment, deleteAttendee } from '@/actions/attendance';
 
 export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[], isAdmin: boolean }) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -58,6 +58,20 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
       alert('Pago eliminado.');
     } else {
       alert(res.error || 'Error al borrar el pago.');
+    }
+    setLoading(null);
+  };
+
+  const handleDeleteAttendee = async (attId: string) => {
+    if (!window.confirm('🚨 ¿ESTÁS COMPLETAMENTE SEGURO? Esta acción expulsará a esta persona del evento y borrará todos sus pagos registrados. No se puede deshacer.')) return;
+    
+    setLoading(`del-att-${attId}`);
+    const res = await deleteAttendee(attId);
+    if (res.success) {
+      alert('Asistente expulsado del evento correctamente.');
+      setEditingAttendee(null);
+    } else {
+      alert(res.error || 'Error al eliminar el asistente.');
     }
     setLoading(null);
   };
@@ -158,6 +172,11 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             + Pago
                           </button>
                         </div>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-red-500/30 flex justify-center">
+                        <button onClick={() => handleDeleteAttendee(att.id)} className="text-danger text-sm font-bold hover:underline" disabled={isProcessing}>
+                          🚨 Expulsar / Borrar Asistente
+                        </button>
                       </div>
                     </div>
                   )}
@@ -270,6 +289,11 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                   Añadir
                                 </button>
                               </div>
+                            </div>
+                            <div className="bg-black/30 p-2 rounded border border-red-500/20 mt-1 flex justify-center">
+                              <button onClick={() => handleDeleteAttendee(att.id)} className="text-danger text-xs font-bold hover:underline" disabled={isProcessing}>
+                                🚨 Expulsar / Borrar Asistente
+                              </button>
                             </div>
                           </div>
                         ) : (
