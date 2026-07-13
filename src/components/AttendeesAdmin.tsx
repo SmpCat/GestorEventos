@@ -160,7 +160,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         {(!att.payments || att.payments.length === 0) && (
                           <div className="text-xs text-secondary italic mb-2">Ningún pago registrado.</div>
                         )}
-                        <div className="bg-black/20 p-2 rounded border border-white/5 mt-3">
+                        <div className="bg-black/20 p-2 rounded border border-white/5 mt-6">
                           <div className="text-[10px] text-secondary mb-1 uppercase tracking-wider">Añadir Nuevo Pago</div>
                           <div className="flex gap-2">
                             <input 
@@ -289,7 +289,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               {(!att.payments || att.payments.length === 0) && (
                                 <div className="text-xs text-secondary italic mb-2">Ningún pago.</div>
                               )}
-                              <div className="bg-black/20 p-1.5 rounded border border-white/5 mt-2">
+                              <div className="bg-black/20 p-1.5 rounded border border-white/5 mt-5">
                                 <div className="text-[10px] text-secondary mb-1 uppercase tracking-wider">Añadir Pago</div>
                                 <div className="flex gap-1">
                                   <input 
