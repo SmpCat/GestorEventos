@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { savePricingRules } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
 
-export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { eventId: string, initialRules: any[], isAdmin: boolean }) {
+export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseDays = [] }: { eventId: string, initialRules: any[], isAdmin: boolean, inUseDays?: number[] }) {
   const [rules, setRules] = useState<{ days: number | '', price: number | '' }[]>(initialRules);
   const [savedRulesJSON, setSavedRulesJSON] = useState<string>(JSON.stringify(initialRules));
   const [loading, setLoading] = useState<boolean>(false);
@@ -18,6 +18,12 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
   };
 
   const handleRemoveRule = (index: number) => {
+    const ruleToDelete = rules[index];
+    if (ruleToDelete.days !== '' && inUseDays.includes(Number(ruleToDelete.days))) {
+      alert(`No puedes borrar la tarifa de ${ruleToDelete.days} días porque hay asistentes apuntados a ella. Cambia la tarifa de esas personas primero.`);
+      return;
+    }
+
     if (window.confirm('¿Seguro que quieres borrar esta regla de precio?')) {
       setRules(rules.filter((_, i) => i !== index));
     }

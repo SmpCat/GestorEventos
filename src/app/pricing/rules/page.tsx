@@ -32,6 +32,10 @@ export default async function RulesPage() {
   const rulesRes = await getPricingRules(activeEvent.id);
   const rules = rulesRes.success && rulesRes.data ? rulesRes.data : [];
 
+  // Buscar tarifas en uso
+  const attendees = await prisma.eventAttendee.findMany({ where: { eventId: activeEvent.id } });
+  const inUseDays = Array.from(new Set(attendees.map(a => a.daysAttending).filter(d => d > 0)));
+
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
@@ -44,6 +48,7 @@ export default async function RulesPage() {
         eventId={activeEvent.id} 
         initialRules={rules} 
         isAdmin={session.isAdmin}
+        inUseDays={inUseDays}
       />
     </div>
   );
