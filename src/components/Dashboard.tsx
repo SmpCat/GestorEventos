@@ -53,9 +53,9 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
                     <span className="text-secondary text-sm">Pagado:</span> <strong className="text-lg">{amountPaid}€</strong>
                   </div>
                   <div className="w-px h-8 bg-white/20"></div>
-                  <div className="font-bold" style={{ color: saldoColor }}>
-                    <span className="text-secondary text-sm font-normal text-white/70 mr-1">Saldo:</span>
-                    <span className="text-lg">{diff === 0 ? '0€' : `${diff > 0 ? '+' : ''}${diff}€`}</span>
+                  <div style={{ color: saldoColor }}>
+                    <span className="text-secondary text-sm text-white/70 mr-1">Saldo:</span>
+                    <strong className="text-xl font-black">{diff === 0 ? '0€' : `${diff > 0 ? '+' : ''}${diff}€`}</strong>
                   </div>
                 </div>
               );
