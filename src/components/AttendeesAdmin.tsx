@@ -63,11 +63,23 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
     setLoading(null);
   };
 
-  const handleDeleteAttendee = async (attId: string) => {
-    if (!window.confirm('🚨 ¿ESTÁS COMPLETAMENTE SEGURO? Esta acción expulsará a esta persona del evento y borrará todos sus pagos registrados. No se puede deshacer.')) return;
+  const handleDeleteAttendee = async (att: any) => {
+    const hasPayments = att.payments && att.payments.length > 0;
+    const hasExpenses = att.user?.expenses && att.user.expenses.length > 0;
+
+    if (hasPayments) {
+      alert('⛔️ No puedes expulsar a este asistente porque tiene PAGOS de cuota registrados. Debes borrarlos todos primero.');
+      return;
+    }
+    if (hasExpenses) {
+      alert('⛔️ No puedes expulsar a este asistente porque tiene TICKETS de gastos registrados. Debes borrar o reasignar sus tickets en la sección Gastos primero.');
+      return;
+    }
+
+    if (!window.confirm('🚨 ¿ESTÁS COMPLETAMENTE SEGURO? Esta acción expulsará a esta persona del evento. No se puede deshacer.')) return;
     
-    setLoading(`del-att-${attId}`);
-    const res = await deleteAttendee(attId);
+    setLoading(`del-att-${att.id}`);
+    const res = await deleteAttendee(att.id);
     if (res.success) {
       alert('Asistente expulsado del evento correctamente.');
       setEditingAttendee(null);
@@ -145,8 +157,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         onChange={e => setEditComment(e.target.value)}
                       />
                       <div className="flex mobile-col gap-2 mt-1">
-                        <button onClick={() => saveAttendee(att.id)} className="btn mobile-w-full py-1.5 text-sm font-bold" style={{ backgroundColor: '#fff', color: '#000', border: 'none' }} disabled={isProcessing}>
-                          Guardar Ajustes
+                        <button onClick={() => saveAttendee(att.id)} className="btn mobile-w-full py-1.5 text-sm font-bold" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.3)' }} disabled={isProcessing}>
+                          Guardar Cuota
                         </button>
                       </div>
 
@@ -186,11 +198,10 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       </div>
                       <div className="mt-4 flex justify-center">
                         <button 
-                          onClick={() => handleDeleteAttendee(att.id)} 
+                          onClick={() => handleDeleteAttendee(att)} 
                           className="btn flex items-center justify-center gap-2 w-full py-2 font-bold" 
                           style={{ backgroundColor: 'transparent', color: 'var(--accent-danger)', border: '1px solid rgba(248, 113, 113, 0.3)' }}
-                          disabled={isProcessing || (att.payments && att.payments.length > 0) || (att.user?.expenses && att.user.expenses.length > 0)}
-                          title={(att.payments && att.payments.length > 0) ? 'Debes borrar todos sus pagos registrados antes de poder expulsarlo' : (att.user?.expenses && att.user.expenses.length > 0) ? 'Debes borrar o reasignar todos sus tickets de compra antes de poder expulsarlo' : 'Expulsar Asistente'}
+                          disabled={isProcessing}
                         >
                           <TrashIcon /> Expulsar Asistente
                         </button>
@@ -282,8 +293,8 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 onChange={e => setEditComment(e.target.value)}
                               />
                               <div className="flex gap-2">
-                                <button onClick={() => saveAttendee(att.id)} className="btn px-3 text-xs font-bold" style={{ backgroundColor: '#fff', color: '#000', border: 'none' }} disabled={isProcessing}>
-                                  Guardar
+                                <button onClick={() => saveAttendee(att.id)} className="btn px-3 text-xs font-bold" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.3)' }} disabled={isProcessing}>
+                                  Guardar Cuota
                                 </button>
                               </div>
                             </div>
@@ -324,11 +335,10 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             </div>
                             <div className="mt-3 flex justify-center">
                               <button 
-                                onClick={() => handleDeleteAttendee(att.id)} 
+                                onClick={() => handleDeleteAttendee(att)} 
                                 className="btn flex items-center justify-center gap-2 w-full py-1.5 text-xs font-bold" 
                                 style={{ backgroundColor: 'transparent', color: 'var(--accent-danger)', border: '1px solid rgba(248, 113, 113, 0.3)' }}
-                                disabled={isProcessing || (att.payments && att.payments.length > 0) || (att.user?.expenses && att.user.expenses.length > 0)}
-                                title={(att.payments && att.payments.length > 0) ? 'Debes borrar todos sus pagos registrados antes de poder expulsarlo' : (att.user?.expenses && att.user.expenses.length > 0) ? 'Debes borrar o reasignar todos sus tickets de compra antes de poder expulsarlo' : 'Expulsar Asistente'}
+                                disabled={isProcessing}
                               >
                                 <TrashIcon /> Expulsar Asistente
                               </button>
