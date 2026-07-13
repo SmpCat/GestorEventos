@@ -134,13 +134,16 @@ test.describe('Macro-Simulación: 50 Asistentes', () => {
     if (isLogin) {
       await page.fill('input[type="text"]', `${prefix}_admin`);
       await page.fill('input[type="password"]', '123456');
-      await Promise.all([page.waitForNavigation(), page.click('button', { hasText: 'Acceder' })]);
+      await page.click('button', { hasText: 'Acceder' });
+      // Esperar a que el server action responda y nos redirija a la raíz, para que no pise la siguiente navegación
+      await page.waitForURL('**/');
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // 1. Validar Rendimiento del Dashboard (Asistentes)
     const startTime = Date.now();
-    await page.goto('/admin/users'); // Solo para forzar el paso
-    await page.goto('/pricing/results'); // Vamos directo a la zona pesada de matemáticas
+    await page.goto('/admin/users', { waitUntil: 'domcontentloaded' }); // Solo para forzar el paso
+    await page.goto('/pricing/results', { waitUntil: 'domcontentloaded' }); // Vamos directo a la zona pesada de matemáticas
     await expect(page.locator('text=Ingresos y Gastos')).toBeVisible({ timeout: 15000 });
     const endTime = Date.now();
     
