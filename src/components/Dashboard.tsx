@@ -42,10 +42,10 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
               const quota = attendee.currentQuota || 0;
               const diff = amountPaid - quota; 
               
-              let saldoColor = 'text-white';
-              if (diff < 0) saldoColor = 'text-danger'; // Debe dinero
-              else if (diff > 0) saldoColor = 'text-success'; // Le deben dinero
-              else saldoColor = 'text-success'; // Clavado
+              let saldoColor = '#fff';
+              if (diff < 0) saldoColor = 'var(--accent-danger)'; // Debe dinero
+              else if (diff > 0) saldoColor = 'var(--accent-success)'; // Le deben dinero
+              else saldoColor = 'var(--accent-success)'; // Clavado
 
               return (
                 <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10" style={{ backdropFilter: 'blur(5px)' }}>
@@ -53,7 +53,7 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
                     <span className="text-secondary text-sm">Pagado:</span> <strong className="text-lg">{amountPaid}€</strong>
                   </div>
                   <div className="w-px h-8 bg-white/20"></div>
-                  <div className={`font-bold ${saldoColor}`}>
+                  <div className="font-bold" style={{ color: saldoColor }}>
                     <span className="text-secondary text-sm font-normal text-white/70 mr-1">Saldo:</span>
                     <span className="text-lg">{diff === 0 ? '0€' : `${diff > 0 ? '+' : ''}${diff}€`}</span>
                   </div>
