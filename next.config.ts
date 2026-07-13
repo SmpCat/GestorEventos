@@ -12,7 +12,7 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   serverExternalPackages: [],
-  allowedDevOrigins: ['192.168.178.73', '192.168.178.73:3000', '192.168.178.22', '192.168.178.22:3000'],
+  allowedDevOrigins: ['192.168.178.73', '192.168.178.73:3000', '192.168.178.22', '192.168.178.22:3000', 'eventos-dev.duckdns.org'],
   experimental: {
     serverActions: {
       allowedOrigins: [
@@ -20,7 +20,8 @@ const nextConfig: NextConfig = {
         'localhost:3000', 
         '192.168.178.22:3000',
         'eventos-smp.duckdns.org',
-        'smpha.duckdns.org'
+        'smpha.duckdns.org',
+        'eventos-dev.duckdns.org'
       ],
       bodySizeLimit: '20mb',
     },
