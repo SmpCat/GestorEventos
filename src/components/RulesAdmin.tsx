@@ -59,8 +59,9 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
               <input 
                 type="number" 
                 min="1" 
+                placeholder="-"
                 className="input-field text-center" 
-                style={{ width: '2.5rem', padding: '0.4rem 0.1rem' }}
+                style={{ width: '3rem', padding: '0.4rem 0.1rem', borderBottom: '2px solid rgba(255,255,255,0.3)' }}
                 value={rule.days}
                 onChange={e => handleRuleChange(idx, 'days', e.target.value)}
               />
@@ -73,8 +74,9 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin }: { ev
                 type="number" 
                 min="0" 
                 step="0.5"
+                placeholder="-"
                 className="input-field text-center" 
-                style={{ width: '2.5rem', padding: '0.4rem 0.2rem' }}
+                style={{ width: '3.5rem', padding: '0.4rem 0.2rem', borderBottom: '2px solid rgba(255,255,255,0.3)' }}
                 value={rule.price}
                 onChange={e => handleRuleChange(idx, 'price', e.target.value)}
               />

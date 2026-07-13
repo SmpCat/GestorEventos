@@ -18,9 +18,12 @@ export async function getPricingRules(eventId: string) {
 }
 
 export async function savePricingRules(eventId: string, rules: { days: number, price: number }[]) {
-  // Validate uniqueness of days
+  // Validate uniqueness of days and > 0
   const daysSet = new Set<number>();
   for (const rule of rules) {
+    if (rule.days <= 0) {
+      return { success: false, error: 'No se pueden crear tarifas de 0 días.' };
+    }
     if (daysSet.has(rule.days)) {
       return { success: false, error: `No puedes tener varias reglas para el mismo número de días (tiene repetido: ${rule.days} días).` };
     }
