@@ -162,20 +162,18 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         {(!att.payments || att.payments.length === 0) && (
                           <div className="text-xs text-secondary italic mb-2">Ningún pago registrado.</div>
                         )}
-                        <div className="bg-black/20 p-2 rounded border border-white/5 mt-6 flex items-center gap-2">
-                          <span className="text-[10px] text-secondary uppercase tracking-wider flex-none">Añadir:</span>
-                          <div className="flex gap-2">
-                            <input 
-                              type="number" 
-                              className="input-field text-sm p-1.5 text-center w-24" 
-                              value={newPaymentAmount}
-                              onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
-                              placeholder="€"
-                            />
-                            <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-0 w-24 whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
-                              + Pago
-                            </button>
-                          </div>
+                        <div className="mt-6 flex items-center gap-2">
+                          <span className="text-sm text-secondary">Añadir Pago (€):</span>
+                          <input 
+                            type="number" 
+                            className="input-field text-sm p-1 text-center flex-1" 
+                            value={newPaymentAmount}
+                            onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                            placeholder="0"
+                          />
+                          <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary py-1 px-4 text-sm whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
+                            + Pago
+                          </button>
                         </div>
                       </div>
                       <div className="mt-4 flex justify-center">
@@ -293,20 +291,18 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               {(!att.payments || att.payments.length === 0) && (
                                 <div className="text-xs text-secondary italic mb-2">Ningún pago.</div>
                               )}
-                              <div className="bg-black/20 p-1.5 rounded border border-white/5 mt-5 flex items-center gap-2">
-                                <span className="text-[10px] text-secondary uppercase tracking-wider flex-none">Añadir:</span>
-                                <div className="flex gap-2">
-                                  <input 
-                                    type="number" 
-                                    className="input-field text-xs p-1 text-center w-20" 
-                                    value={newPaymentAmount}
-                                    onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
-                                    placeholder="€"
-                                  />
-                                  <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs px-0 w-20 whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
-                                    + Pago
-                                  </button>
-                                </div>
+                              <div className="mt-6 flex items-center gap-2">
+                                <span className="text-sm text-secondary">Añadir Pago (€):</span>
+                                <input 
+                                  type="number" 
+                                  className="input-field text-sm p-1 text-center flex-1" 
+                                  value={newPaymentAmount}
+                                  onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                                  placeholder="0"
+                                />
+                                <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary py-1 px-4 text-sm whitespace-nowrap" disabled={isProcessing || newPaymentAmount === ''}>
+                                  + Pago
+                                </button>
                               </div>
                             </div>
                             <div className="mt-3 flex justify-center">
