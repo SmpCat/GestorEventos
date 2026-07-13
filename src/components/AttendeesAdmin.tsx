@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { updateAttendeeAdmin, addPayment, deletePayment, deleteAttendee } from '@/actions/attendance';
+import TrashIcon from './TrashIcon';
 
 export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[], isAdmin: boolean }) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -154,7 +155,9 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           <div key={p.id} className="flex justify-between items-center text-xs bg-black/40 p-2 rounded mb-1">
                             <span className="text-secondary">{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
                             <span className="font-bold text-success">+{p.amount}€</span>
-                            <button onClick={() => handleDeletePayment(p.id)} className="text-danger px-2 py-0.5 rounded hover:bg-danger/20" disabled={isProcessing}>❌</button>
+                            <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors p-1" disabled={isProcessing} title="Borrar Pago">
+                              <TrashIcon />
+                            </button>
                           </div>
                         ))}
                         {(!att.payments || att.payments.length === 0) && (
@@ -173,9 +176,14 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           </button>
                         </div>
                       </div>
-                      <div className="mt-4 pt-3 border-t border-red-500/30 flex justify-center">
-                        <button onClick={() => handleDeleteAttendee(att.id)} className="text-danger text-sm font-bold hover:underline" disabled={isProcessing}>
-                          🚨 Expulsar / Borrar Asistente
+                      <div className="mt-4 pt-3 flex justify-center">
+                        <button 
+                          onClick={() => handleDeleteAttendee(att.id)} 
+                          className="btn flex items-center justify-center gap-2 w-full py-2" 
+                          style={{ borderColor: 'rgba(239, 68, 68, 0.3)', color: 'rgb(239, 68, 68)', backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
+                          disabled={isProcessing}
+                        >
+                          <TrashIcon /> Expulsar Asistente
                         </button>
                       </div>
                     </div>
@@ -274,7 +282,9 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 <div key={p.id} className="flex justify-between items-center text-xs bg-black/40 p-1.5 rounded mb-1">
                                   <span className="text-secondary">{new Date(p.date).toLocaleDateString('es-ES')}</span>
                                   <span className="font-bold text-success">+{p.amount}€</span>
-                                  <button onClick={() => handleDeletePayment(p.id)} className="text-danger hover:text-white" disabled={isProcessing}>❌</button>
+                                  <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors p-1" disabled={isProcessing} title="Borrar Pago">
+                                    <TrashIcon />
+                                  </button>
                                 </div>
                               ))}
                               <div className="flex gap-1 mt-2">
@@ -290,9 +300,14 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 </button>
                               </div>
                             </div>
-                            <div className="bg-black/30 p-2 rounded border border-red-500/20 mt-1 flex justify-center">
-                              <button onClick={() => handleDeleteAttendee(att.id)} className="text-danger text-xs font-bold hover:underline" disabled={isProcessing}>
-                                🚨 Expulsar / Borrar Asistente
+                            <div className="mt-2 flex justify-center">
+                              <button 
+                                onClick={() => handleDeleteAttendee(att.id)} 
+                                className="btn flex items-center justify-center gap-2 w-full py-1.5 text-xs" 
+                                style={{ borderColor: 'rgba(239, 68, 68, 0.3)', color: 'rgb(239, 68, 68)', backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
+                                disabled={isProcessing}
+                              >
+                                <TrashIcon /> Expulsar Asistente
                               </button>
                             </div>
                           </div>
