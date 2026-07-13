@@ -40,7 +40,7 @@ export default async function RulesPage() {
     <div>
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h1>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Tarifas</h1>
         </div>
       </div>
 
