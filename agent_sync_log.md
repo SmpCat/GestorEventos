@@ -45,3 +45,19 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 ### Instrucciones para el Agente Mac:
 1. Las nuevas pruebas E2E y el macro-simulador están en la carpeta `tests/`. Puedes ejecutarlos cuando quieras para asegurar la consistencia.
 2. Todo el código de GestorEventos es 100% estable. Tienes luz verde para empaquetarlo y mandarlo al QNAP mediante Docker.
+
+## Resumen de la Sesión de UX y Diseño Frontend (Mac)
+*Última actualización: 13 de Julio de 2026 (por Mac Agent)*
+
+### 1. Refactorización de UI/UX (AttendeesAdmin & RulesAdmin)
+- **Papeleras Globales:** Se reemplazaron todos los botones de borrado masivos rojos (`btn-danger`) por elegantes iconos de papelera flotantes transparentes con texto blanco, unificando la línea gráfica premium en toda la app (`ExpenseList.tsx`, `ShoppingList.tsx`, `UserMaintenance.tsx`, `EventMaintenance.tsx`).
+- **Formularios de Cuota:** Se ajustó la cuadrícula móvil para poner el *input* directamente debajo del texto que ahora muestra explícitamente `Cuota de X días:`. Se devolvió el nombre `Guardar Cuota` al botón, aplicándole estilo transparente/bordes.
+- **Botones Peligrosos:** "Expulsar Asistente" fue transformado en un botón `transparent` de borde rojo.
+
+### 2. Safeguards (Doble Seguridad Antimorosidad)
+- **Capa Servidor (`actions/attendance.ts`):** Añadido bloqueo estricto en `deleteAttendee` impidiendo la expulsión de usuarios si existen registros en `Payment` (han pagado cuota) o `Expense` (tienen tickets a su nombre).
+- **Capa Cliente:** Los botones de "Expulsar Asistente" ya no se inhabilitan en gris genérico de HTML. Ahora interceptan el clic y emiten una advertencia nativa (`alert`) detallando la necesidad de borrar/reasignar pagos o gastos antes de la expulsión.
+
+### Instrucciones para el Agente Windows:
+1. El proyecto ha sido altamente estabilizado a nivel frontend. Todo ha sido comiteado a GitHub.
+2. Todo listo para seguir con los despliegues a producción programados para hoy (sea en Vercel o directamente enviándolo a la red del QNAP).
