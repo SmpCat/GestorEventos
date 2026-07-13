@@ -44,7 +44,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
     }
     
     setLoading(true);
-    const validRules = rules as { days: number, price: number }[];
+    const validRules = (rules as { days: number, price: number }[]).sort((a, b) => a.days - b.days);
     const res = await savePricingRules(eventId, validRules);
     setLoading(false);
     
@@ -52,7 +52,8 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
       alert(res.error || 'Error al guardar las tarifas.');
     } else {
       setSavedRulesJSON(JSON.stringify(validRules));
-      alert('Tarifas guardadas correctamente.');
+      setRules(validRules);
+      alert('Tarifas guardadas correctamente y ordenadas por días.');
     }
   };
 
@@ -73,7 +74,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
         return;
       }
       setLoading(true);
-      const validRules = rules as { days: number, price: number }[];
+      const validRules = (rules as { days: number, price: number }[]).sort((a, b) => a.days - b.days);
       const res = await savePricingRules(eventId, validRules);
       setLoading(false);
       
@@ -82,10 +83,13 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
         return; // Detenemos la ejecución, no abrimos la nueva fila
       }
       setSavedRulesJSON(JSON.stringify(validRules));
+      
+      // Si todo está correcto y guardado, abrimos una nueva fila vacía con las reglas ya ordenadas
+      setRules([...validRules, { days: '', price: '' }]);
+    } else {
+      // Si no había cambios, simplemente abrimos una nueva fila vacía
+      setRules(prev => [...prev, { days: '', price: '' }]);
     }
-
-    // Si todo está correcto y guardado (o no había cambios), abrimos una nueva fila vacía
-    setRules(prev => [...prev, { days: '', price: '' }]);
   };
 
   return (
