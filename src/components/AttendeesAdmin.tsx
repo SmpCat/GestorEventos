@@ -162,16 +162,18 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         )}
                         <div className="bg-black/20 p-2 rounded border border-white/5 mt-6 flex items-center gap-2">
                           <span className="text-[10px] text-secondary uppercase tracking-wider flex-none">Añadir:</span>
-                          <input 
-                            type="number" 
-                            className="input-field text-sm p-1.5 text-center flex-1 min-w-0" 
-                            value={newPaymentAmount}
-                            onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
-                            placeholder="€"
-                          />
-                          <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-3 flex-1 min-w-0" disabled={isProcessing || newPaymentAmount === ''}>
-                            + Pago
-                          </button>
+                          <div className="flex gap-2 flex-1">
+                            <input 
+                              type="number" 
+                              className="input-field text-sm p-1.5 text-center w-1/2" 
+                              value={newPaymentAmount}
+                              onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                              placeholder="€"
+                            />
+                            <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-sm px-0 w-1/2" disabled={isProcessing || newPaymentAmount === ''}>
+                              + Pago
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div className="mt-4 flex justify-center">
@@ -289,16 +291,18 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                               )}
                               <div className="bg-black/20 p-1.5 rounded border border-white/5 mt-5 flex items-center gap-2">
                                 <span className="text-[10px] text-secondary uppercase tracking-wider flex-none">Añadir:</span>
-                                <input 
-                                  type="number" 
-                                  className="input-field text-xs p-1 text-center flex-1 min-w-0" 
-                                  value={newPaymentAmount}
-                                  onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
-                                  placeholder="€"
-                                />
-                                <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs flex-1 min-w-0" disabled={isProcessing || newPaymentAmount === ''}>
-                                  + Pago
-                                </button>
+                                <div className="flex gap-1 flex-1">
+                                  <input 
+                                    type="number" 
+                                    className="input-field text-xs p-1 text-center w-1/2" 
+                                    value={newPaymentAmount}
+                                    onChange={e => setNewPaymentAmount(e.target.value ? Number(e.target.value) : '')}
+                                    placeholder="€"
+                                  />
+                                  <button onClick={() => handleAddPayment(att.id)} className="btn btn-secondary text-xs px-0 w-1/2" disabled={isProcessing || newPaymentAmount === ''}>
+                                    + Pago
+                                  </button>
+                                </div>
                               </div>
                             </div>
                             <div className="mt-3 flex justify-center">
