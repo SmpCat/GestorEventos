@@ -176,7 +176,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           </button>
                         </div>
                       </div>
-                      <div className="mt-4 pt-3 flex justify-center">
+                      <div className="mt-4 pt-3 border-t border-white/10 flex justify-center">
                         <button 
                           onClick={() => handleDeleteAttendee(att.id)} 
                           className="btn flex items-center justify-center gap-2 w-full py-2" 
@@ -300,7 +300,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                                 </button>
                               </div>
                             </div>
-                            <div className="mt-2 flex justify-center">
+                            <div className="mt-3 pt-3 border-t border-white/10 flex justify-center">
                               <button 
                                 onClick={() => handleDeleteAttendee(att.id)} 
                                 className="btn flex items-center justify-center gap-2 w-full py-1.5 text-xs" 
