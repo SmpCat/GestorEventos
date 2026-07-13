@@ -1,42 +1,37 @@
 version: '3.8'
 
 services:
-  gestor-eventos:
+  web:
     image: ghcr.io/smpcat/gestoreventos:latest
-    container_name: gestoreventos_prod
+    container_name: gestoreventos
+    user: "root"
     restart: always
     ports:
       - "3000:3000"
     volumes:
-      - ./data:/app/data
-      - ./public/uploads:/app/public/uploads
+      - /share/CACHEDEV1_DATA/Container/gestoreventos/data:/app/data
+      - /share/CACHEDEV1_DATA/Container/gestoreventos/public/uploads:/app/public/uploads
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/app/data/prod.db
       - NEXT_PUBLIC_BASE_URL=https://eventos-smp.duckdns.org
       - JWT_SECRET=cambia_esta_clave_por_una_super_segura_para_el_nas
-    # Redirigimos el contenedor a la red del proxy maestro
     networks:
       - proxy_network
 
   watchtower:
     image: containrrr/watchtower
-    container_name: watchtower_gestoreventos
+    container_name: watchtower
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      # Mapeamos el archivo de autenticación de Docker del NAS para acceder a GHCR
-      - /share/CACHEDEV1_DATA/.qpkg/container-station/homes/admin/.docker/config.json:/config.json:ro
     environment:
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=300 # Comprueba cada 5 minutos
+      - WATCHTOWER_POLL_INTERVAL=3600
       - WATCHTOWER_INCLUDE_STOPPED=false
-    # Argumento posicional: Solo vigila ESTE contenedor, ignora el resto del NAS
-    command: gestoreventos_prod
+      - WATCHTOWER_RUN_FIRST=true
+    command: gestoreventos
 
-# --------------------------------------------------------
-# CONEXIÓN A RED EXTERNA (Core-Proxy)
-# --------------------------------------------------------
 networks:
   proxy_network:
     external: true

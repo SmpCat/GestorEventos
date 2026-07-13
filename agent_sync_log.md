@@ -73,3 +73,21 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 1. **Puesta en Marcha del CI/CD**: Tienes todo el plan detallado en `docs/CICD_PLAN.md`. El usuario nos ha dado luz verde para implementarlo. 
 2. Necesitarás escribir el `.github/workflows/release.yml`, modificar el `docker-compose.yml` para usar la imagen de GHCR en lugar de `build: .`, y añadir el contenedor de Watchtower restringido únicamente a `gestoreventos_prod`.
 3. **Generación del Token**: Pide al usuario que genere su *Personal Access Token* clásico con permisos `read:packages` para que Watchtower pueda autenticarse en el NAS y descargar la imagen privada. Guíale en este proceso.
+
+## Resumen de la Sesión de Despliegue Automatizado y PWA (Mac)
+*Última actualización: 13 de Julio de 2026 (por Mac Agent)*
+
+### 1. PWA, Iconos y Metadatos Dinámicos
+- **Iconos Diferenciados**: Se implementó una lógica dinámica en `src/app/manifest.ts` y `src/app/layout.tsx` para distinguir entre Producción y Desarrollo. 
+- En Producción se usa el icono de los Girasoles (`apple-icon-prod.png` y `favicon-prod.ico`) y el nombre "Eventos". 
+- En Desarrollo (local) se inyecta el icono "Neon Ticket" (`dev-icon.jpg`) y el nombre "Eventos-Dev". Next.js estaba pisando la configuración auto-descubriendo el favicon, así que se extrajeron los estáticos a nombres custom para inyectarlos manualmente.
+
+### 2. Implementación GitHub Actions -> QNAP (Watchtower)
+- **GitHub Packages Público**: En lugar de pelear con tokens PAT y mapeo de configuraciones Docker (`config.json`), cambiamos el paquete en GitHub a visibilidad "Public". Esto simplificó enormemente el Compose de producción.
+- **Despliegue nativo (Container Station)**: El contenedor se desplegó usando una "Aplicación" nativa de Docker Compose en el QNAP en lugar de contenedores "sueltos", lo cual garantiza persistencia estructural y red.
+- **SQLite Permisos Fix**: Al desplegarse en el NAS, SQLite daba `Permission denied (os error 13)`. Se solucionó añadiendo explícitamente `user: "root"` al `docker-compose.yml` final, otorgando a la imagen Node Alpine los permisos de host necesarios para lectura/escritura en la carpeta local compartida.
+
+### Instrucciones para el Agente Windows:
+1. El sistema `Watchtower` está totalmente operativo. Revisa el `docker-compose.yml` del repositorio para que tengas la configuración final oficial.
+2. Si subes cualquier cambio a `main` creando un tag (ej. `v1.1.5`), GitHub Actions generará la imagen y el QNAP la bajará en menos de una hora sin tocar nada.
+3. El usuario ya tiene un borrador en `instrucciones_instalacion_app.md` / `WHATSAPP_MANUAL.md` para pasarlo a los invitados por WhatsApp con instrucciones de PWA en iOS y Android.
