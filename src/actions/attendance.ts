@@ -30,7 +30,7 @@ export async function savePricingRules(eventId: string, rules: { days: number, p
   // CASO 4: Bloqueo Estricto si se intentan borrar tarifas en uso
   const attendees = await prisma.eventAttendee.findMany({ where: { eventId } });
   for (const att of attendees) {
-    if (!daysSet.has(att.daysAttending)) {
+    if (att.daysAttending > 0 && !daysSet.has(att.daysAttending)) {
       return { 
         success: false, 
         error: `No puedes borrar la tarifa de ${att.daysAttending} días porque hay asistentes apuntados con esos días. Por favor, cambia a esas personas primero.` 
