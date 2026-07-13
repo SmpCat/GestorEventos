@@ -26,7 +26,8 @@ export default async function Home() {
       // Usamos Promise.all para cargar en paralelo si el usuario no tiene caché
       const [attendeeRes, rulesRes] = await Promise.all([
         prisma.eventAttendee.findUnique({
-          where: { userId_eventId: { userId: session.id, eventId: activeEvent.id } }
+          where: { userId_eventId: { userId: session.id, eventId: activeEvent.id } },
+          include: { payments: true }
         }),
         prisma.pricingRule.findMany({
           where: { eventId: activeEvent.id },
@@ -34,7 +35,14 @@ export default async function Home() {
         })
       ]);
       
-      attendee = attendeeRes;
+      if (attendeeRes) {
+        const amountPaid = attendeeRes.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+        const currentQuota = attendeeRes.expectedPayment || 0;
+        attendee = {
+          ...attendeeRes,
+          hasPaid: currentQuota > 0 && amountPaid >= currentQuota
+        };
+      }
       pricingRules = rulesRes;
     }
   } catch (error) {
