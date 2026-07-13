@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
         '192.168.178.73:3000', 
         'localhost:3000', 
         '192.168.178.22:3000',
-        'eventos-smp.duckdns.org',
+        'eventos-pro.duckdns.org',
         'smpha.duckdns.org',
         'eventos-dev.duckdns.org'
       ],
