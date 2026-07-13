@@ -20,7 +20,6 @@ const nextConfig: NextConfig = {
         'localhost:3000', 
         '192.168.178.22:3000',
         'eventos-pro.duckdns.org',
-        'smpha.duckdns.org',
         'eventos-dev.duckdns.org'
       ],
       bodySizeLimit: '20mb',
