@@ -130,7 +130,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                           className="input-field text-sm p-1 text-center flex-1" 
                           value={editPrice}
                           onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
-                          placeholder="Automático"
+                          placeholder="€"
                         />
                       </div>
                       <input 
@@ -237,7 +237,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             className="input-field w-20 text-right text-sm" 
                             value={editPrice}
                             onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
-                            placeholder="Auto"
+                            placeholder="€"
                           />
                         ) : (
                           <span style={{ color: att.adminComment ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>
