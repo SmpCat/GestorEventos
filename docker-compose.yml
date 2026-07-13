@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   gestor-eventos:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/smpcat/gestoreventos:latest
     container_name: gestoreventos_prod
     restart: always
     ports:
@@ -20,6 +18,21 @@ services:
     # Redirigimos el contenedor a la red del proxy maestro
     networks:
       - proxy_network
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower_gestoreventos
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mapeamos el archivo de autenticación de Docker del NAS para acceder a GHCR
+      - /root/.docker/config.json:/config.json:ro
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300 # Comprueba cada 5 minutos
+      - WATCHTOWER_INCLUDE_STOPPED=false
+    # Argumento posicional: Solo vigila ESTE contenedor, ignora el resto del NAS
+    command: gestoreventos_prod
 
 # --------------------------------------------------------
 # CONEXIÓN A RED EXTERNA (Core-Proxy)
