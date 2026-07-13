@@ -149,10 +149,10 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       <div className="mt-6 pt-5 border-t border-white/10">
                         <div className="text-sm font-bold text-success mb-2">Historial de Pagos</div>
                         {att.payments?.map((p: any) => (
-                          <div key={p.id} className="flex justify-between items-center text-xs bg-black/40 p-2 rounded mb-1">
-                            <span className="text-secondary">{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
-                            <span className="font-bold text-success">+{p.amount}€</span>
-                            <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors p-1" disabled={isProcessing} title="Borrar Pago">
+                          <div key={p.id} className="flex justify-between items-center gap-2 text-xs bg-black/40 py-0.5 px-2 rounded mb-2">
+                            <span className="text-secondary truncate">{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
+                            <span className="font-bold text-success flex-1 text-right">+{p.amount}€</span>
+                            <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors p-1 flex-none" disabled={isProcessing} title="Borrar Pago">
                               <TrashIcon />
                             </button>
                           </div>
@@ -278,10 +278,10 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                             <div className="bg-black/30 p-2 rounded border border-white/5">
                               <div className="text-xs text-success mb-1">Pagos</div>
                               {att.payments?.map((p: any) => (
-                                <div key={p.id} className="flex justify-between items-center text-xs bg-black/40 p-1.5 rounded mb-1">
-                                  <span className="text-secondary">{new Date(p.date).toLocaleDateString('es-ES')}</span>
-                                  <span className="font-bold text-success">+{p.amount}€</span>
-                                  <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors p-1" disabled={isProcessing} title="Borrar Pago">
+                                <div key={p.id} className="flex justify-between items-center gap-2 text-xs bg-black/40 py-0.5 px-2 rounded mb-2">
+                                  <span className="text-secondary truncate">{new Date(p.date).toLocaleDateString('es-ES')}</span>
+                                  <span className="font-bold text-success flex-1 text-right">+{p.amount}€</span>
+                                  <button onClick={() => handleDeletePayment(p.id)} className="text-red-400/70 hover:text-red-400 transition-colors p-1 flex-none" disabled={isProcessing} title="Borrar Pago">
                                     <TrashIcon />
                                   </button>
                                 </div>
