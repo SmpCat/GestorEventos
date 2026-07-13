@@ -146,7 +146,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         </button>
                       </div>
 
-                      <div className="mt-3 pt-3 border-t border-white/10">
+                      <div className="mt-6 pt-5 border-t border-white/10">
                         <div className="text-sm font-bold text-success mb-2">Historial de Pagos</div>
                         {att.payments?.map((p: any) => (
                           <div key={p.id} className="flex justify-between items-center text-xs bg-black/40 p-2 rounded mb-1">
@@ -258,7 +258,7 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
 
                       <td className="py-3 px-2 align-top">
                         {isEditing && isAdmin ? (
-                          <div className="flex flex-col gap-3 min-w-[280px]">
+                          <div className="flex flex-col gap-5 min-w-[280px]">
                             <div className="bg-black/30 p-2 rounded border border-white/5">
                               <div className="text-xs text-warning mb-1">Ajuste Cuota</div>
                               <input 
