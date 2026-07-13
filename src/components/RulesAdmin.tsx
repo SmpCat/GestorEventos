@@ -114,7 +114,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
       </div>
 
       {isAdmin && (
-        <div className="flex mobile-col gap-4">
+        <div className="flex mobile-col gap-4 mt-6">
           <button 
             onClick={handleSaveAndAddRule} 
             className="btn btn-secondary mobile-w-full py-3" 
