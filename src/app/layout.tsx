@@ -32,8 +32,8 @@ export default async function RootLayout({
       <head>
         {process.env.NODE_ENV === 'development' && (
           <>
-            <link rel="icon" href="/images/fiestas-valdeganga.jpg" type="image/jpeg" sizes="any" />
-            <link rel="apple-touch-icon" href="/images/fiestas-valdeganga.jpg" />
+            <link rel="icon" href="/dev-icon.jpg" type="image/jpeg" sizes="any" />
+            <link rel="apple-touch-icon" href="/dev-icon.jpg" />
           </>
         )}
       </head>
