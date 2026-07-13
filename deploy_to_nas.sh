@@ -21,7 +21,9 @@ fi
 # 2. Ejecutar la compilación remota
 echo "🏗️  Construyendo la imagen Docker en el NAS (esto puede tardar unos minutos)..."
 # Usamos -t para forzar TTY y poder meter la contraseña si "sudo" lo pide.
-ssh -t ${NAS_USER}@${NAS_IP} "source /etc/profile && cd ${NAS_DIR} && sudo docker compose up -d --build"
+ssh -t ${NAS_USER}@${NAS_IP} "source /etc/profile && cd ${NAS_DIR} && \
+sudo mkdir -p data public/uploads && sudo chown -R 1001:1001 data public/uploads && \
+sudo docker compose up -d --build && echo '🧹 Limpiando imágenes antiguas (basura)...' && sudo docker image prune -f"
 
 if [ $? -ne 0 ]; then
     echo "❌ Error durante la construcción de Docker."
