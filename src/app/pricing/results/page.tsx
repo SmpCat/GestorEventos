@@ -72,7 +72,7 @@ export default async function ResultsPage() {
         <div className="glass-panel p-6 text-center">
           <p className="text-secondary text-sm font-bold uppercase tracking-wider mb-2">Dinero en Caja (Real)</p>
           <p className="text-3xl font-bold" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
-          <p className="text-xs text-secondary mt-2">Falta cobrar: <span className="text-warning font-bold">{dineroPorCobrar > 0 ? `${dineroPorCobrar}€` : 'Nada'}</span></p>
+          <p className="text-xs text-secondary mt-2">Falta cobrar: <span style={{ color: 'var(--accent-warning)', fontWeight: 'bold' }}>{dineroPorCobrar > 0 ? `${dineroPorCobrar}€` : 'Nada'}</span></p>
         </div>
         
         <div className="glass-panel p-6 text-center">

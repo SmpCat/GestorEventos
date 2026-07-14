@@ -42,7 +42,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
           <p className="subtitle">Gestión de Usuarios del Sistema</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
-          <button onClick={handleCreate} className="btn btn-primary mobile-w-full">
+          <button onClick={handleCreate} className="btn mobile-w-full" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
             + Añadir Usuario
           </button>
         </div>
@@ -58,7 +58,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
             {/* VISTA MÓVIL (Cards) */}
             <div className="desktop-hide flex flex-col gap-4 p-4">
               {users.map(user => (
-                <div key={`mobile-${user.id}`} className="bg-black/30 p-4 rounded-lg border flex flex-col gap-3" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                <div key={`mobile-${user.id}`} className="p-4 rounded-lg border flex flex-col gap-3" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.05)' }}>
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="font-bold text-lg">{user.name}</div>
@@ -73,17 +73,17 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                     </div>
                   </div>
                   
-                  <div className="flex flex-col gap-1 text-sm bg-black/20 p-2 rounded">
+                  <div className="flex flex-col gap-1 text-sm p-2 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
                     {user.email && <span>✉️ {user.email}</span>}
                     {user.phone && <span>📱 {user.phone}</span>}
                     {!user.email && !user.phone && <span className="text-secondary italic">Sin datos de contacto</span>}
                   </div>
 
                   <div className="flex gap-2 mt-2">
-                    <button onClick={() => handleEdit(user)} className="btn btn-secondary flex-1 py-2 text-sm flex items-center justify-center gap-2" disabled={actionLoading !== null}>
+                    <button onClick={() => handleEdit(user)} className="btn flex-1 py-2 text-sm flex items-center justify-center gap-2" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }} disabled={actionLoading !== null}>
                       ✏️ Editar
                     </button>
-                    <button onClick={() => handleDelete(user.id, user.name)} style={{ color: 'rgba(255, 255, 255, 0.7)', background: 'transparent', border: 'none', cursor: 'pointer' }} className="flex-1 py-2 text-sm flex items-center justify-center gap-2" title="Borrar" disabled={actionLoading !== null}>
+                    <button onClick={() => handleDelete(user.id, user.name)} className="btn flex-1 py-2 text-sm flex items-center justify-center gap-2" style={{ color: 'var(--accent-danger)', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }} title="Borrar" disabled={actionLoading !== null}>
                       {actionLoading === user.id ? '...' : <><TrashIcon /> Borrar</>}
                     </button>
                   </div>
@@ -125,10 +125,10 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <button onClick={() => handleEdit(user)} className="btn btn-secondary" style={{ marginRight: '0.5rem' }} disabled={actionLoading !== null}>
+                        <button onClick={() => handleEdit(user)} className="btn" style={{ marginRight: '0.5rem', backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }} disabled={actionLoading !== null}>
                           Editar
                         </button>
-                        <button onClick={() => handleDelete(user.id, user.name)} style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} title="Borrar" disabled={actionLoading !== null}>
+                        <button onClick={() => handleDelete(user.id, user.name)} className="btn" style={{ color: 'var(--accent-danger)', padding: '0.5rem', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} title="Borrar" disabled={actionLoading !== null}>
                           {actionLoading === user.id ? '...' : <TrashIcon />}
                         </button>
                       </td>

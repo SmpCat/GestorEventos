@@ -97,7 +97,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
       <div className="flex flex-col gap-3 mb-4">
         {rules.length === 0 && <p className="text-secondary italic">No hay tarifas configuradas.</p>}
         {rules.map((rule, idx) => (
-          <div key={idx} className="flex gap-1 md:gap-3 items-center bg-black/20 p-2 md:p-3 rounded-lg text-sm md:text-base" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div key={idx} className="flex gap-1 md:gap-3 items-center p-2 md:p-3 rounded-lg text-sm md:text-base" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.05)' }}>
             <span>Si vienes</span>
             {isAdmin ? (
               <input 
@@ -105,7 +105,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                 min="1" 
                 placeholder="-"
                 className="input-field text-center" 
-                style={{ width: '3rem', padding: '0.4rem 0.1rem', borderBottom: '2px solid rgba(255,255,255,0.3)' }}
+                style={{ width: '3.5rem', padding: '0.4rem 0.2rem' }}
                 value={rule.days}
                 onChange={e => handleRuleChange(idx, 'days', e.target.value)}
               />
@@ -120,12 +120,12 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                 step="0.5"
                 placeholder="-"
                 className="input-field text-center" 
-                style={{ width: '3.5rem', padding: '0.4rem 0.2rem', borderBottom: '2px solid rgba(255,255,255,0.3)' }}
+                style={{ width: '4.5rem', padding: '0.4rem 0.2rem' }}
                 value={rule.price}
                 onChange={e => handleRuleChange(idx, 'price', e.target.value)}
               />
             ) : (
-              <strong className="text-center text-success" style={{ width: '3rem' }}>{rule.price}</strong>
+              <strong className="text-center" style={{ width: '3rem', color: 'var(--accent-success)' }}>{rule.price}</strong>
             )}
             <span>€</span>
             
@@ -148,15 +148,21 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
         <div className="flex mobile-col gap-4 mt-6">
           <button 
             onClick={handleSaveAndAddRule} 
-            className="btn btn-secondary mobile-w-full py-3" 
+            className="btn mobile-w-full py-3" 
+            style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
             disabled={loading}
           >
             {loading ? 'Guardando...' : '+ Añadir Tarifa'}
           </button>
           <button 
             onClick={handleSaveOnly} 
-            className={`btn mobile-w-full py-3 ${hasChanges ? 'btn-primary' : 'btn-secondary'}`} 
-            style={{ opacity: hasChanges ? 1 : 0.5 }}
+            className="btn mobile-w-full py-3" 
+            style={{ 
+              opacity: hasChanges ? 1 : 0.5,
+              backgroundColor: 'transparent', 
+              color: hasChanges ? '#fff' : 'var(--text-secondary)', 
+              border: hasChanges ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)'
+            }}
             disabled={loading || !hasChanges}
           >
             {loading ? 'Guardando...' : hasChanges ? '⚠️ Guardar Tarifas' : '✅ Guardado'}

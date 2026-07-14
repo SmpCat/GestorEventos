@@ -61,14 +61,14 @@ export default function LoginForm() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary mt-2" disabled={loading} style={{ padding: '1rem', fontSize: '1.1rem' }}>
+          <button type="submit" className="btn mt-2" disabled={loading} style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '1rem', fontSize: '1.1rem' }}>
             {loading ? 'Entrando...' : 'Acceder'}
           </button>
         </form>
 
         <div className="mt-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
           <p className="text-secondary" style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>¿Es tu primera vez aquí?</p>
-          <Link href="/register" className="btn btn-secondary w-full" style={{ padding: '0.8rem', display: 'block' }}>
+          <Link href="/register" className="btn w-full" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '0.8rem', display: 'block' }}>
             Quiero registrarme en el grupo
           </Link>
         </div>

@@ -33,9 +33,9 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
         {/* Estado de la Cuota del Asistente */}
         {attendee && (
-          <div className="mt-8 p-4 rounded-xl flex flex-col md:flex-row items-center justify-center gap-6 relative z-10 mx-auto" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', maxWidth: '600px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
-            <p style={{ fontSize: '1.1rem', color: '#fff', margin: 0 }}>
-              Tu cuota estimada: <strong style={{ color: 'var(--accent-primary)', fontSize: '1.3rem', textShadow: '0 0 10px rgba(99,102,241,0.5)' }}>{attendee.expectedPayment !== null ? `${attendee.expectedPayment}€` : 'Calculando...'}</strong>
+          <div className="mt-8 p-4 flex flex-col md:flex-row items-center justify-center gap-6 relative z-10 mx-auto" style={{ maxWidth: '600px' }}>
+            <p style={{ fontSize: '1.1rem', color: '#fff', margin: 0, textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+              Tu cuota es: <strong style={{ color: '#fff', fontSize: '1.3rem', textShadow: '0 2px 15px rgba(0,0,0,0.9), 0 0 5px rgba(255,255,255,0.3)' }}>{attendee.expectedPayment !== null ? `${attendee.expectedPayment}€` : 'Calculando...'}</strong>
             </p>
             {(() => {
               const amountPaid = attendee.amountPaid || 0;
@@ -48,13 +48,13 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
               else saldoColor = 'var(--accent-success)'; // Clavado
 
               return (
-                <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10" style={{ backdropFilter: 'blur(5px)' }}>
-                  <div className="text-white">
-                    <span className="text-secondary text-sm">Pagado:</span> <strong className="text-lg">{amountPaid}€</strong>
+                <div className="flex items-center gap-4 px-2 py-1">
+                  <div className="text-white" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                    <span className="text-secondary text-sm">Pagado:</span> <strong className="text-lg text-white">{amountPaid}€</strong>
                   </div>
-                  <div className="w-px h-8 bg-white/20"></div>
-                  <div style={{ color: saldoColor }}>
-                    <span className="text-secondary text-sm text-white/70 mr-1">Saldo:</span>
+                  <div className="w-px h-6 bg-white/20" style={{ backgroundColor: 'rgba(255,255,255,0.4)' }}></div>
+                  <div style={{ color: saldoColor, textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>
+                    <span className="text-secondary text-sm mr-1" style={{ color: 'rgba(255,255,255,0.9)' }}>Saldo:</span>
                     <strong className="text-xl font-black">{diff === 0 ? '0€' : `${diff > 0 ? '+' : ''}${diff}€`}</strong>
                   </div>
                 </div>

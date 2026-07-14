@@ -146,7 +146,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                       type="text" 
                       value={receiptData.store}
                       onChange={(e) => setReceiptData({...receiptData, store: e.target.value})}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-primary transition-all" 
+                      className="input-field w-full" 
+                      style={{ padding: '0.75rem 1rem' }}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -155,7 +156,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                       type="date" 
                       value={receiptData.date}
                       onChange={(e) => setReceiptData({...receiptData, date: e.target.value})}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-primary transition-all appearance-none" 
+                      className="input-field w-full appearance-none" 
+                      style={{ padding: '0.75rem 1rem' }}
                     />
                   </div>
                 </div>
@@ -167,7 +169,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                     step="0.01" 
                     value={receiptData.amount} 
                     onChange={(e) => setReceiptData({...receiptData, amount: parseFloat(e.target.value) || 0})}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-primary transition-all font-mono text-lg" 
+                    className="input-field w-full font-mono text-lg" 
+                    style={{ padding: '0.75rem 1rem' }}
                   />
                 </div>
 
@@ -175,7 +178,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                   <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1 border-b border-white/5 pb-2">Artículos Detectados ({receiptData.items?.length || 0})</label>
                   <div className="max-h-48 overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-2">
                     {receiptData.items?.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center bg-white/5 px-3 py-2.5 rounded-lg border border-white/5">
+                      <div key={idx} className="flex justify-between items-center px-3 py-2.5 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div className="flex items-center gap-3 overflow-hidden">
                           <span className="text-accent-primary font-bold text-sm bg-accent-primary/10 px-2 py-1 rounded">{item.quantity}x</span>
                           <span className="text-slate-200 text-sm truncate">{item.name}</span>
@@ -188,17 +191,19 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               </div>
             </div>
 
-            <div className="flex mobile-col gap-3 mt-4 pt-6 border-t border-white/10">
+            <div className="flex mobile-col gap-3 mt-4 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <button 
                 onClick={() => setReceiptData(null)} 
-                className="btn btn-secondary mobile-w-full py-3"
+                className="btn mobile-w-full py-3"
+                style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
               >
                 Cancelar y Descartar
               </button>
               <button 
                 onClick={confirmReceipt} 
                 disabled={isUploading} 
-                className="btn btn-primary mobile-w-full py-3 text-lg font-bold shadow-lg shadow-indigo-500/20"
+                className="btn mobile-w-full py-3 text-lg font-bold"
+                style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}
               >
                 {isUploading ? '⏳ Guardando...' : '✅ Confirmar y Guardar Gasto'}
               </button>
@@ -226,7 +231,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               });
 
               return (
-                <div key={expense.id} className="flex flex-col bg-black/40 border border-white/5 rounded-lg p-4 mb-3 relative overflow-hidden group hover:border-white/10 transition-colors">
+                <div key={expense.id} className="flex flex-col rounded-lg p-4 mb-3 relative overflow-hidden group transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                   
                   {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete Button */}
                   <div className="flex justify-between items-start mb-1">

@@ -135,8 +135,8 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     return (
       <div 
         key={item.id} 
-        className="flex flex-col bg-black/20 p-3 rounded-lg transition-opacity gap-2"
-        style={{ opacity: isProcessing ? 0.5 : 1, border: '1px solid rgba(255,255,255,0.05)' }}
+        className="flex flex-col p-3 rounded-lg transition-opacity gap-2"
+        style={{ opacity: isProcessing ? 0.5 : 1, backgroundColor: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.05)' }}
       >
         {/* Primera fila: Checkbox, Nombre, Papelera */}
         <div className="flex justify-between items-start w-full gap-3">
@@ -221,7 +221,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
               disabled={loading === 'add'}
               style={{ fontSize: '1.1rem', padding: '1rem', fontWeight: '500' }}
             />
-            <button type="submit" className="btn btn-primary flex items-center justify-center" disabled={loading === 'add' || !newItemName.trim()} style={{ width: '3.5rem', padding: '0', fontSize: '1.4rem' }}>
+            <button type="submit" className="btn flex items-center justify-center" disabled={loading === 'add' || !newItemName.trim()} style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', width: '3.5rem', padding: '0', fontSize: '1.4rem' }}>
               +
             </button>
           </form>
@@ -241,10 +241,10 @@ export default function ShoppingList({ items, evidences, eventId, users, current
           />
           <button 
             type="button"
-            className="w-full btn btn-primary py-3 text-lg font-bold shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
+            className="w-full btn py-3 text-lg font-bold flex items-center justify-center gap-2"
             onClick={() => document.getElementById('ai-scanner-input')?.click()}
             disabled={loading === 'scanning'}
-            style={{ opacity: loading === 'scanning' ? 0.7 : 1 }}
+            style={{ opacity: loading === 'scanning' ? 0.7 : 1, backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}
           >
             {loading === 'scanning' ? (
               '⏳ Procesando con IA...'
@@ -259,7 +259,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
       {/* Pestañas (Tabs) estilo Segmented Control */}
       <h3 className="text-white font-bold text-lg" style={{ marginTop: '3rem', marginBottom: '1rem' }}>📋 Lista</h3>
-      <div className="flex p-1 bg-black/40 rounded-xl mb-6" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="flex p-1 rounded-xl mb-6" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
         <button 
           onClick={() => setActiveTab('pending')}
           className={`transition-all font-bold ${activeTab === 'pending' ? 'shadow-md' : 'hover:opacity-80'}`}

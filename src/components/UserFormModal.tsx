@@ -83,7 +83,7 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
                <p style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>@{session?.username || 'admin'}</p>
              </div>
            </div>
-           <button type="button" onClick={onClose} className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.9rem', fontWeight: 'bold' }}>
+           <button type="button" onClick={onClose} className="btn" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '0.3rem 0.8rem', fontSize: '0.9rem', fontWeight: 'bold' }}>
              Volver
            </button>
         </div>
@@ -163,7 +163,7 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
           </div>
 
           <div className="flex mobile-col justify-end gap-3 mt-2">
-            <button type="submit" className="btn btn-primary mobile-w-full py-3 text-lg" disabled={loading}>
+            <button type="submit" className="btn mobile-w-full py-3 text-lg" disabled={loading} style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
               {loading ? 'Guardando...' : 'Guardar Usuario'}
             </button>
           </div>

@@ -48,7 +48,8 @@ export default function RegisterPage() {
             Tu cuenta ha sido creada con éxito. Pide al Administrador que te agregue al evento activo para empezar a subir facturas.
           </p>
           <button 
-            className="btn btn-primary mt-6 w-full"
+            className="btn mt-6 w-full"
+            style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}
             onClick={() => window.location.href = '/'}
           >
             Ir al inicio
@@ -124,14 +125,14 @@ export default function RegisterPage() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary mt-4 w-full" disabled={loading} style={{ padding: '1rem' }}>
+          <button type="submit" className="btn mt-4 w-full" disabled={loading} style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '1rem' }}>
             {loading ? 'Creando cuenta...' : 'Unirse al Grupo'}
           </button>
         </form>
 
         <div className="mt-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
           <p className="text-secondary" style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>¿Ya tienes una cuenta?</p>
-          <Link href="/" className="btn btn-secondary w-full" style={{ padding: '0.8rem', display: 'block' }}>
+          <Link href="/" className="btn w-full" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '0.8rem', display: 'block' }}>
             Volver al Inicio de Sesión
           </Link>
         </div>

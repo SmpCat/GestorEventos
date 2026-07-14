@@ -70,7 +70,7 @@ export default function EventMaintenance({ events, session }: { events: any[], s
           <p className="subtitle">Gestión de Eventos / Viajes</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
-          <button onClick={handleCreate} className="btn btn-primary mobile-w-full">
+          <button onClick={handleCreate} className="btn mobile-w-full" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
             + Añadir Evento
           </button>
         </div>
@@ -87,9 +87,9 @@ export default function EventMaintenance({ events, session }: { events: any[], s
               key={event.id} 
               className="glass-panel relative overflow-hidden flex flex-col justify-between"
               style={{
-                border: '1px solid rgba(255, 255, 255, 0.8)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
                 boxShadow: 'none',
-                background: event.isActive ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.25)',
+                backgroundColor: 'rgba(15, 23, 42, 0.6)',
                 transition: 'all 0.3s ease',
               }}
             >
@@ -99,7 +99,7 @@ export default function EventMaintenance({ events, session }: { events: any[], s
                     {event.name}
                   </h3>
                   {event.isActive && (
-                    <span className="badge badge-admin" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', border: '1px solid #10b981' }}>
+                    <span className="badge" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', fontWeight: 'bold' }}>
                       OPERATIVO
                     </span>
                   )}
@@ -112,33 +112,43 @@ export default function EventMaintenance({ events, session }: { events: any[], s
               </div>
 
               <div className="flex mobile-col gap-2 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                {!event.isActive && (
-                  <button 
-                    onClick={() => handleActivate(event.id, event.name)} 
-                    className="btn btn-primary mobile-w-full" 
-                    style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', border: '1px solid #10b981' }}
-                    disabled={actionLoading !== null}
-                  >
-                    {actionLoading === `activate-${event.id}` ? 'Activando...' : 'Hacer Operativo'}
-                  </button>
+                {(!event.isActive && event.isProtected) ? (
+                  <div className="text-secondary w-full text-center flex items-center justify-center gap-2" style={{ padding: '0.5rem', fontSize: '0.9rem' }}>
+                    🔒 Evento Historificado
+                  </div>
+                ) : (
+                  <>
+                    {!event.isActive && (
+                      <button 
+                        onClick={() => handleActivate(event.id, event.name)} 
+                        className="btn mobile-w-full" 
+                        style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)', fontWeight: 'bold' }}
+                        disabled={actionLoading !== null}
+                      >
+                        {actionLoading === `activate-${event.id}` ? 'Activando...' : 'Hacer Operativo'}
+                      </button>
+                    )}
+                    
+                    <button 
+                      onClick={() => handleEdit(event)} 
+                      className="btn mobile-w-full" 
+                      style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+                      disabled={actionLoading !== null}
+                    >
+                      Editar
+                    </button>
+                    
+                    <button 
+                      onClick={() => handleDelete(event.id, event.name, event.isActive)} 
+                      className="btn"
+                      style={{ color: 'var(--accent-danger)', padding: '0.5rem', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: event.isActive ? 0.6 : 1 }}
+                      title={event.isActive ? "No se puede borrar el evento activo" : "Borrar"}
+                      disabled={actionLoading !== null}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </>
                 )}
-                
-                <button 
-                  onClick={() => handleEdit(event)} 
-                  className="btn btn-secondary mobile-w-full" 
-                  disabled={actionLoading !== null}
-                >
-                  Editar
-                </button>
-                
-                <button 
-                  onClick={() => handleDelete(event.id, event.name, event.isActive)} 
-                  style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  title="Borrar"
-                  disabled={event.isActive || actionLoading !== null}
-                >
-                  <TrashIcon />
-                </button>
               </div>
             </div>
           ))

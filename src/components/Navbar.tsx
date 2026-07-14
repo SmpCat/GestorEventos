@@ -46,7 +46,13 @@ export default function Navbar({ session }: { session: any }) {
           </button>
         ) : (
           <button 
-            onClick={() => router.push('/')}
+            onClick={() => {
+              const event = new CustomEvent('navbar-volver', { cancelable: true });
+              window.dispatchEvent(event);
+              if (!event.defaultPrevented) {
+                router.push('/');
+              }
+            }}
             className="btn btn-secondary"
             style={{ padding: '0.3rem 0.8rem', fontSize: '0.9rem', fontWeight: 'bold' }}
           >
