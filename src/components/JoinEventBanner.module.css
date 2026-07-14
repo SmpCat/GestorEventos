@@ -1,0 +1,66 @@
+.bannerContainer {
+  text-align: center;
+  padding: 2rem;
+  margin-top: 1.5rem;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.2) !important;
+}
+
+.bannerSubtitle {
+  margin-bottom: 0.5rem;
+}
+
+.bannerSubtitleLast {
+  margin-bottom: 2rem;
+}
+
+.bannerForm {
+  max-width: 24rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bannerInputGroup {
+  text-align: left;
+}
+
+.bannerInputField {
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.bannerEstimateBox {
+  padding: 1rem;
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.bannerEstimateLabel {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.bannerEstimateValue {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent-success);
+  margin: 0;
+}
+
+.bannerEstimateError {
+  color: #f87171;
+  font-weight: bold;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.bannerSubmitBtn {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  font-size: 1.25rem !important;
+  margin-top: 0.5rem;
+}

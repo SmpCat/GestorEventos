@@ -1,0 +1,421 @@
+/* Panel principal */
+.adminPanel {
+  border-color: rgba(255,255,255,0.2) !important;
+  padding: 1.5rem !important;
+}
+
+.emptyState {
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ---------------- VISTA MÓVIL ---------------- */
+.mobileList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobileCard {
+  background-color: rgba(0,0,0,0.3);
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardTitle {
+  font-size: 0.875rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 0.5rem;
+}
+
+.cardUsername {
+  font-weight: normal;
+  color: var(--text-secondary);
+}
+
+.editBtnSmall {
+  padding: 0.2rem 0.5rem !important;
+  font-size: 0.9rem !important;
+}
+
+/* Info Summary (Mobile) */
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.infoLabel {
+  color: var(--text-secondary);
+}
+
+.infoValue {
+  font-weight: bold;
+}
+
+.infoSuccess {
+  color: var(--accent-success);
+}
+
+.infoWarning {
+  color: var(--accent-warning);
+}
+
+.infoDanger {
+  color: var(--accent-danger);
+}
+
+/* Edición Mobile */
+.editSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 0.5rem;
+}
+
+.editTitle {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: var(--accent-warning);
+  margin-bottom: 0.25rem;
+}
+
+.inputWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.currencyInput {
+  font-size: 0.875rem !important;
+  padding: 0.25rem !important;
+  padding-right: 1.5rem !important;
+  text-align: center;
+  width: 100%;
+}
+
+.currencySymbol {
+  font-weight: bold;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.commentInput {
+  font-size: 0.875rem !important;
+  padding: 0.5rem !important;
+  width: 100%;
+}
+
+.saveBtn {
+  background-color: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 0.375rem 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: bold !important;
+  width: 100%;
+}
+
+/* Pagos Mobile */
+.paymentsSection {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.paymentsTitle {
+  font-size: 0.875rem;
+  font-weight: bold;
+  margin-bottom: 0.35rem;
+}
+
+.paymentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.paymentRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+.paymentDate {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.paymentAmount {
+  font-weight: bold;
+  flex: 1;
+  text-align: right;
+  color: var(--accent-success);
+  font-size: 1rem;
+}
+
+.deletePaymentBtn {
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.deletePaymentBtn:hover {
+  color: var(--accent-danger);
+}
+
+.noPayments {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.addPaymentRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.addPaymentBtn {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+  color: #fff !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 6px !important;
+  font-size: 1.25rem !important;
+  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.deleteAttendeeContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.deleteAttendeeBtn {
+  background-color: transparent !important;
+  color: var(--accent-danger) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  padding: 0.5rem 0 !important;
+  font-weight: bold !important;
+}
+
+.adminComment {
+  font-size: 0.75rem;
+  padding: 0.375rem;
+  border-radius: 0.25rem;
+  background-color: rgba(234, 179, 8, 0.2);
+  color: var(--accent-warning);
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+/* ---------------- VISTA ESCRITORIO (Tabla) ---------------- */
+.tableHeader {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.tableHeader th {
+  padding-bottom: 0.75rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.tableRow {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.tableCell {
+  padding: 0.75rem 0.5rem;
+  vertical-align: top;
+}
+
+.tableUsername {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.tableComment {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  background-color: rgba(234, 179, 8, 0.2);
+  color: var(--accent-warning);
+  display: inline-block;
+}
+
+.tableDays {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.tableInputWrapper {
+  position: relative;
+  display: inline-block;
+  width: 5rem;
+}
+
+.tableCurrencyInput {
+  text-align: right;
+  font-size: 0.875rem !important;
+  padding-right: 1.2rem !important;
+  padding-left: 0.2rem !important;
+  width: 100%;
+}
+
+.tableCurrencySymbol {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tableAmountPaid {
+  color: var(--accent-success);
+  font-weight: bold;
+}
+
+.balanceBadge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.balanceNegative {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--accent-danger);
+  border: 1px solid var(--accent-danger);
+}
+
+.balancePositive {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: var(--accent-success);
+  border: 1px solid var(--accent-success);
+}
+
+.balanceNeutral {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Acciones Escritorio */
+.desktopActions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 280px;
+}
+
+.actionBox {
+  background-color: rgba(0,0,0,0.3);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.actionBoxTitle {
+  font-size: 0.75rem;
+  color: var(--accent-warning);
+  margin-bottom: 0.25rem;
+}
+
+.actionBoxTitleAlt {
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-bottom: 0.35rem;
+}
+
+.actionInput {
+  font-size: 0.75rem !important;
+  padding: 0.5rem !important;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.actionSaveBtn {
+  padding: 0.25rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  font-weight: bold !important;
+  background-color: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.deleteAttendeeTableBtn {
+  background-color: transparent !important;
+  color: var(--accent-danger) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  padding: 0.375rem 0 !important;
+  font-size: 0.75rem !important;
+  font-weight: bold !important;
+}
+
+.manageBtn {
+  padding: 0.25rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  width: 100% !important;
+}
+
+.readOnlyMsg {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}

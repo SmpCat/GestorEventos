@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { savePricingRules } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
+import styles from './RulesAdmin.module.css';
 
 export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseDays = [] }: { eventId: string, initialRules: any[], isAdmin: boolean, inUseDays?: number[] }) {
   const [rules, setRules] = useState<{ days: number | '', price: number | '' }[]>(initialRules);
@@ -93,82 +94,75 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
   };
 
   return (
-    <div className="glass-panel p-6">
-      <div className="flex flex-col gap-3 mb-4">
-        {rules.length === 0 && <p className="text-secondary italic">No hay tarifas configuradas.</p>}
-        {rules.map((rule, idx) => (
-          <div key={idx} className="flex gap-1 md:gap-3 items-center p-2 md:p-3 rounded-lg text-sm md:text-base" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <span>Si vienes</span>
-            {isAdmin ? (
-              <input 
-                type="number" 
-                min="1" 
-                placeholder="-"
-                className="input-field text-center" 
-                style={{ width: '3.5rem', padding: '0.4rem 0.2rem' }}
-                value={rule.days}
-                onChange={e => handleRuleChange(idx, 'days', e.target.value)}
-              />
-            ) : (
-              <strong className="text-center" style={{ width: '2rem' }}>{rule.days}</strong>
-            )}
-            <span>días, pagas</span>
-            {isAdmin ? (
-              <input 
-                type="number" 
-                min="0" 
-                step="0.5"
-                placeholder="-"
-                className="input-field text-center" 
-                style={{ width: '4.5rem', padding: '0.4rem 0.2rem' }}
-                value={rule.price}
-                onChange={e => handleRuleChange(idx, 'price', e.target.value)}
-              />
-            ) : (
-              <strong className="text-center" style={{ width: '3rem', color: 'var(--accent-success)' }}>{rule.price}</strong>
-            )}
-            <span>€</span>
-            
-            <div className="flex justify-end" style={{ marginLeft: 'auto', marginRight: '-0.6rem' }}>
-              {isAdmin && (
-                <button 
-                  onClick={() => handleRemoveRule(idx)} 
-                  style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  title="Borrar Regla"
-                >
-                  <TrashIcon />
-                </button>
+    <div className={`glass-panel ${styles.adminPanel}`}>
+      <div className={styles.innerBlackBox}>
+        <div className={styles.rulesList}>
+          {rules.length === 0 && <p className={styles.emptyState}>No hay tarifas configuradas.</p>}
+          {rules.map((rule, idx) => (
+            <div key={idx} className={styles.ruleRow}>
+              <span>Si vienes</span>
+              {isAdmin ? (
+                <input 
+                  type="number" 
+                  min="1" 
+                  placeholder="-"
+                  className={`input-field ${styles.daysInput}`}
+                  value={rule.days}
+                  onChange={e => handleRuleChange(idx, 'days', e.target.value)}
+                />
+              ) : (
+                <strong className={styles.daysValue}>{rule.days}</strong>
               )}
+              <span>días, pagas</span>
+              {isAdmin ? (
+                <input 
+                  type="number" 
+                  min="0" 
+                  step="0.5"
+                  placeholder="-"
+                  className={`input-field ${styles.priceInput}`}
+                  value={rule.price}
+                  onChange={e => handleRuleChange(idx, 'price', e.target.value)}
+                />
+              ) : (
+                <strong className={styles.priceValue}>{rule.price}</strong>
+              )}
+              <span>€</span>
+              
+              <div className={styles.actionContainer}>
+                {isAdmin && (
+                  <button 
+                    onClick={() => handleRemoveRule(idx)} 
+                    className={styles.deleteBtn}
+                    title="Borrar Regla"
+                  >
+                    <TrashIcon />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {isAdmin && (
-        <div className="flex mobile-col gap-4 mt-6">
-          <button 
-            onClick={handleSaveAndAddRule} 
-            className="btn mobile-w-full py-3" 
-            style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
-            disabled={loading}
-          >
-            {loading ? 'Guardando...' : '+ Añadir Tarifa'}
-          </button>
-          <button 
-            onClick={handleSaveOnly} 
-            className="btn mobile-w-full py-3" 
-            style={{ 
-              opacity: hasChanges ? 1 : 0.5,
-              backgroundColor: 'transparent', 
-              color: hasChanges ? '#fff' : 'var(--text-secondary)', 
-              border: hasChanges ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)'
-            }}
-            disabled={loading || !hasChanges}
-          >
-            {loading ? 'Guardando...' : hasChanges ? '⚠️ Guardar Tarifas' : '✅ Guardado'}
-          </button>
+          ))}
         </div>
-      )}
+
+        {isAdmin && (
+          <div className={styles.actionsFooter}>
+            <button 
+              onClick={handleSaveAndAddRule} 
+              className={`btn ${styles.addBtn}`}
+              disabled={loading}
+            >
+              {loading ? 'Guardando...' : '+ Añadir Tarifa'}
+            </button>
+            <button 
+              onClick={handleSaveOnly} 
+              className={`btn ${styles.saveBtn} ${hasChanges ? styles.saveBtnHasChanges : styles.saveBtnNoChanges}`}
+              disabled={loading || !hasChanges}
+            >
+              {loading ? 'Guardando...' : hasChanges ? '⚠️ Guardar Tarifas' : '✅ Guardado'}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -57,6 +57,20 @@ export async function togglePurchased(itemId: string, isPurchased: boolean) {
   }
 }
 
+// Marcar múltiples artículos como comprados o no comprados a la vez
+export async function togglePurchasedBulk(itemIds: string[], isPurchased: boolean) {
+  try {
+    await prisma.shoppingListItem.updateMany({
+      where: { id: { in: itemIds } },
+      data: { isPurchased },
+    });
+    revalidatePath('/shopping');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: 'Error al actualizar múltiples artículos: ' + error.message };
+  }
+}
+
 // Asignar el artículo a un usuario para que lo compre
 export async function assignItem(itemId: string, userId: string | null) {
   try {

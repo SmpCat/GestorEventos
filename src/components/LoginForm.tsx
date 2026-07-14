@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { login } from '@/actions/auth';
 import Link from 'next/link';
+import styles from './LoginForm.module.css';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -25,18 +26,18 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh]">
-      <div className="text-center mb-8">
-        <h1 style={{ fontSize: '3rem', color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>GestorEventos</h1>
+    <div className={styles.loginWrapper}>
+      <div className={styles.loginHeader}>
+        <h1 className={styles.loginTitle}>GestorEventos</h1>
         <p className="subtitle">La plataforma privada para tu grupo</p>
       </div>
 
-      <div className="glass-panel" style={{ width: '100%', maxWidth: '400px' }}>
-        <h2 className="text-center mb-6">Iniciar Sesión</h2>
+      <div className={`glass-panel ${styles.loginFormContainer}`}>
+        <h2 className={styles.loginFormTitle}>Iniciar Sesión</h2>
         
-        {error && <p style={{ color: 'var(--accent-danger)', marginBottom: '1.5rem', fontSize: '0.875rem', textAlign: 'center' }}>{error}</p>}
+        {error && <p className={styles.loginError}>{error}</p>}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
           <div className="input-group">
             <label className="input-label">Usuario</label>
             <input 
@@ -61,14 +62,14 @@ export default function LoginForm() {
             />
           </div>
 
-          <button type="submit" className="btn mt-2" disabled={loading} style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '1rem', fontSize: '1.1rem' }}>
+          <button type="submit" className={`btn ${styles.loginSubmitBtn}`} disabled={loading}>
             {loading ? 'Entrando...' : 'Acceder'}
           </button>
         </form>
 
-        <div className="mt-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
-          <p className="text-secondary" style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>¿Es tu primera vez aquí?</p>
-          <Link href="/register" className="btn w-full" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '0.8rem', display: 'block' }}>
+        <div className={styles.loginFooter}>
+          <p className={styles.loginFooterText}>¿Es tu primera vez aquí?</p>
+          <Link href="/register" className={`btn ${styles.loginRegisterBtn}`}>
             Quiero registrarme en el grupo
           </Link>
         </div>

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import Link from 'next/link';
-import { deleteExpenseAction, processReceiptAction, saveExpenseAction, deleteExpenseEvidence, ReceiptData } from '@/actions/receipts';
+import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
+import styles from './ExpenseList.module.css';
 
 export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expenses: any[], isAdmin: boolean, currentUserId: string }) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -12,7 +12,11 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
   const [error, setError] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Estados para entrada manual
+  const [manualStore, setManualStore] = useState('');
+  const [manualAmount, setManualAmount] = useState<number | ''>('');
+  const [isManualLoading, setIsManualLoading] = useState(false);
 
   const handleDelete = async (expenseId: string) => {
     if (window.confirm('¿Seguro que quieres borrar este gasto y su ticket asociado?')) {
@@ -22,12 +26,36 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
     }
   };
 
-  const handleDeleteEvidence = async (evidenceId: string, expenseId: string) => {
+  const handleDeleteEvidence = async (evidenceId: string) => {
     if (window.confirm('¿Seguro que quieres borrar esta foto de evidencia?')) {
       setLoading(`delete-ev-${evidenceId}`);
       await deleteExpenseEvidence(evidenceId);
       setLoading(null);
     }
+  };
+
+  const handleManualAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualStore.trim() || manualAmount === '' || Number(manualAmount) <= 0) return;
+    
+    setIsManualLoading(true);
+    setError(null);
+    const dateStr = new Date().toISOString().split('T')[0];
+    
+    const res = await saveManualExpenseAction({
+      store: manualStore,
+      amount: Number(manualAmount),
+      description: `Compra manual en ${manualStore}`,
+      date: dateStr
+    });
+    
+    if (!res.success) {
+      setError(res.error || 'Error al guardar gasto manual.');
+    } else {
+      setManualStore('');
+      setManualAmount('');
+    }
+    setIsManualLoading(false);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,8 +98,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-6">
-      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+    <div className={styles.container}>
+      <div className={styles.headerRow}>
         <div>
           <h1>Gastos Registrados</h1>
           <p className="subtitle">Gestiona y revisa los tickets escaneados del evento activo.</p>
@@ -79,111 +107,141 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       </div>
 
       {/* Controles para Añadir Elementos (Arriba) */}
-      <h3 className="text-white font-bold text-lg" style={{ marginBottom: '1rem' }}>🧾 Añadir Ticket</h3>
-      <div className="glass-panel mb-16 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="flex flex-col gap-4 max-w-md mx-auto">
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-            style={{ display: 'none' }}
-          />
-          <button 
-            className="w-full btn btn-primary py-3 text-lg font-bold shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            style={{ opacity: isUploading ? 0.7 : 1 }}
-          >
-            {isUploading && !receiptData ? (
-              '⏳ Procesando con IA...'
-            ) : (
-              <>
-                <span className="text-2xl">📸</span> Escanear Nuevo Ticket
-              </>
-            )}
-          </button>
-          
-          <div className="text-center">
-            <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Sube una foto y la IA extraerá los datos automáticamente</span>
-          </div>
+      <h3 className={styles.sectionTitle}>🧾 Añadir Gasto</h3>
+      <div className="glass-panel" style={{ marginBottom: '4rem' }}>
+        <div className={styles.innerBlackBox}>
+          <div className={styles.uploadWrapper}>
+            
+            {/* Formulario de Entrada Manual */}
+            <form onSubmit={handleManualAdd} className={styles.addForm}>
+              <input 
+                type="text" 
+                className={`input-field ${styles.addInput}`} 
+                placeholder="Establecimiento o concepto..."
+                value={manualStore}
+                onChange={e => setManualStore(e.target.value)}
+                disabled={isManualLoading || isUploading}
+              />
+              <input 
+                type="number" 
+                step="0.01"
+                className={`input-field ${styles.addInputAmount}`} 
+                placeholder="0.00 €"
+                value={manualAmount}
+                onChange={e => setManualAmount(e.target.value ? Number(e.target.value) : '')}
+                disabled={isManualLoading || isUploading}
+              />
+              <button type="submit" className={`btn ${styles.addBtn}`} disabled={isManualLoading || isUploading || !manualStore.trim() || manualAmount === ''}>
+                {isManualLoading ? '⏳' : '+ Añadir'}
+              </button>
+            </form>
 
-          {error && (
-            <div className="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm text-center">
-              ❌ {error}
+            <div className={styles.orDivider}>
+              <span className={styles.orText}>o escanea un ticket</span>
             </div>
-          )}
+
+            {/* Escáner de IA */}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            <button 
+              className={`btn ${styles.uploadBtn}`}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading || isManualLoading}
+              style={{ opacity: isUploading ? 0.7 : 1 }}
+            >
+              {isUploading && !receiptData ? (
+                '⏳ Procesando con IA...'
+              ) : (
+                <>
+                  <span style={{ fontSize: '1.5rem' }}>📸</span> Escanear Nuevo Ticket
+                </>
+              )}
+            </button>
+            
+            <div className={styles.uploadHelperText}>
+              Sube una foto y la IA extraerá los datos automáticamente
+            </div>
+
+            {error && (
+              <div className={styles.errorBox}>
+                ❌ {error}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Previsualización y Revisión del JSON devuelto */}
       {receiptData && (
-        <div className="glass-panel mb-16 overflow-hidden relative animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="p-4 md:p-6 border-b border-white/10 bg-emerald-500/10">
-            <h3 className="font-bold text-emerald-400 text-lg flex items-center gap-2">
+        <div className={`glass-panel ${styles.previewContainer}`} style={{ marginBottom: '4rem' }}>
+          <div className={styles.previewHeader}>
+            <h3 className={styles.previewTitle}>
               <span>✨</span> Datos Extraídos con Éxito
             </h3>
-            <p className="text-sm text-secondary mt-1">Revisa y confirma los detalles antes de guardar el gasto.</p>
+            <p className={styles.previewSubtitle}>Revisa y confirma los detalles antes de guardar el gasto.</p>
           </div>
           
-          <div className="p-4 md:p-6 flex flex-col gap-6">
-            <div className="flex flex-col md:flex-row gap-8">
+          <div className={styles.previewBody}>
+            <div className={styles.previewFlexRow}>
               {/* Imagen */}
-              <div className="w-full md:w-1/3 flex flex-col gap-2">
-                <span className="text-xs font-bold text-secondary uppercase tracking-wider">Ticket Original</span>
-                <div className="border border-white/10 rounded-xl overflow-hidden shadow-lg bg-black/50 p-2">
-                  <img src={receiptData.imageUrl} alt="Ticket" className="w-full h-auto object-contain max-h-[350px] rounded-lg" />
+              <div className={styles.previewImageCol}>
+                <span className={styles.previewLabel}>Ticket Original</span>
+                <div className={styles.previewImageWrapper}>
+                  <img src={receiptData.imageUrl} alt="Ticket" className={styles.previewImage} />
                 </div>
               </div>
               
               {/* Formulario de Revisión */}
-              <div className="w-full md:w-2/3 flex flex-col gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1">Establecimiento</label>
+              <div className={styles.previewFormCol}>
+                <div className={styles.previewGrid2}>
+                  <div className={styles.previewInputGroup}>
+                    <label className={styles.previewLabel}>Establecimiento</label>
                     <input 
                       type="text" 
                       value={receiptData.store}
                       onChange={(e) => setReceiptData({...receiptData, store: e.target.value})}
-                      className="input-field w-full" 
-                      style={{ padding: '0.75rem 1rem' }}
+                      className={`input-field ${styles.previewInput}`} 
                     />
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1">Fecha</label>
+                  <div className={styles.previewInputGroup}>
+                    <label className={styles.previewLabel}>Fecha</label>
                     <input 
                       type="date" 
                       value={receiptData.date}
                       onChange={(e) => setReceiptData({...receiptData, date: e.target.value})}
-                      className="input-field w-full appearance-none" 
-                      style={{ padding: '0.75rem 1rem' }}
+                      className={`input-field ${styles.previewInput}`} 
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1">Importe Total (€)</label>
+                <div className={styles.previewInputGroup}>
+                  <label className={styles.previewLabel}>Importe Total (€)</label>
                   <input 
                     type="number" 
                     step="0.01" 
                     value={receiptData.amount} 
                     onChange={(e) => setReceiptData({...receiptData, amount: parseFloat(e.target.value) || 0})}
-                    className="input-field w-full font-mono text-lg" 
-                    style={{ padding: '0.75rem 1rem' }}
+                    className={`input-field ${styles.previewInput} ${styles.previewInputAmount}`} 
                   />
                 </div>
 
-                <div className="flex flex-col gap-2 mt-2">
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider pl-1 border-b border-white/5 pb-2">Artículos Detectados ({receiptData.items?.length || 0})</label>
-                  <div className="max-h-48 overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-2">
+                <div className={styles.previewInputGroup}>
+                  <label className={`${styles.previewLabel} ${styles.previewItemsLabel}`}>
+                    Artículos Detectados ({receiptData.items?.length || 0})
+                  </label>
+                  <div className={`custom-scrollbar ${styles.previewItemsList}`}>
                     {receiptData.items?.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center px-3 py-2.5 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <span className="text-accent-primary font-bold text-sm bg-accent-primary/10 px-2 py-1 rounded">{item.quantity}x</span>
-                          <span className="text-slate-200 text-sm truncate">{item.name}</span>
+                      <div key={idx} className={styles.previewItemRow}>
+                        <div className={styles.previewItemLeft}>
+                          <span className={styles.previewItemQty}>{item.quantity}x</span>
+                          <span className={styles.previewItemName} title={item.name}>{item.name}</span>
                         </div>
-                        <span className="text-white font-mono text-sm shrink-0 pl-2">{item.price.toFixed(2)} €</span>
+                        <span className={styles.previewItemPrice}>{item.price.toFixed(2)} €</span>
                       </div>
                     ))}
                   </div>
@@ -191,19 +249,17 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               </div>
             </div>
 
-            <div className="flex mobile-col gap-3 mt-4 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div className={styles.previewActions}>
               <button 
                 onClick={() => setReceiptData(null)} 
-                className="btn mobile-w-full py-3"
-                style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+                className={`btn ${styles.cancelBtn}`}
               >
                 Cancelar y Descartar
               </button>
               <button 
                 onClick={confirmReceipt} 
                 disabled={isUploading} 
-                className="btn mobile-w-full py-3 text-lg font-bold"
-                style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}
+                className={`btn ${styles.confirmBtn}`}
               >
                 {isUploading ? '⏳ Guardando...' : '✅ Confirmar y Guardar Gasto'}
               </button>
@@ -213,83 +269,85 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       )}
 
       {/* Listado de Elementos */}
-      <div className="flex justify-between items-end mb-4" style={{ marginTop: '3rem' }}>
-        <h3 className="text-white font-bold text-lg m-0">📊 Lista de Gastos</h3>
-        <div className="text-emerald-400 font-bold text-lg leading-none" style={{ paddingBottom: '0.1rem' }}>
+      <div className={styles.listHeader}>
+        <h3 className={styles.listHeaderTitle}>📊 Lista de Gastos</h3>
+        <div className={styles.listHeaderTotal}>
           {expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}&nbsp;€
         </div>
       </div>
-      <div className="glass-panel p-4 md:p-6 mb-8">
-        <div className="flex flex-col">
-          {expenses.length === 0 ? (
-            <p className="text-secondary italic">Aún no se ha registrado ningún gasto.</p>
-          ) : (
-            expenses.map((expense) => {
-              const canDelete = isAdmin || expense.purchaserId === currentUserId;
-              const dateStr = new Date(expense.date).toLocaleDateString('es-ES', {
-                day: '2-digit', month: '2-digit', year: 'numeric'
-              });
+      
+      <div className="glass-panel" style={{ marginBottom: '2rem' }}>
+        <div className={styles.innerBlackBox}>
+          <div className={styles.expensesList}>
+            {expenses.length === 0 ? (
+              <p className={styles.emptyState}>Aún no se ha registrado ningún gasto.</p>
+            ) : (
+              expenses.map((expense) => {
+                const canDelete = isAdmin || expense.purchaserId === currentUserId;
+                const dateStr = new Date(expense.date).toLocaleDateString('es-ES', {
+                  day: '2-digit', month: '2-digit', year: 'numeric'
+                });
 
-              return (
-                <div key={expense.id} className="flex flex-col rounded-lg p-4 mb-3 relative overflow-hidden group transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  
-                  {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete Button */}
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="flex items-center flex-1">
-                      <div className="text-sm leading-tight flex-1 flex flex-col gap-1">
-                        <div className="text-secondary">
-                          {dateStr} <span className="mx-1">•</span> <strong className="text-white/80">{expense.purchaser.name}</strong>
+                return (
+                  <div key={expense.id} className={styles.expenseCard}>
+                    
+                    {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete Button */}
+                    <div className={styles.expenseTopRow}>
+                      <div className={styles.expenseMeta}>
+                        <div className={styles.expenseMetaInfo}>
+                          <div className={styles.expenseDateUser}>
+                            {dateStr} <span style={{ margin: '0 0.25rem' }}>•</span> <strong className={styles.expenseUser}>{expense.purchaser.name}</strong>
+                          </div>
+                          {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && (
+                            <div className={styles.expenseStore}>{expense.store}</div>
+                          )}
                         </div>
-                        {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && (
-                          <div className="font-bold text-emerald-100 text-[15px]">{expense.store}</div>
+                      </div>
+                      
+                      {/* Delete Button */}
+                      <div>
+                        {canDelete && (
+                          <button 
+                            onClick={() => handleDelete(expense.id)}
+                            disabled={loading === expense.id}
+                            className={styles.expenseDeleteBtn}
+                            title="Eliminar gasto"
+                          >
+                            {loading === expense.id ? '⏳' : <TrashIcon />}
+                          </button>
                         )}
                       </div>
                     </div>
                     
-                    {/* Delete Button */}
-                    <div className="shrink-0 ml-4">
-                      {canDelete && (
-                        <button 
-                          onClick={() => handleDelete(expense.id)}
-                          disabled={loading === expense.id}
-                          className="flex items-center justify-center p-1"
-                          style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                          title="Eliminar gasto"
-                        >
-                          {loading === expense.id ? '⏳' : <TrashIcon />}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Description if present */}
-                  {expense.description && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
-                    <div className="text-xs mt-1 pl-10 text-secondary/70">
-                      {expense.description}
-                    </div>
-                  )}
+                    {/* Description if present */}
+                    {expense.description && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
+                      <div className={styles.expenseDescription}>
+                        {expense.description}
+                      </div>
+                    )}
 
-                  {/* Items and Total */}
-                  <div className="flex flex-col gap-1 w-full mt-2 pr-1">
-                    <div className="flex flex-col gap-1" style={{ marginLeft: '1.5rem' }}>
-                      {expense.items.map((item: any, idx: number) => (
-                        <div key={idx} className="flex justify-between text-sm text-slate-300">
-                          <span>{item.quantity}x {item.name}</span>
-                          {item.price > 0 && (
-                            <span className="font-mono text-white/70">{item.price.toFixed(2)}&nbsp;€</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between items-center text-sm font-bold text-emerald-400 mt-2 pt-2 border-t border-white/5" style={{ marginLeft: '1.5rem' }}>
-                      <span>Total</span>
-                      <span className="font-mono">{expense.amount.toFixed(2)}&nbsp;€</span>
+                    {/* Items and Total */}
+                    <div className={styles.expenseItemsContainer}>
+                      <div className={styles.expenseItemsList}>
+                        {expense.items.map((item: any, idx: number) => (
+                          <div key={idx} className={styles.expenseItemRow}>
+                            <span>{item.quantity}x {item.name}</span>
+                            {item.price > 0 && (
+                              <span className={styles.expenseItemPrice}>{item.price.toFixed(2)}&nbsp;€</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <div className={styles.expenseTotalRow}>
+                        <span>Total</span>
+                        <span className={styles.expenseTotalValue}>{expense.amount.toFixed(2)}&nbsp;€</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          )}
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
 
@@ -308,41 +366,42 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
         return (
           <div style={{ marginTop: '2.5rem' }}>
-            <h3 className="text-white font-bold text-lg" style={{ marginBottom: '1rem' }}>📷 Tickets Originales</h3>
-            <div className="glass-panel mb-10 p-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {allImages.map((ev: any) => {
-                  const apiImageUrl = ev.url;
-                  const dateStr = new Date(ev.createdAt).toLocaleString('es-ES', {
-                    day: '2-digit', month: '2-digit', year: '2-digit',
-                    hour: '2-digit', minute: '2-digit'
-                  });
-                  return (
-                    <div key={ev.id} className="flex flex-col gap-2 relative">
-                      <div className="flex justify-between items-center px-1 mb-1">
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                          🗓️ {dateStr}
-                        </span>
-                        <button
-                          onClick={() => handleDeleteEvidence(ev.id, ev.expenseId)}
-                          disabled={loading === `delete-ev-${ev.id}`}
-                          className="flex items-center justify-center shrink-0"
-                          style={{ color: 'rgba(255, 255, 255, 0.7)', padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                          title="Borrar foto"
+            <h3 className={`${styles.sectionTitle} ${styles.sectionTitleSpaced}`}>📷 Tickets Originales</h3>
+            <div className="glass-panel" style={{ marginBottom: '2.5rem' }}>
+              <div className={styles.innerBlackBox}>
+                <div className={styles.galleryGrid}>
+                  {allImages.map((ev: any) => {
+                    const apiImageUrl = ev.url;
+                    const dateStr = new Date(ev.createdAt).toLocaleString('es-ES', {
+                      day: '2-digit', month: '2-digit', year: '2-digit',
+                      hour: '2-digit', minute: '2-digit'
+                    });
+                    return (
+                      <div key={ev.id} className={styles.galleryItem}>
+                        <div className={styles.galleryHeader}>
+                          <span className={styles.galleryDate}>
+                            🗓️ {dateStr}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteEvidence(ev.id)}
+                            disabled={loading === `delete-ev-${ev.id}`}
+                            className={styles.galleryDeleteBtn}
+                            title="Borrar foto"
+                          >
+                            {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
+                          </button>
+                        </div>
+                        <a 
+                          href={apiImageUrl}
+                          className={styles.galleryLink}
+                          style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1 }}
                         >
-                          {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
-                        </button>
+                          <img src={apiImageUrl} alt="Ticket" className={styles.galleryImg} />
+                        </a>
                       </div>
-                      <a 
-                        href={apiImageUrl}
-                        className="block border border-white/10 rounded overflow-hidden" 
-                        style={{ minHeight: '100px' }}
-                      >
-                        <img src={apiImageUrl} alt="Ticket" className="w-full h-auto object-cover" style={{ aspectRatio: '1/1' }} />
-                      </a>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>

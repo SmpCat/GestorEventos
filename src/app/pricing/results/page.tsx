@@ -79,11 +79,21 @@ export default async function ResultsPage() {
           margin-bottom: 0.2rem;
           margin-top: 0;
         }
+        .inner-black-box {
+          background-color: rgba(0,0,0,0.3);
+          padding: 1rem;
+          border-radius: 0.75rem;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        @media (min-width: 768px) {
+          .inner-black-box {
+            padding: 1.5rem;
+          }
+        }
         .results-grid {
           display: grid;
           grid-template-columns: 1fr;
           gap: 1.5rem;
-          margin-bottom: 2rem;
         }
         @media (min-width: 1024px) {
           .results-grid {
@@ -95,7 +105,10 @@ export default async function ResultsPage() {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: 0.75rem 0.5rem !important;
+          padding: 1rem !important;
+          background-color: rgba(15, 23, 42, 0.6) !important;
+          border: 1px solid rgba(255, 255, 255, 0.05) !important;
+          border-radius: 0.5rem;
         }
         .results-card-title {
           color: var(--text-secondary);
@@ -124,33 +137,37 @@ export default async function ResultsPage() {
           </div>
         </div>
 
-        <div className="results-grid">
-          <div className="glass-panel results-card">
-            <p className="results-card-title">Bote Total</p>
-            <p className="results-card-value">{totalBoteEsperado}€</p>
-            <p className="results-card-subtitle">Suma de las cuotas asignadas</p>
-          </div>
-          
-          <div className="glass-panel results-card">
-            <p className="results-card-title">Dinero en Caja</p>
-            <p className="results-card-value" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
-            <p className="results-card-subtitle">Falta cobrar: <span style={{ color: dineroPorCobrar > 0 ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>{dineroPorCobrar > 0 ? `${dineroPorCobrar}€` : 'Nada'}</span></p>
-          </div>
-          
-          <div className="glass-panel results-card">
-            <p className="results-card-title">Total Gastado</p>
-            <p className="results-card-value">{totalGastado}€</p>
-            <p className="results-card-subtitle">Suma de todos los tickets</p>
-          </div>
-          
-          <div className="glass-panel results-card">
-            <p className="results-card-title">Saldo Final</p>
-            <p className="results-card-value" style={{ color: saldoFisico >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
-              {saldoFisico >= 0 ? `+${saldoFisico}€` : `${saldoFisico}€`}
-            </p>
-            <p className="results-card-subtitle" style={{ color: saldoFisico < 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
-              {saldoFisico < 0 ? '¡ALERTA! Bote en rojo.' : 'Físicamente sobrante'}
-            </p>
+        <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <div className="inner-black-box">
+            <div className="results-grid">
+              <div className="results-card">
+                <p className="results-card-title">Bote Total</p>
+                <p className="results-card-value">{totalBoteEsperado}€</p>
+                <p className="results-card-subtitle">Suma de las cuotas asignadas</p>
+              </div>
+              
+              <div className="results-card">
+                <p className="results-card-title">Dinero en Caja</p>
+                <p className="results-card-value" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
+                <p className="results-card-subtitle">Falta cobrar: <span style={{ color: dineroPorCobrar > 0 ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>{dineroPorCobrar > 0 ? `${dineroPorCobrar}€` : 'Nada'}</span></p>
+              </div>
+              
+              <div className="results-card">
+                <p className="results-card-title">Total Gastado</p>
+                <p className="results-card-value">{totalGastado}€</p>
+                <p className="results-card-subtitle">Suma de todos los tickets</p>
+              </div>
+              
+              <div className="results-card">
+                <p className="results-card-title">Saldo Final</p>
+                <p className="results-card-value" style={{ color: saldoFisico >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
+                  {saldoFisico >= 0 ? `+${saldoFisico}€` : `${saldoFisico}€`}
+                </p>
+                <p className="results-card-subtitle" style={{ color: saldoFisico < 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
+                  {saldoFisico < 0 ? '¡ALERTA! Bote en rojo.' : 'Físicamente sobrante'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

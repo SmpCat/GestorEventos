@@ -1,0 +1,166 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.headerRow {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .headerRow {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.innerBlackBox {
+  background-color: rgba(0,0,0,0.3);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (min-width: 768px) {
+  .innerBlackBox {
+    padding: 1.5rem;
+  }
+}
+
+.addBtn {
+  background-color: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.eventsGrid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.emptyState {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem 0;
+  grid-column: 1 / -1;
+  font-style: italic;
+}
+
+.eventCard {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  padding: 1.5rem;
+  border-radius: 1rem;
+}
+
+.eventCardActive {
+  border-color: var(--accent-success);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+.eventHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.eventTitle {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.eventTitleActive {
+  color: var(--accent-success);
+}
+
+.activeBadge {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: var(--accent-success) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  font-weight: bold !important;
+}
+
+.eventDates {
+  color: #fff;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Removed media query since we now use column layout everywhere */
+
+.actionBtn {
+  background-color: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  flex: 1 !important;
+}
+
+.actionBtnActive {
+  font-weight: bold !important;
+}
+
+.deleteBtn {
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  color: var(--accent-danger);
+  border-color: rgba(239, 68, 68, 0.3);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Padlock specific logic */
+.historifiedBtn {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  color: var(--text-secondary) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.1) !important;
+  padding: 0.75rem !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.historifiedBtn:hover {
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}

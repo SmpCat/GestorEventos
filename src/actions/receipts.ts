@@ -143,3 +143,31 @@ export async function deleteExpenseEvidence(evidenceId: string) {
     return { success: false, error: err.message || "Error al eliminar la evidencia." };
   }
 }
+
+export async function saveManualExpenseAction(data: { store: string; amount: number; description: string; date: string }) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+
+    const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
+    if (!activeEvent) return { success: false, error: "No hay evento activo" };
+
+    await prisma.expense.create({
+      data: {
+        description: data.description || `Compra en ${data.store}`,
+        store: data.store,
+        amount: data.amount,
+        date: new Date(data.date),
+        eventId: activeEvent.id,
+        purchaserId: session.id,
+      }
+    });
+    
+    revalidatePath('/expenses');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error en saveManualExpenseAction:", err);
+    return { success: false, error: err.message || "Error al guardar el gasto manual." };
+  }
+}

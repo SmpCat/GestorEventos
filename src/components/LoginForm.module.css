@@ -1,0 +1,75 @@
+.loginWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.loginHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.loginTitle {
+  font-size: 3rem;
+  color: var(--accent-primary);
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.loginFormContainer {
+  width: 100%;
+  max-width: 400px;
+}
+
+.loginFormTitle {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.loginError {
+  color: var(--accent-danger);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.loginSubmitBtn {
+  margin-top: 0.5rem;
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+.loginFooter {
+  margin-top: 1.5rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+}
+
+.loginFooterText {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.loginRegisterBtn {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.8rem;
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}

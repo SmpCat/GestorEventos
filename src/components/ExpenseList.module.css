@@ -1,0 +1,571 @@
+.container {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 1.5rem 0;
+}
+
+.headerRow {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .headerRow {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.sectionTitle {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.sectionTitleSpaced {
+  margin-top: 3rem;
+}
+
+.innerBlackBox {
+  background-color: rgba(0,0,0,0.3);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (min-width: 768px) {
+  .innerBlackBox {
+    padding: 1.5rem;
+  }
+}
+
+/* Upload Section */
+.uploadWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.uploadBtn {
+  width: 100% !important;
+  padding: 0.6rem 0 !important;
+  font-size: 1rem !important;
+  font-weight: normal !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  background-color: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.uploadHelperText {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .addForm {
+    flex-direction: row;
+  }
+}
+
+.addInput {
+  flex: 1;
+}
+
+.addInputAmount {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .addInputAmount {
+    width: 120px;
+  }
+}
+
+.addBtn {
+  background-color: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 0.6rem 1.25rem !important;
+}
+
+.orDivider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 1rem 0;
+}
+
+.orDivider::before,
+.orDivider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.orDivider::before {
+  margin-right: 0.5em;
+}
+
+.orDivider::after {
+  margin-left: 0.5em;
+}
+
+.errorBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 0.75rem;
+  color: #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* IA Preview Section */
+.previewContainer {
+  overflow: hidden;
+  position: relative;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(1rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.previewHeader {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.previewTitle {
+  font-weight: bold;
+  color: var(--accent-success);
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.previewSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+.previewBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.previewFlexRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .previewFlexRow {
+    flex-direction: row;
+  }
+}
+
+.previewImageCol {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .previewImageCol {
+    width: 33.333%;
+  }
+}
+
+.previewLabel {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 0.25rem;
+}
+
+.previewImageWrapper {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 0.5rem;
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 350px;
+  border-radius: 0.5rem;
+}
+
+.previewFormCol {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .previewFormCol {
+    width: 66.666%;
+  }
+}
+
+.previewGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.previewInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.previewInput {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.previewInputAmount {
+  font-family: monospace;
+  font-size: 1.125rem !important;
+}
+
+.previewItemsLabel {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.previewItemsList {
+  max-height: 12rem;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.previewItemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.previewItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.previewItemQty {
+  color: var(--accent-primary);
+  font-weight: bold;
+  font-size: 0.875rem;
+  background-color: rgba(99, 102, 241, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.previewItemName {
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.previewItemPrice {
+  color: #fff;
+  font-family: monospace;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  padding-left: 0.5rem;
+}
+
+.previewActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .previewActions {
+    flex-direction: column;
+  }
+}
+
+.cancelBtn {
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 0.75rem 0 !important;
+  width: 100% !important;
+}
+
+.confirmBtn {
+  background-color: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 0.75rem 0 !important;
+  width: 100% !important;
+  font-size: 1.125rem !important;
+  font-weight: bold !important;
+}
+
+/* Expenses List */
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+  margin-top: 3rem;
+}
+
+.listHeaderTitle {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.listHeaderTotal {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.125rem;
+  line-height: 1;
+  padding-bottom: 0.1rem;
+}
+
+.expensesList {
+  display: flex;
+  flex-direction: column;
+}
+
+.emptyState {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.expenseCard {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.expenseTopRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.expenseMeta {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.expenseMetaInfo {
+  font-size: 0.875rem;
+  line-height: 1.25;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.expenseDateUser {
+  color: var(--text-secondary);
+}
+
+.expenseUser {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: bold;
+}
+
+.expenseStore {
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.expenseDeleteBtn {
+  flex-shrink: 0;
+  margin-left: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expenseDeleteBtn:hover {
+  color: var(--accent-danger);
+}
+
+.expenseDescription {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  padding-left: 0;
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.expenseItemsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding-right: 0.25rem;
+}
+
+.expenseItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.expenseItemRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+}
+
+.expenseItemPrice {
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.expenseTotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #fff;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.expenseTotalValue {
+  font-family: monospace;
+}
+
+/* Evidences Gallery */
+.galleryGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.galleryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  width: calc(50% - 0.5rem);
+}
+
+@media (min-width: 768px) {
+  .galleryItem {
+    width: calc(25% - 0.75rem);
+  }
+}
+
+.galleryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.galleryDate {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.galleryDeleteBtn {
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.galleryLink {
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  overflow: hidden;
+  min-height: 100px;
+}
+
+.galleryImg {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: 1/1;
+}

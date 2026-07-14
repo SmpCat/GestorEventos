@@ -1,0 +1,132 @@
+.adminPanel {
+  padding: 1.5rem !important;
+}
+
+.innerBlackBox {
+  background-color: rgba(0,0,0,0.3);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (min-width: 768px) {
+  .innerBlackBox {
+    padding: 1.5rem;
+  }
+}
+
+.rulesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.emptyState {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.ruleRow {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Para pantallas más grandes, aumentar padding y gap */
+@media (min-width: 768px) {
+  .ruleRow {
+    gap: 0.75rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+}
+
+.daysInput {
+  text-align: center;
+  width: 3.5rem !important;
+  padding: 0.4rem 0.2rem !important;
+}
+
+.daysValue {
+  text-align: center;
+  width: 2rem;
+}
+
+.priceInput {
+  text-align: center;
+  width: 4.5rem !important;
+  padding: 0.4rem 0.2rem !important;
+}
+
+.priceValue {
+  text-align: center;
+  width: 3rem;
+  color: var(--accent-success);
+}
+
+.actionContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
+  margin-right: -0.6rem;
+}
+
+.deleteBtn {
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteBtn:hover {
+  color: var(--accent-danger);
+}
+
+.actionsFooter {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .actionsFooter {
+    flex-direction: column;
+  }
+}
+
+.addBtn {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 0.75rem 0 !important;
+  width: 100% !important;
+  font-weight: bold !important;
+}
+
+.saveBtn {
+  background-color: transparent !important;
+  padding: 0.75rem 0 !important;
+  width: 100% !important;
+  font-weight: bold !important;
+}
+
+.saveBtnHasChanges {
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.saveBtnNoChanges {
+  color: var(--text-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  opacity: 0.5 !important;
+}
