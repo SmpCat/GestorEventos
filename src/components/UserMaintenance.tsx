@@ -58,7 +58,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
             {/* VISTA MÓVIL (Cards) */}
             <div className="desktop-hide flex flex-col gap-4 p-4">
               {users.map(user => (
-                <div key={`mobile-${user.id}`} className="p-4 rounded-lg border flex flex-col gap-3" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.05)' }}>
+                <div key={`mobile-${user.id}`} className="p-4 rounded-lg border flex flex-col gap-3" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.2)' }}>
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="font-bold text-lg">{user.name}</div>
@@ -79,13 +79,15 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                     {!user.email && !user.phone && <span className="text-secondary italic">Sin datos de contacto</span>}
                   </div>
 
-                  <div className="flex mobile-col gap-2 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                    <button onClick={() => handleEdit(user)} className="btn mobile-w-full" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)' }} disabled={actionLoading !== null}>
-                      Editar
-                    </button>
-                    <button onClick={() => handleDelete(user.id, user.name)} className="btn mobile-w-full" style={{ color: 'var(--accent-danger)', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }} title="Borrar" disabled={actionLoading !== null}>
-                      {actionLoading === user.id ? '...' : <><TrashIcon /> Borrar</>}
-                    </button>
+                  <div className="mt-4" style={{ paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div className="flex flex-col gap-2 mt-1">
+                      <button onClick={() => handleEdit(user)} className="btn mobile-w-full py-1.5 text-sm font-bold" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }} disabled={actionLoading !== null}>
+                        Editar
+                      </button>
+                      <button onClick={() => handleDelete(user.id, user.name)} className="btn mobile-w-full py-1.5 text-sm font-bold flex items-center justify-center gap-2" style={{ color: 'var(--accent-danger)', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }} title="Borrar" disabled={actionLoading !== null}>
+                        {actionLoading === user.id ? '...' : <><TrashIcon /> Borrar</>}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
