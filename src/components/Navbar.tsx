@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { logout } from '@/actions/auth';
 
 export default function Navbar({ session }: { session: any }) {
   const pathname = usePathname();
@@ -36,8 +37,8 @@ export default function Navbar({ session }: { session: any }) {
         {isDashboard ? (
           <button 
             onClick={async () => {
-              const { logout } = await import('@/actions/auth');
               await logout();
+              window.location.href = '/';
             }}
             className="btn btn-danger"
             style={{ padding: '0.3rem 0.8rem', fontSize: '0.9rem', fontWeight: 'bold' }}
