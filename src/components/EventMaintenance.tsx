@@ -66,8 +66,8 @@ export default function EventMaintenance({ events, session }: { events: any[], s
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4" style={{ marginBottom: '1.5rem' }}>
         <div>
-          <h1>Mantenimiento</h1>
-          <p className="subtitle">Gestión de Eventos / Viajes</p>
+          <h1>Gestión de Eventos</h1>
+          <p className="subtitle">Eventos</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
           <button onClick={handleCreate} className="btn mobile-w-full" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
