@@ -66,52 +66,52 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
 
       <div className="grid mt-6" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         
-        <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+        <Link href="/pricing/attendees" className="glass-panel flex items-center justify-between py-3 px-5 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes</h3>
-            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver y editar pagos</p>
+            <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Ver y editar pagos</p>
           </div>
           <div style={{ fontSize: '2rem' }}>👥</div>
         </Link>
 
-        <Link href="/pricing/rules" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+        <Link href="/pricing/rules" className="glass-panel flex items-center justify-between py-3 px-5 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h3>
-            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Reglas de precios</p>
+            <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Reglas de precios</p>
           </div>
           <div style={{ fontSize: '2rem' }}>⚙️</div>
         </Link>
 
-        <Link href="/pricing/results" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+        <Link href="/pricing/results" className="glass-panel flex items-center justify-between py-3 px-5 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
-            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Resumen financiero</p>
+            <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Resumen financiero</p>
           </div>
           <div style={{ fontSize: '2rem' }}>📈</div>
         </Link>
 
-        <Link href="/shopping" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+        <Link href="/shopping" className="glass-panel flex items-center justify-between py-3 px-5 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
-            <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Qué falta por comprar</p>
+            <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Qué falta por comprar</p>
           </div>
           <div style={{ fontSize: '2rem' }}>🛒</div>
         </Link>
 
         {/* Gastos */}
         {activeEvent ? (
-          <Link href="/expenses" className="glass-panel flex items-center justify-between p-6 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+          <Link href="/expenses" className="glass-panel flex items-center justify-between py-3 px-5 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
             <div>
               <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gastos Registrados</h3>
-              <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Ver listado y añadir tickets</p>
+              <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Ver listado y añadir tickets</p>
             </div>
             <div style={{ fontSize: '2rem' }}>📸</div>
           </Link>
         ) : (
-          <div className="glass-panel flex items-center justify-between p-6" style={{ opacity: 0.5, cursor: 'not-allowed', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+          <div className="glass-panel flex items-center justify-between py-3 px-5" style={{ opacity: 0.5, cursor: 'not-allowed', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
             <div>
               <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Añadir Gasto</h3>
-              <p className="text-secondary" style={{ fontSize: '0.85rem' }}>Requiere evento activo</p>
+              <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Requiere evento activo</p>
             </div>
             <div style={{ fontSize: '2rem' }}>📸</div>
           </div>
@@ -122,14 +122,20 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
       {session.isAdmin && (
         <div style={{ marginTop: '3.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <h3 className="mb-6 text-white">👑 Zona de Administración</h3>
-          <div className="grid" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-            <Link href="/admin/events" className="glass-panel flex flex-col items-center justify-center p-6 transition-colors" style={{ color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-              <span style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</span>
-              <strong style={{ fontSize: '1.1rem' }}>Gestión de Eventos</strong>
+          <div className="grid" style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+            <Link href="/admin/events" className="glass-panel flex items-center justify-between py-3 px-5 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gestión de Eventos</h3>
+                <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Crear y editar eventos</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>📅</div>
             </Link>
-            <Link href="/admin/users" className="glass-panel flex flex-col items-center justify-center p-6 transition-colors" style={{ color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-              <span style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>👥</span>
-              <strong style={{ fontSize: '1.1rem' }}>Usuarios</strong>
+            <Link href="/admin/users" className="glass-panel flex items-center justify-between py-3 px-5 transition-colors hover:bg-white/5" style={{ textDecoration: 'none', color: 'inherit', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Usuarios</h3>
+                <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 0 }}>Mantenimiento y roles</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>👥</div>
             </Link>
           </div>
         </div>
