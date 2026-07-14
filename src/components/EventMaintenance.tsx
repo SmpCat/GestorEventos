@@ -105,7 +105,7 @@ export default function EventMaintenance({ events, session }: { events: any[], s
                   )}
                 </div>
                 
-                <div className="text-secondary mb-4" style={{ fontSize: '0.875rem' }}>
+                <div className="mb-4" style={{ color: '#fff', fontSize: '0.875rem' }}>
                   <p>📅 Inicio: {renderDate(event.startDate)}</p>
                   <p>🏁 Fin: {renderDate(event.endDate)}</p>
                 </div>
@@ -113,16 +113,22 @@ export default function EventMaintenance({ events, session }: { events: any[], s
 
               <div className="flex mobile-col gap-2 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 {(!event.isActive && event.isProtected) ? (
-                  <div className="text-secondary w-full text-center flex items-center justify-center gap-2" style={{ padding: '0.5rem', fontSize: '0.9rem' }}>
+                  <button 
+                    onClick={() => handleActivate(event.id, event.name)}
+                    className="btn w-full text-center flex items-center justify-center gap-2" 
+                    style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}
+                    title="Clic para volver a hacer operativo este evento"
+                    disabled={actionLoading !== null}
+                  >
                     🔒 Evento Historificado
-                  </div>
+                  </button>
                 ) : (
                   <>
                     {!event.isActive && (
                       <button 
                         onClick={() => handleActivate(event.id, event.name)} 
                         className="btn mobile-w-full" 
-                        style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)', fontWeight: 'bold' }}
+                        style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', fontWeight: 'bold' }}
                         disabled={actionLoading !== null}
                       >
                         {actionLoading === `activate-${event.id}` ? 'Activando...' : 'Hacer Operativo'}
@@ -132,21 +138,23 @@ export default function EventMaintenance({ events, session }: { events: any[], s
                     <button 
                       onClick={() => handleEdit(event)} 
                       className="btn mobile-w-full" 
-                      style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+                      style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)' }}
                       disabled={actionLoading !== null}
                     >
                       Editar
                     </button>
                     
-                    <button 
-                      onClick={() => handleDelete(event.id, event.name, event.isActive)} 
-                      className="btn"
-                      style={{ color: 'var(--accent-danger)', padding: '0.5rem', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: event.isActive ? 0.6 : 1 }}
-                      title={event.isActive ? "No se puede borrar el evento activo" : "Borrar"}
-                      disabled={actionLoading !== null}
-                    >
-                      <TrashIcon />
-                    </button>
+                    {!event.isActive && (
+                      <button 
+                        onClick={() => handleDelete(event.id, event.name, event.isActive)} 
+                        className="btn"
+                        style={{ color: 'var(--accent-danger)', padding: '0.5rem', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        title="Borrar"
+                        disabled={actionLoading !== null}
+                      >
+                        <TrashIcon />
+                      </button>
+                    )}
                   </>
                 )}
               </div>
