@@ -36,7 +36,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4" style={{ marginBottom: '2rem' }}>
         <div>
           <h1>Mantenimiento</h1>
           <p className="subtitle">Gestión de Usuarios del Sistema</p>
@@ -66,9 +66,9 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                     </div>
                     <div>
                       {user.isAdmin ? (
-                        <span className="badge badge-admin text-xs">Admin</span>
+                        <span className="badge text-xs" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', fontWeight: 'bold' }}>Admin</span>
                       ) : (
-                        <span className="badge badge-user text-xs">Usuario</span>
+                        <span className="badge text-xs" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>Usuario</span>
                       )}
                     </div>
                   </div>
@@ -79,11 +79,11 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                     {!user.email && !user.phone && <span className="text-secondary italic">Sin datos de contacto</span>}
                   </div>
 
-                  <div className="flex gap-2 mt-2">
-                    <button onClick={() => handleEdit(user)} className="btn flex-1 py-2 text-sm flex items-center justify-center gap-2" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }} disabled={actionLoading !== null}>
-                      ✏️ Editar
+                  <div className="flex mobile-col gap-2 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <button onClick={() => handleEdit(user)} className="btn mobile-w-full" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)' }} disabled={actionLoading !== null}>
+                      Editar
                     </button>
-                    <button onClick={() => handleDelete(user.id, user.name)} className="btn flex-1 py-2 text-sm flex items-center justify-center gap-2" style={{ color: 'var(--accent-danger)', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }} title="Borrar" disabled={actionLoading !== null}>
+                    <button onClick={() => handleDelete(user.id, user.name)} className="btn mobile-w-full" style={{ color: 'var(--accent-danger)', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }} title="Borrar" disabled={actionLoading !== null}>
                       {actionLoading === user.id ? '...' : <><TrashIcon /> Borrar</>}
                     </button>
                   </div>
@@ -119,13 +119,13 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                       </td>
                       <td>
                         {user.isAdmin ? (
-                          <span className="badge badge-admin">Admin</span>
+                          <span className="badge" style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', fontWeight: 'bold' }}>Admin</span>
                         ) : (
-                          <span className="badge badge-user">Usuario</span>
+                          <span className="badge" style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>Usuario</span>
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <button onClick={() => handleEdit(user)} className="btn" style={{ marginRight: '0.5rem', backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }} disabled={actionLoading !== null}>
+                        <button onClick={() => handleEdit(user)} className="btn" style={{ marginRight: '0.5rem', backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)' }} disabled={actionLoading !== null}>
                           Editar
                         </button>
                         <button onClick={() => handleDelete(user.id, user.name)} className="btn" style={{ color: 'var(--accent-danger)', padding: '0.5rem', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} title="Borrar" disabled={actionLoading !== null}>
