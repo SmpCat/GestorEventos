@@ -126,7 +126,7 @@ export default async function ResultsPage() {
 
         <div className="results-grid">
           <div className="glass-panel results-card">
-            <p className="results-card-title">Bote Teórico Total</p>
+            <p className="results-card-title">Bote Total</p>
             <p className="results-card-value">{totalBoteEsperado}€</p>
             <p className="results-card-subtitle">Suma de las cuotas asignadas</p>
           </div>
@@ -134,16 +134,16 @@ export default async function ResultsPage() {
           <div className="glass-panel results-card">
             <p className="results-card-title">Dinero en Caja</p>
             <p className="results-card-value" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
-            <p className="results-card-subtitle">Falta cobrar: <span style={{ color: 'var(--accent-warning)', fontWeight: 'bold' }}>{dineroPorCobrar > 0 ? `${dineroPorCobrar}€` : 'Nada'}</span></p>
+            <p className="results-card-subtitle">Falta cobrar: <span style={{ color: dineroPorCobrar > 0 ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>{dineroPorCobrar > 0 ? `${dineroPorCobrar}€` : 'Nada'}</span></p>
           </div>
           
           <div className="glass-panel results-card">
             <p className="results-card-title">Total Gastado</p>
-            <p className="results-card-value" style={{ color: 'var(--accent-danger)' }}>{totalGastado}€</p>
+            <p className="results-card-value">{totalGastado}€</p>
             <p className="results-card-subtitle">Suma de todos los tickets</p>
           </div>
           
-          <div className="glass-panel results-card" style={{ backgroundColor: saldoFisico >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.1)' }}>
+          <div className="glass-panel results-card">
             <p className="results-card-title">Saldo Final</p>
             <p className="results-card-value" style={{ color: saldoFisico >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
               {saldoFisico >= 0 ? `+${saldoFisico}€` : `${saldoFisico}€`}
