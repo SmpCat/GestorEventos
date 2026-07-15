@@ -91,3 +91,24 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 1. El sistema `Watchtower` está totalmente operativo. Revisa el `docker-compose.yml` del repositorio para que tengas la configuración final oficial.
 2. Si subes cualquier cambio a `main` creando un tag (ej. `v1.1.5`), GitHub Actions generará la imagen y el QNAP la bajará en menos de una hora sin tocar nada.
 3. El usuario ya tiene un borrador en `instrucciones_instalacion_app.md` / `WHATSAPP_MANUAL.md` para pasarlo a los invitados por WhatsApp con instrucciones de PWA en iOS y Android.
+
+## Resumen de la Sesión de Pulido de UI, Despliegues NAS y WatchTower Global (Mac)
+*Última actualización: 15 de Julio de 2026 (por Mac Agent)*
+
+### 1. Refactorización Estética (Aesthetic & Glassmorphism)
+- Se consolidó el diseño UI aplicando paneles traslúcidos con bordes suaves (`innerBlackBox` class) y desenfoque (backdrop-filter) por toda la aplicación, eliminando diseños duros de colores planos antiguos (ej. pantalla "Únete a la fiesta", "Login", etc.).
+- Se implementó la imagen premium de los girasoles oscura como fondo estático para las pantallas de bienvenida.
+
+### 2. Error 500 ChunkLoadError & Limpieza QNAP NAS
+- En esta sesión el usuario reportó que el despliegue al NAS (`./deploy_to_nas.sh`) daba errores 500 en Next.js.
+- Se diagnosticó que se debía a la corrupción de la caché de Docker de los "layers" de compilación (reusaba carpetas `.next` antiguas al compilar en el NAS). Se arregló inyectando explícitamente la directiva `--no-cache` al `docker compose build` y `--remove-orphans` en `deploy_to_nas.sh`.
+- Se resolvieron inconsistencias en los nombres de las aplicaciones en Container Station. Todo se ha unificado para que la carpeta en el NAS, la aplicación Compose y el nombre del contenedor se llamen exactamente `gestoreventos` (todo en minúsculas). 
+
+### 3. Independencia de WatchTower (Global)
+- Para evitar que la configuración de Watchtower viviera dentro de la de GestorEventos (causando bloqueo en la UI de QNAP para borrarlos independientemente), Watchtower se ha separado por completo.
+- Se ha inyectado en `docker-compose.yml` la etiqueta `com.centurylinklabs.watchtower.enable=false` para blindar GestorEventos.
+- Se creó un script definitivo `deploy_watchtower.sh` que instala de forma aislada a Watchtower en `/share/CACHEDEV1_DATA/Container/watchtower` en el NAS para vigilar el resto de aplicaciones públicas (Pi-hole, Plex, etc).
+
+### Instrucciones para el Agente Windows:
+1. Lee detenidamente el `ROADMAP.md` en su sección V2, hay modificaciones de la Lógica de Negocio introducidas hoy que mañana deberás desarrollar (como quitar el Ajuste Manual de Cuota y sustituir input por Select de Tarifas).
+2. Todo el código de GestorEventos ha sido subido a Github sin problemas, incluyendo los nuevos scripts de automatización del NAS. Ya no es necesario tocar Watchtower ni el NAS. Mañana puedes ponerte 100% con la programación de las features de V2.
