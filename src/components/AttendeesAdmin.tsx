@@ -65,15 +65,17 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
   };
 
   const handleDeletePayment = async (paymentId: string) => {
-    if (!window.confirm('¿Borrar este registro de pago?')) return;
-    setLoading(`del-pay-${paymentId}`);
-    const res = await deletePayment(paymentId);
-    if (res.success) {
-      alert('Pago eliminado.');
-    } else {
-      alert(res.error || 'Error al borrar el pago.');
-    }
-    setLoading(null);
+    setTimeout(async () => {
+      if (!window.confirm('¿Borrar este registro de pago?')) return;
+      setLoading(`del-pay-${paymentId}`);
+      const res = await deletePayment(paymentId);
+      if (res.success) {
+        alert('Pago eliminado.');
+      } else {
+        alert(res.error || 'Error al borrar el pago.');
+      }
+      setLoading(null);
+    }, 50);
   };
 
   const handleDeleteAttendee = async (att: any) => {
@@ -89,17 +91,19 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
       return;
     }
 
-    if (!window.confirm('🚨 ¿ESTÁS COMPLETAMENTE SEGURO? Esta acción expulsará a esta persona del evento. No se puede deshacer.')) return;
-    
-    setLoading(`del-att-${att.id}`);
-    const res = await deleteAttendee(att.id);
-    if (res.success) {
-      alert('Asistente expulsado del evento correctamente.');
-      setEditingAttendee(null);
-    } else {
-      alert(res.error || 'Error al eliminar el asistente.');
-    }
-    setLoading(null);
+    setTimeout(async () => {
+      if (!window.confirm('🚨 ¿ESTÁS COMPLETAMENTE SEGURO? Esta acción expulsará a esta persona del evento. No se puede deshacer.')) return;
+      
+      setLoading(`del-att-${att.id}`);
+      const res = await deleteAttendee(att.id);
+      if (res.success) {
+        alert('Asistente expulsado del evento correctamente.');
+        setEditingAttendee(null);
+      } else {
+        alert(res.error || 'Error al eliminar el asistente.');
+      }
+      setLoading(null);
+    }, 50);
   };
 
   return (

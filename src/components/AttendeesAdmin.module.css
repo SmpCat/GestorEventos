@@ -197,8 +197,10 @@
   cursor: pointer;
 }
 
-.deletePaymentBtn:hover {
-  color: var(--accent-danger);
+@media (hover: hover) {
+  .deletePaymentBtn:hover {
+    color: var(--accent-danger);
+  }
 }
 
 .noPayments {

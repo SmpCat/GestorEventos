@@ -88,8 +88,10 @@
   justify-content: center;
 }
 
-.deleteBtn:hover {
-  color: var(--accent-danger);
+@media (hover: hover) {
+  .deleteBtn:hover {
+    color: var(--accent-danger);
+  }
 }
 
 .actionsFooter {

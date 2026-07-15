@@ -51,11 +51,11 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
     
     if (!res.success) {
       alert(res.error || 'Error al guardar las tarifas.');
-    } else {
-      setSavedRulesJSON(JSON.stringify(validRules));
-      setRules(validRules);
-      alert('Tarifas guardadas correctamente y ordenadas por días.');
+      return;
     }
+    setSavedRulesJSON(JSON.stringify(validRules));
+    setRules(validRules);
+    alert('Tarifas guardadas correctamente y ordenadas por días.');
   };
 
   const handleSaveAndAddRule = async () => {
@@ -81,7 +81,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
       
       if (!res.success) {
         alert(res.error || 'Error al guardar las tarifas.');
-        return; // Detenemos la ejecución, no abrimos la nueva fila
+        return;
       }
       setSavedRulesJSON(JSON.stringify(validRules));
       

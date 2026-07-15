@@ -4,28 +4,54 @@
   align-items: center;
   justify-content: center;
   min-height: 80vh;
+  position: relative;
+  z-index: 1;
+}
+
+.loginWrapper::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.5) 0%, rgba(15, 23, 42, 0.95) 100%), url('/images/fiestas-valdeganga.jpg?v=2');
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
 }
 
 .loginHeader {
-  text-align: center;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
 }
 
 .loginTitle {
-  font-size: 3rem;
-  color: var(--accent-primary);
-  margin-bottom: 0.5rem;
+  font-size: 2.25rem;
+  color: #ffffff;
+  margin-bottom: -0.25rem; /* Negative margin to pull the subtitle closer */
   margin-top: 0;
 }
 
 .loginFormContainer {
   width: 100%;
-  max-width: 400px;
+  max-width: 340px;
+  padding: 1rem !important; /* Slightly reduced padding so the black box fits nicely */
+}
+
+.innerBlackBox {
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .loginFormTitle {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
 }
 
 .loginError {
@@ -38,7 +64,7 @@
 .loginForm {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .loginSubmitBtn {

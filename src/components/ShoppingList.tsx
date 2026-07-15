@@ -61,9 +61,10 @@ export default function ShoppingList({ items, evidences, eventId, users, current
   const handleDelete = async (itemId: string) => {
     if (window.confirm('¿Seguro que quieres borrar esto de la lista?')) {
       setLoading(`delete-${itemId}`);
-      await deleteItem(itemId);
-      router.refresh();
-      setLoading(null);
+      deleteItem(itemId).then(() => {
+        router.refresh();
+        setLoading(null);
+      });
     }
   };
 

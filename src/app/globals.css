@@ -130,9 +130,11 @@ p { color: var(--text-secondary); margin-bottom: 1rem; }
   box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
 }
 
-.btn-primary:hover {
-  background-color: var(--accent-primary-hover);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .btn-primary:hover {
+    background-color: var(--accent-primary-hover);
+    transform: translateY(-1px);
+  }
 }
 
 .btn-danger {
@@ -141,8 +143,10 @@ p { color: var(--text-secondary); margin-bottom: 1rem; }
   border: 1px solid var(--accent-danger);
 }
 
-.btn-danger:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+@media (hover: hover) {
+  .btn-danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+  }
 }
 
 .btn-secondary {
@@ -151,8 +155,10 @@ p { color: var(--text-secondary); margin-bottom: 1rem; }
   border: 1px solid var(--glass-border);
 }
 
-.btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+@media (hover: hover) {
+  .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 }
 
 /* Global CSS ends */
@@ -217,8 +223,10 @@ p { color: var(--text-secondary); margin-bottom: 1rem; }
   border-bottom: none;
 }
 
-.table tr:hover td {
-  background-color: rgba(255, 255, 255, 0.02);
+@media (hover: hover) {
+  .table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
 }
 
 /* Modal Overlay */

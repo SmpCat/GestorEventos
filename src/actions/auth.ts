@@ -14,7 +14,7 @@ const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
 
 export async function login(data: any) {
   try {
-    const normalizedUsername = data.username.toLowerCase();
+    const normalizedUsername = data.username.trim().toLowerCase();
     const user = await prisma.user.findUnique({
       where: { username: normalizedUsername },
     });

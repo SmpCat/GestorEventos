@@ -148,8 +148,10 @@
   color: var(--text-secondary);
 }
 
-.tabBtnInactiveHover:hover {
-  opacity: 0.8;
+@media (hover: hover) {
+  .tabBtnInactiveHover:hover {
+    opacity: 0.8;
+  }
 }
 
 /* List Items */
@@ -238,8 +240,10 @@
   justify-content: center;
 }
 
-.deleteBtn:hover {
-  color: var(--accent-danger);
+@media (hover: hover) {
+  .deleteBtn:hover {
+    color: var(--accent-danger);
+  }
 }
 
 .assignSelectWrapper {

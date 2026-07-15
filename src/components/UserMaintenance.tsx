@@ -11,6 +11,11 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+
+  const toggleExpand = (id: string) => {
+    setExpandedUserId(prev => prev === id ? null : id);
+  };
 
   const handleCreate = () => {
     setEditingUser(null);
@@ -56,62 +61,71 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
               <p>No hay usuarios registrados en el sistema.</p>
             </div>
           ) : (
-            users.map(user => (
+            users.map(user => {
+              const isExpanded = expandedUserId === user.id;
+              return (
               <div key={user.id} className={styles.userCard}>
-                <div>
-                  <div className={styles.userHeader}>
-                    <div className={styles.userInfo}>
-                      <h3 className={styles.userName}>{user.name}</h3>
-                      <span className={styles.userHandle}>@{user.username}</span>
-                    </div>
-                    <div>
-                      {user.isAdmin ? (
-                        <span className={`badge ${styles.adminBadge}`}>Admin</span>
-                      ) : (
-                        <span className={`badge ${styles.userBadge}`}>Usuario</span>
+                <div 
+                  className={styles.userHeader} 
+                  onClick={() => toggleExpand(user.id)}
+                  style={{ cursor: 'pointer', marginBottom: isExpanded ? '1rem' : '0' }}
+                >
+                  <div className={styles.userInfo}>
+                    <h3 className={styles.userName}>{user.name}</h3>
+                    <span className={styles.userHandle}>@{user.username}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    {user.isAdmin ? (
+                      <span className={`badge ${styles.adminBadge}`}>Admin</span>
+                    ) : (
+                      <span className={`badge ${styles.userBadge}`}>Usuario</span>
+                    )}
+                    <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>{isExpanded ? '▲' : '▼'}</span>
+                  </div>
+                </div>
+                
+                {isExpanded && (
+                  <div className={styles.expandedContent}>
+                    <div className={styles.contactBox}>
+                      {user.email && (
+                        <div className={styles.contactRow}>
+                          <span className={styles.contactIcon}>✉️</span>
+                          <span>{user.email}</span>
+                        </div>
+                      )}
+                      {user.phone && (
+                        <div className={styles.contactRow}>
+                          <span className={styles.contactIcon}>📱</span>
+                          <span>{user.phone}</span>
+                        </div>
+                      )}
+                      {!user.email && !user.phone && (
+                        <span className={styles.noContact}>Sin datos de contacto</span>
                       )}
                     </div>
-                  </div>
-                  
-                  <div className={styles.contactBox}>
-                    {user.email && (
-                      <div className={styles.contactRow}>
-                        <span className={styles.contactIcon}>✉️</span>
-                        <span>{user.email}</span>
-                      </div>
-                    )}
-                    {user.phone && (
-                      <div className={styles.contactRow}>
-                        <span className={styles.contactIcon}>📱</span>
-                        <span>{user.phone}</span>
-                      </div>
-                    )}
-                    {!user.email && !user.phone && (
-                      <span className={styles.noContact}>Sin datos de contacto</span>
-                    )}
-                  </div>
-                </div>
 
-                <div className={styles.actionsContainer}>
-                  <button 
-                    onClick={() => handleEdit(user)} 
-                    className={`btn ${styles.editBtn}`}
-                    disabled={actionLoading !== null}
-                  >
-                    Editar
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleDelete(user.id, user.name)} 
-                    className={styles.deleteBtn}
-                    title="Borrar"
-                    disabled={actionLoading !== null}
-                  >
-                    {actionLoading === user.id ? '⏳' : <TrashIcon />}
-                  </button>
-                </div>
+                    <div className={styles.actionsContainer}>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleEdit(user); }} 
+                        className={`btn ${styles.editBtn}`}
+                        disabled={actionLoading !== null}
+                      >
+                        Editar
+                      </button>
+                      
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleDelete(user.id, user.name); }} 
+                        className={styles.deleteBtn}
+                        title="Borrar"
+                        disabled={actionLoading !== null}
+                      >
+                        {actionLoading === user.id ? '⏳' : <TrashIcon />}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            ))
+            )})
           )}
         </div>
       </div>

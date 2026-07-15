@@ -50,79 +50,87 @@ export default function Dashboard({ session, activeEvent, attendee }: { session:
         )}
       </div>
 
-      <div className={styles.menuGrid}>
-        
-        <Link href="/pricing/attendees" className={`glass-panel ${styles.menuItem}`}>
-          <div>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes</h3>
-            <p className={styles.menuItemSubtitle}>Ver y editar pagos</p>
-          </div>
-          <div style={{ fontSize: '2rem' }}>👥</div>
-        </Link>
+      <div className="glass-panel">
+        <div className={styles.innerBlackBox}>
+          <div className={styles.menuGrid} style={{ marginTop: 0 }}>
+            
+            <Link href="/pricing/attendees" className={styles.menuItem}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Asistentes</h3>
+                <p className={styles.menuItemSubtitle}>Ver y editar pagos</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>👥</div>
+            </Link>
 
-        <Link href="/pricing/rules" className={`glass-panel ${styles.menuItem}`}>
-          <div>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h3>
-            <p className={styles.menuItemSubtitle}>Reglas de precios</p>
-          </div>
-          <div style={{ fontSize: '2rem' }}>⚙️</div>
-        </Link>
+            <Link href="/pricing/rules" className={styles.menuItem}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Configurador de Tarifas</h3>
+                <p className={styles.menuItemSubtitle}>Reglas de precios</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>⚙️</div>
+            </Link>
 
-        <Link href="/pricing/results" className={`glass-panel ${styles.menuItem}`}>
-          <div>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
-            <p className={styles.menuItemSubtitle}>Resumen financiero</p>
-          </div>
-          <div style={{ fontSize: '2rem' }}>📈</div>
-        </Link>
+            <Link href="/pricing/results" className={styles.menuItem}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
+                <p className={styles.menuItemSubtitle}>Resumen financiero</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>📈</div>
+            </Link>
 
-        <Link href="/shopping" className={`glass-panel ${styles.menuItem}`}>
-          <div>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
-            <p className={styles.menuItemSubtitle}>Qué falta por comprar</p>
-          </div>
-          <div style={{ fontSize: '2rem' }}>🛒</div>
-        </Link>
+            <Link href="/shopping" className={styles.menuItem}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
+                <p className={styles.menuItemSubtitle}>Qué falta por comprar</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>🛒</div>
+            </Link>
 
-        {/* Gastos */}
-        {activeEvent ? (
-          <Link href="/expenses" className={`glass-panel ${styles.menuItem}`}>
-            <div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gastos Registrados</h3>
-              <p className={styles.menuItemSubtitle}>Ver listado y añadir tickets</p>
-            </div>
-            <div style={{ fontSize: '2rem' }}>📸</div>
-          </Link>
-        ) : (
-          <div className={`glass-panel ${styles.menuItem} ${styles.menuItemDisabled}`}>
-            <div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Añadir Gasto</h3>
-              <p className={styles.menuItemSubtitle}>Requiere evento activo</p>
-            </div>
-            <div style={{ fontSize: '2rem' }}>📸</div>
+            {/* Gastos */}
+            {activeEvent ? (
+              <Link href="/expenses" className={styles.menuItem}>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gastos Registrados</h3>
+                  <p className={styles.menuItemSubtitle}>Ver listado y añadir tickets</p>
+                </div>
+                <div style={{ fontSize: '2rem' }}>📸</div>
+              </Link>
+            ) : (
+              <div className={`${styles.menuItem} ${styles.menuItemDisabled}`}>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Añadir Gasto</h3>
+                  <p className={styles.menuItemSubtitle}>Requiere evento activo</p>
+                </div>
+                <div style={{ fontSize: '2rem' }}>📸</div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Zona VIP para Administradores */}
       {session.isAdmin && (
         <div className={styles.adminZone}>
           <h3 className={styles.adminTitle}>👑 Zona de Administración</h3>
-          <div className={styles.menuGrid}>
-            <Link href="/admin/events" className={`glass-panel ${styles.menuItem} ${styles.adminMenuItem}`}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gestión de Eventos</h3>
-                <p className={styles.menuItemSubtitle}>Crear y editar eventos</p>
+          <div className="glass-panel">
+            <div className={styles.innerBlackBox}>
+              <div className={styles.menuGrid} style={{ marginTop: 0 }}>
+                <Link href="/admin/events" className={`${styles.menuItem} ${styles.adminMenuItem}`}>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gestión de Eventos</h3>
+                    <p className={styles.menuItemSubtitle}>Crear y editar eventos</p>
+                  </div>
+                  <div style={{ fontSize: '2rem' }}>📅</div>
+                </Link>
+                <Link href="/admin/users" className={`${styles.menuItem} ${styles.adminMenuItem}`}>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Usuarios</h3>
+                    <p className={styles.menuItemSubtitle}>Mantenimiento y roles</p>
+                  </div>
+                  <div style={{ fontSize: '2rem' }}>👥</div>
+                </Link>
               </div>
-              <div style={{ fontSize: '2rem' }}>📅</div>
-            </Link>
-            <Link href="/admin/users" className={`glass-panel ${styles.menuItem} ${styles.adminMenuItem}`}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Usuarios</h3>
-                <p className={styles.menuItemSubtitle}>Mantenimiento y roles</p>
-              </div>
-              <div style={{ fontSize: '2rem' }}>👥</div>
-            </Link>
+            </div>
           </div>
         </div>
       )}

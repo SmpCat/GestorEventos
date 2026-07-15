@@ -454,8 +454,11 @@
   justify-content: center;
 }
 
-.expenseDeleteBtn:hover {
-  color: var(--accent-danger);
+@media (hover: hover) {
+  .expenseDeleteBtn:hover {
+    color: var(--accent-danger);
+    background-color: rgba(239, 68, 68, 0.1);
+  }
 }
 
 .expenseDescription {

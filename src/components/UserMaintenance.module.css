@@ -23,6 +23,7 @@
   background-color: transparent !important;
   color: #fff !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  width: 100% !important;
 }
 
 .innerBlackBox {
@@ -80,7 +81,7 @@
 
 .userName {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 0.95rem;
   font-weight: bold;
 }
 
@@ -158,8 +159,10 @@
   transition: all 0.2s;
 }
 
-.deleteBtn:hover {
-  color: var(--accent-danger);
-  border-color: rgba(239, 68, 68, 0.3);
-  background-color: rgba(239, 68, 68, 0.1);
+@media (hover: hover) and (pointer: fine) {
+  .deleteBtn:hover {
+    color: var(--accent-danger);
+    border-color: rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.1);
+  }
 }

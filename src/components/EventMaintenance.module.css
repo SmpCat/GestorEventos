@@ -36,6 +36,7 @@
   background-color: transparent !important;
   color: #fff !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  width: 100% !important;
 }
 
 .eventsGrid {
@@ -79,7 +80,7 @@
 
 .eventTitle {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
 }
 
 .eventTitleActive {
@@ -100,6 +101,23 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+.expandedContent {
+  animation: slideDown 0.3s ease-out forwards;
+  overflow: hidden;
+  transform-origin: top;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
 }
 
 .actionsContainer {
@@ -137,10 +155,12 @@
   transition: all 0.2s;
 }
 
-.deleteBtn:hover {
-  color: var(--accent-danger);
-  border-color: rgba(239, 68, 68, 0.3);
-  background-color: rgba(239, 68, 68, 0.1);
+@media (hover: hover) and (pointer: fine) {
+  .deleteBtn:hover {
+    color: var(--accent-danger);
+    border-color: rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.1);
+  }
 }
 
 /* Padlock specific logic */
@@ -159,8 +179,10 @@
   transition: all 0.2s !important;
 }
 
-.historifiedBtn:hover {
-  color: #fff !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  background-color: rgba(255, 255, 255, 0.05) !important;
+@media (hover: hover) and (pointer: fine) {
+  .historifiedBtn:hover {
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
 }

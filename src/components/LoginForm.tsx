@@ -29,49 +29,54 @@ export default function LoginForm() {
     <div className={styles.loginWrapper}>
       <div className={styles.loginHeader}>
         <h1 className={styles.loginTitle}>GestorEventos</h1>
-        <p className="subtitle">La plataforma privada para tu grupo</p>
+        <p className="subtitle" style={{ fontSize: '0.85rem', color: '#ffffff', margin: 0 }}>by Salvador Martínez Palacios</p>
       </div>
 
       <div className={`glass-panel ${styles.loginFormContainer}`}>
-        <h2 className={styles.loginFormTitle}>Iniciar Sesión</h2>
-        
-        {error && <p className={styles.loginError}>{error}</p>}
+        <div className={styles.innerBlackBox}>
+          <h2 className={styles.loginFormTitle}>Iniciar Sesión</h2>
+          
+          {error && <p className={styles.loginError}>{error}</p>}
 
-        <form onSubmit={handleSubmit} className={styles.loginForm}>
-          <div className="input-group">
-            <label className="input-label">Usuario</label>
-            <input 
-              type="text" 
-              className="input-field" 
-              placeholder="Tu nombre de usuario"
-              value={formData.username}
-              onChange={e => setFormData({...formData, username: e.target.value})}
-              required
-            />
+          <form onSubmit={handleSubmit} className={styles.loginForm}>
+            <div className="input-group">
+              <label className="input-label">Usuario</label>
+              <input 
+                type="text" 
+                className="input-field" 
+                placeholder="Tu nombre de usuario"
+                value={formData.username}
+                onChange={e => setFormData({...formData, username: e.target.value})}
+                required
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Contraseña</label>
+              <input 
+                type="password" 
+                className="input-field" 
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={e => setFormData({...formData, password: e.target.value})}
+                required
+              />
+            </div>
+
+            <button type="submit" className={`btn ${styles.loginSubmitBtn}`} disabled={loading}>
+              {loading ? 'Entrando...' : 'Acceder'}
+            </button>
+          </form>
+
+          <div className={styles.loginFooter}>
+            <p className={styles.loginFooterText}>¿Es tu primera vez aquí?</p>
+            <Link href="/register" className={`btn ${styles.loginRegisterBtn}`}>
+              Quiero registrarme
+            </Link>
           </div>
-
-          <div className="input-group">
-            <label className="input-label">Contraseña</label>
-            <input 
-              type="password" 
-              className="input-field" 
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={e => setFormData({...formData, password: e.target.value})}
-              required
-            />
-          </div>
-
-          <button type="submit" className={`btn ${styles.loginSubmitBtn}`} disabled={loading}>
-            {loading ? 'Entrando...' : 'Acceder'}
-          </button>
-        </form>
-
-        <div className={styles.loginFooter}>
-          <p className={styles.loginFooterText}>¿Es tu primera vez aquí?</p>
-          <Link href="/register" className={`btn ${styles.loginRegisterBtn}`}>
-            Quiero registrarme en el grupo
-          </Link>
         </div>
       </div>
     </div>

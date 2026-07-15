@@ -23,7 +23,7 @@ export async function createUser(data: any) {
     const user = await prisma.user.create({
       data: {
         name: data.name,
-        username: data.username,
+        username: data.username.trim().toLowerCase(),
         password: hashedPassword,
         email: data.email || null,
         phone: data.phone || null,
@@ -45,7 +45,7 @@ export async function updateUser(id: string, data: any) {
   try {
     const updateData: any = {
       name: data.name,
-      username: data.username,
+      username: data.username.trim().toLowerCase(),
       email: data.email || null,
       phone: data.phone || null,
       isAdmin: data.isAdmin,
@@ -101,7 +101,7 @@ export async function registerPublicUser(data: any) {
     const user = await prisma.user.create({
       data: {
         name: data.name,
-        username: data.username,
+        username: data.username.trim().toLowerCase(),
         password: hashedPassword,
         email: data.email || null,
         phone: data.phone || null,
