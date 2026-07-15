@@ -51,6 +51,7 @@ export default function LoginForm() {
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck="false"
+                suppressHydrationWarning
               />
             </div>
 
@@ -63,6 +64,7 @@ export default function LoginForm() {
                 value={formData.password}
                 onChange={e => setFormData({...formData, password: e.target.value})}
                 required
+                suppressHydrationWarning
               />
             </div>
 

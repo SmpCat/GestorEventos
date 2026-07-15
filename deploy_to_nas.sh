@@ -5,9 +5,13 @@
 
 NAS_USER="smp"
 NAS_IP="192.168.178.60"
-NAS_DIR="/share/Container/GestorEventos-Prod"
+NAS_DIR="/share/CACHEDEV1_DATA/Container/gestoreventos"
 
 echo "🚀 Iniciando despliegue de GestorEventos a Producción..."
+
+# 0. Ajustar permisos en la carpeta del NAS por si fue creada por root o Docker
+echo "🔧 Ajustando permisos en el NAS para permitir la copia..."
+ssh -t ${NAS_USER}@${NAS_IP} "sudo mkdir -p ${NAS_DIR} && sudo chown -R ${NAS_USER} ${NAS_DIR}"
 
 # 1. Sincronizar archivos (ignorar dependencias y archivos ocultos pesados)
 echo "📦 Transfiriendo archivos nuevos al NAS..."
@@ -23,7 +27,10 @@ echo "🏗️  Construyendo la imagen Docker en el NAS (esto puede tardar unos m
 # Usamos -t para forzar TTY y poder meter la contraseña si "sudo" lo pide.
 ssh -t ${NAS_USER}@${NAS_IP} "source /etc/profile && cd ${NAS_DIR} && \
 sudo mkdir -p data public/uploads && sudo chown -R 1001:1001 data public/uploads && \
-sudo docker compose up -d --build && echo '🧹 Limpiando imágenes antiguas (basura)...' && sudo docker image prune -f"
+rm -f next.config.js next.config.mjs && \
+sudo docker rm -f gestoreventos || true && \
+sudo docker compose build --no-cache && \
+sudo docker compose up -d --remove-orphans && echo '🧹 Limpiando imágenes antiguas (basura)...' && sudo docker image prune -f"
 
 if [ $? -ne 0 ]; then
     echo "❌ Error durante la construcción de Docker."

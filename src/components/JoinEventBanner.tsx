@@ -33,11 +33,12 @@ export default function JoinEventBanner({ eventId, eventName, pricingRules, user
 
   return (
     <div className={`glass-panel ${styles.bannerContainer}`}>
-      <h2>¡Únete a la Fiesta!</h2>
-      <p className={`subtitle ${styles.bannerSubtitle}`}>El evento <strong>{eventName}</strong> ya está operativo.</p>
-      <p className={`subtitle ${styles.bannerSubtitleLast}`}>Para poder subir tickets de gasto o ver la lista de la compra, primero dinos cuántos días vas a venir.</p>
+      <div className={styles.innerBlackBox}>
+        <h2>¡Únete a la Fiesta!</h2>
+        <p className={styles.bannerSubtitle}>El evento <strong style={{ color: '#fff' }}>{eventName}</strong> ya está operativo.</p>
+        <p className={styles.bannerSubtitleLast}>Para poder subir tickets de gasto o ver la lista de la compra, primero dinos cuántos días vas a venir.</p>
 
-      <form onSubmit={handleJoin} className={styles.bannerForm}>
+        <form onSubmit={handleJoin} className={styles.bannerForm}>
         <div className={`input-group ${styles.bannerInputGroup}`}>
           <label className="input-label">¿Cuántos días vas a asistir?</label>
           <input 
@@ -64,10 +65,11 @@ export default function JoinEventBanner({ eventId, eventName, pricingRules, user
           </div>
         )}
 
-        <button type="submit" className={`btn btn-primary ${styles.bannerSubmitBtn}`} disabled={loading || !days || estimatedPrice === null}>
-          {loading ? 'Apuntándote...' : '¡Me apunto!'}
-        </button>
-      </form>
+          <button type="submit" className={`btn ${styles.bannerSubmitBtn}`} disabled={loading || !days || estimatedPrice === null}>
+            {loading ? 'Apuntándote...' : '¡Me apunto!'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

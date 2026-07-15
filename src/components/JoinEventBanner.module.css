@@ -1,17 +1,35 @@
 .bannerContainer {
+  padding: 0.5rem !important;
+  margin-top: 1rem;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+
+.innerBlackBox {
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 2rem 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   text-align: center;
-  padding: 2rem;
-  margin-top: 1.5rem;
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.2) !important;
+  width: 100%;
+  max-width: 400px;
 }
 
 .bannerSubtitle {
   margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.9);
 }
 
 .bannerSubtitleLast {
   margin-bottom: 2rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
 }
 
 .bannerForm {
@@ -59,8 +77,11 @@
 }
 
 .bannerSubmitBtn {
-  padding-top: 1rem !important;
-  padding-bottom: 1rem !important;
-  font-size: 1.25rem !important;
   margin-top: 0.5rem;
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem;
+  font-size: 1.1rem !important;
+  width: 100%;
 }
