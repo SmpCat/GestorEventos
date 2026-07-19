@@ -139,7 +139,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
         <>
           {isAdmin && attendees.length > 0 && (
             <div style={{ marginBottom: '1.5rem' }}>
-              <div className={styles.mobileCard} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '1rem' }}>
+              <div className={styles.mobileCard} style={{ padding: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <input 
                     type="checkbox"
@@ -153,15 +153,17 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                   </span>
                 </div>
                 {isSelectAll && (
-                  <button 
-                    onClick={handleBulkExpel}
-                    disabled={loading === 'bulk-expel'}
-                    className={`btn ${styles.deleteAttendeeTableBtn}`}
-                    style={{ padding: '0.3rem 0.6rem' }}
-                    title="Expulsar Todos los Asistentes No Administradores"
-                  >
-                    {loading === 'bulk-expel' ? '⏳' : <TrashIcon />} Expulsar
-                  </button>
+                  <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button 
+                      onClick={handleBulkExpel}
+                      disabled={loading === 'bulk-expel'}
+                      className={`btn ${styles.deleteAttendeeTableBtn}`}
+                      style={{ padding: '0.3rem 0.6rem' }}
+                      title="Expulsar Todos los Asistentes No Administradores"
+                    >
+                      {loading === 'bulk-expel' ? '⏳' : <TrashIcon />} Expulsar a todos
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
