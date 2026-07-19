@@ -184,11 +184,12 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                     <div className={styles.cardTitle}>
                       {att.user.name} <span className={styles.cardUsername}>@{att.user.username}</span>
                     </div>
-                    {!isEditing && (
-                      <button onClick={() => startEditing(att)} className={`btn btn-secondary ${styles.editBtnSmall}`}>
-                        {isAdmin ? '✏️' : '👁️'}
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => isEditing ? setEditingAttendee(null) : startEditing(att)} 
+                      className={`btn btn-secondary ${styles.editBtnSmall}`}
+                    >
+                      {isEditing ? '⬆️' : (isAdmin ? '✏️' : '👁️')}
+                    </button>
                   </div>
                   
                   {!isEditing ? (
@@ -365,6 +366,13 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                       <td className={styles.tableCell}>
                         {isEditing ? (
                           <div className={styles.desktopActions}>
+                            <button 
+                              onClick={() => setEditingAttendee(null)} 
+                              className={`btn btn-secondary ${styles.manageBtn}`} 
+                              style={{ marginBottom: '1rem' }}
+                            >
+                              ⬆️ Cerrar Panel
+                            </button>
                             <div className={styles.actionBox}>
                               {isAdmin && (
                                 <>
