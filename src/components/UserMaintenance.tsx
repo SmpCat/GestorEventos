@@ -83,12 +83,12 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
             </span>
           </div>
           {isSelectAll && (
-            <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'center' }}>
               <button 
                 onClick={handleBulkDelete}
                 disabled={actionLoading === 'bulk'}
                 className={styles.deleteBtn}
-                style={{ padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                style={{ padding: '0.375rem 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                 title="Borrar Todos los Usuarios No Administradores"
               >
                 {actionLoading === 'bulk' ? '⏳' : <TrashIcon />} Borrar a todos
