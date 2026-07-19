@@ -45,7 +45,9 @@ export default async function ResultsPage() {
   let personasRezagadas = 0;
   
   attendees.forEach((att: any) => {
-    const amountPaid = att.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+    const amountPaid = att.payments?.reduce((acc: number, p: any) => {
+      return p.type === 'INCOME' ? acc + p.amount : acc;
+    }, 0) || 0;
     const expected = att.expectedPayment !== null ? att.expectedPayment : 0;
     
     totalRecaudado += amountPaid;

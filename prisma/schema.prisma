@@ -88,6 +88,7 @@ model EventAttendee {
 model Payment {
   id          String   @id @default(uuid())
   amount      Float
+  type        String   @default("INCOME") // "INCOME" o "EXPENSE"
   date        DateTime @default(now())
   
   attendeeId  String
