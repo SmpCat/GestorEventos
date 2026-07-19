@@ -104,7 +104,7 @@ export async function deleteAllNonAdminUsers() {
         eventAttendances: {
           include: { payments: true }
         },
-        assignedItems: true
+        shoppingTasks: true
       }
     });
 
@@ -113,8 +113,8 @@ export async function deleteAllNonAdminUsers() {
 
     for (const user of nonAdmins) {
       const hasExpenses = user.expenses.length > 0;
-      const hasPayments = user.eventAttendances.some(att => att.payments.length > 0);
-      const hasShoppingItems = user.assignedItems && user.assignedItems.length > 0;
+      const hasPayments = user.eventAttendances.some((att: any) => att.payments.length > 0);
+      const hasShoppingItems = user.shoppingTasks && user.shoppingTasks.length > 0;
 
       if (!hasExpenses && !hasPayments && !hasShoppingItems) {
         // Safe to delete
