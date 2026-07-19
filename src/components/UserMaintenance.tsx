@@ -64,7 +64,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
         </div>
       </div>
 
-      <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
         <button onClick={handleCreate} className={`btn ${styles.addBtn}`} style={{ padding: '1rem', borderRadius: '1rem' }}>
           + Añadir Usuario
         </button>
@@ -96,7 +96,9 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
             </div>
           )}
         </div>
+      </div>
 
+      <div className="glass-panel">
         <div className={styles.usersGrid}>
           {users.length === 0 ? (
             <div className={`glass-panel ${styles.emptyState}`}>
