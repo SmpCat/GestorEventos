@@ -66,13 +66,13 @@ export default async function ResultsPage() {
         .results-container {
           max-width: 56rem;
           margin: 0 auto;
-          padding: 1.5rem 0;
+          padding: 0.25rem 0 1.5rem 0;
         }
         .results-header {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1rem;
           gap: 1rem;
         }
         @media (min-width: 768px) {
