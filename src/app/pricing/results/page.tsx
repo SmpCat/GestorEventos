@@ -102,9 +102,14 @@ export default async function ResultsPage() {
           grid-template-columns: 1fr;
           gap: 1.5rem;
         }
+        @media (min-width: 768px) {
+          .results-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
         @media (min-width: 1024px) {
           .results-grid {
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
           }
         }
         .results-card {
@@ -144,35 +149,27 @@ export default async function ResultsPage() {
           </div>
         </div>
 
-        {deudaRezagados > 0 && (
-          <div className="glass-panel" style={{ marginBottom: '1.5rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-            <div className="inner-black-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
-              <div>
-                <h2 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--accent-danger)' }}>🚨 Pendiente de Cobro</h2>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                  Aún faltan por pagar <strong>{personasRezagadas} {personasRezagadas === 1 ? 'persona' : 'personas'}</strong> de la lista de asistentes.
-                </p>
-              </div>
-              <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--accent-danger)' }}>
-                {deudaRezagados}€
-              </div>
-            </div>
-          </div>
-        )}
-
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
           <div className="inner-black-box">
             <div className="results-grid">
               <div className="results-card">
                 <p className="results-card-title">Bote Total</p>
                 <p className="results-card-value">{totalBoteEsperado}€</p>
-                <p className="results-card-subtitle">Suma de las cuotas asignadas</p>
+                <p className="results-card-subtitle">Si todos pagan sus días</p>
               </div>
               
               <div className="results-card">
                 <p className="results-card-title">Dinero en Caja</p>
                 <p className="results-card-value" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
-                <p className="results-card-subtitle">Falta cobrar: <span style={{ color: dineroPorCobrar > 0 ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>{dineroPorCobrar > 0 ? `${dineroPorCobrar}€` : 'Nada'}</span></p>
+                <p className="results-card-subtitle">Bote físico real disponible</p>
+              </div>
+
+              <div className="results-card" style={{ borderColor: deudaRezagados > 0 ? 'rgba(239, 68, 68, 0.5)' : 'inherit', backgroundColor: deudaRezagados > 0 ? 'rgba(239, 68, 68, 0.1)' : 'inherit' }}>
+                <p className="results-card-title" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>Pendiente</p>
+                <p className="results-card-value" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'inherit' }}>{deudaRezagados}€</p>
+                <p className="results-card-subtitle" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
+                  {deudaRezagados > 0 ? `Deuda de ${personasRezagadas} ${personasRezagadas === 1 ? 'persona' : 'personas'}` : 'Todos están al día'}
+                </p>
               </div>
               
               <div className="results-card">
