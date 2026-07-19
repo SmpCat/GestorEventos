@@ -112,7 +112,7 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
                 <p className={styles.menuItemSubtitle}>Pagos y adelantos</p>
               </div>
-              <div style={{ fontSize: '2rem' }}>💸</div>
+              <div style={{ fontSize: '2rem' }}>💰</div>
             </Link>
 
             {/* Balance Financiero (Antes llamado Ingresos y Gastos) */}
