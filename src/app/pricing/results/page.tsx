@@ -100,7 +100,7 @@ export default async function ResultsPage() {
         .results-grid {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 1.5rem;
+          gap: 0.75rem;
         }
         @media (min-width: 768px) {
           .results-grid {
@@ -153,7 +153,7 @@ export default async function ResultsPage() {
           <div className="inner-black-box">
             <div className="results-grid">
               <div className="results-card">
-                <p className="results-card-title">Bote Total</p>
+                <p className="results-card-title">Bote teórico</p>
                 <p className="results-card-value">{totalBoteEsperado}€</p>
                 <p className="results-card-subtitle">Si todos pagan sus días</p>
               </div>
@@ -165,7 +165,7 @@ export default async function ResultsPage() {
               </div>
 
               <div className="results-card" style={{ borderColor: deudaRezagados > 0 ? 'rgba(239, 68, 68, 0.5)' : 'inherit', backgroundColor: deudaRezagados > 0 ? 'rgba(239, 68, 68, 0.1)' : 'inherit' }}>
-                <p className="results-card-title" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>Pendiente</p>
+                <p className="results-card-title" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>Pendiente Pago</p>
                 <p className="results-card-value" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'inherit' }}>{deudaRezagados}€</p>
                 <p className="results-card-subtitle" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
                   {deudaRezagados > 0 ? `Deuda de ${personasRezagadas} ${personasRezagadas === 1 ? 'persona' : 'personas'}` : 'Todos están al día'}
