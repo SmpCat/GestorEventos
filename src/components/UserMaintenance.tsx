@@ -62,29 +62,40 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
           <h1>Usuarios</h1>
           <p className="subtitle">Gestión de Usuarios del Sistema</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '0.5rem' }}>
+        <div>
+          <button onClick={handleCreate} className={`btn ${styles.addBtn}`}>
+            + Añadir Usuario
+          </button>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '1.5rem' }}>
+        <div className={styles.userCard} style={{ padding: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <input 
               type="checkbox"
               checked={isSelectAll}
               onChange={(e) => setIsSelectAll(e.target.checked)}
-              style={{ width: '1.1rem', height: '1.1rem', cursor: 'pointer' }}
+              style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', flexShrink: 0 }}
               title="Selección Maestra de Borrado"
             />
-            {isSelectAll && (
+            <span style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
+              Borrado Masivo
+            </span>
+          </div>
+          {isSelectAll && (
+            <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'flex-end' }}>
               <button 
                 onClick={handleBulkDelete}
                 disabled={actionLoading === 'bulk'}
                 className={styles.deleteBtn}
+                style={{ padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                 title="Borrar Todos los Usuarios No Administradores"
               >
-                {actionLoading === 'bulk' ? '⏳' : <TrashIcon />}
+                {actionLoading === 'bulk' ? '⏳' : <TrashIcon />} Borrar a todos
               </button>
-            )}
-          </div>
-          <button onClick={handleCreate} className={`btn ${styles.addBtn}`}>
-            + Añadir Usuario
-          </button>
+            </div>
+          )}
         </div>
       </div>
 
