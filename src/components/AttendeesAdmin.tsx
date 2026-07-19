@@ -312,25 +312,27 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                       <td className={styles.tableCell}>
                         {isEditing ? (
                           <div className={styles.desktopActions}>
-                            {isAdmin && (
-                              <div className={styles.actionBox}>
-                                <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
-                                <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem', alignItems: 'center' }}>
-                                <div style={{ flex: 1 }}>
-                                  <SelectField
-                                    value={newDays}
-                                    onChange={e => setNewDays(Number(e.target.value))}
-                                    disabled={isProcessing}
-                                    containerStyle={{ width: '100%', marginBottom: 0 }}
-                                  >
-                                    <option value={0}>No lo sé aún</option>
-                                    {pricingRules.map(r => (
-                                      <option key={r.id} value={r.days}>{r.days} días ({r.price}€)</option>
-                                    ))}
-                                  </SelectField>
-                                </div>
-                              </div>
-                            )}
+                            <div className={styles.actionBox}>
+                              {isAdmin && (
+                                <>
+                                  <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
+                                  <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem', alignItems: 'center' }}>
+                                    <div style={{ flex: 1 }}>
+                                      <SelectField
+                                        value={newDays}
+                                        onChange={e => setNewDays(Number(e.target.value))}
+                                        disabled={isProcessing}
+                                        containerStyle={{ width: '100%', marginBottom: 0 }}
+                                      >
+                                        <option value={0}>No lo sé aún</option>
+                                        {pricingRules.map(r => (
+                                          <option key={r.id} value={r.days}>{r.days} días ({r.price}€)</option>
+                                        ))}
+                                      </SelectField>
+                                    </div>
+                                  </div>
+                                </>
+                              )}
                               
                             {att.history && att.history.length > 0 && (
                                 <div style={{ marginTop: '0.75rem' }}>
