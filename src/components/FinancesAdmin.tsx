@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import styles from './FinancesAdmin.module.css'; // Reutilizaremos algo similar a AttendeesAdmin
+import styles from './FinancesAdmin.module.css'; 
 import { addTransaction, deleteTransaction } from '@/actions/finances';
+import SelectField from './SelectField';
 
 export default function FinancesAdmin({ attendees, eventId, currentUser }: { attendees: any[], eventId: string, currentUser: any }) {
   const [editingAttendee, setEditingAttendee] = useState<string | null>(null);
@@ -106,71 +107,68 @@ export default function FinancesAdmin({ attendees, eventId, currentUser }: { att
                 </div>
               ) : (
                 <div className={styles.editSection}>
-                  <div className={styles.editCard}>
-                    <h4 style={{ marginBottom: '1rem' }}>Añadir Movimiento</h4>
+                  <div className={styles.actionBox} style={{ marginBottom: '1rem' }}>
+                    <div className={styles.actionBoxTitleAlt}>Añadir Movimiento</div>
                     
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                    <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem', alignItems: 'center' }}>
+                      <span className={styles.infoLabel} style={{ minWidth: '40px' }}>Tipo:</span>
                       <div style={{ flex: 1 }}>
-                        <label className={styles.editLabel}>Tipo de Movimiento</label>
-                        <select 
-                          className={styles.editSelect}
+                        <SelectField
                           value={txType}
                           onChange={(e) => setTxType(e.target.value as 'INCOME' | 'EXPENSE')}
                           disabled={isProcessing}
+                          containerStyle={{ width: '100%', marginBottom: 0 }}
+                          style={{ opacity: isProcessing ? 0.6 : 1 }}
                         >
                           <option value="INCOME">Ingreso (Aporta al bote)</option>
-                          <option value="EXPENSE">Gasto (Dinero del bote para él)</option>
-                        </select>
-                      </div>
-                      
-                      <div style={{ width: '100px' }}>
-                        <label className={styles.editLabel}>Euros (€)</label>
-                        <input 
-                          type="number"
-                          className={styles.editInput}
-                          value={txAmount}
-                          onChange={(e) => setTxAmount(e.target.value)}
-                          placeholder="0.00"
-                          disabled={isProcessing}
-                        />
+                          <option value="EXPENSE">Gasto (Dinero para él)</option>
+                        </SelectField>
                       </div>
                     </div>
-                    
-                    <button 
-                      onClick={() => handleAddTransaction(att.id)}
-                      className={`btn btn-primary`}
-                      disabled={isProcessing || !txAmount}
-                      style={{ width: '100%' }}
-                    >
-                      {isProcessing ? 'Guardando...' : 'Registrar Movimiento'}
-                    </button>
+
+                    <div className={styles.addPaymentRow} style={{ marginTop: '1rem' }}>
+                      <span className={styles.infoLabel} style={{ minWidth: '40px' }}>Importe:</span>
+                      <div className={styles.inputWrapper}>
+                        <input 
+                          type="number" 
+                          className={`input-field ${styles.currencyInput}`}
+                          value={txAmount}
+                          onChange={e => setTxAmount(e.target.value)}
+                          placeholder="0"
+                          disabled={isProcessing}
+                        />
+                        <span className={styles.currencySymbol}>€</span>
+                      </div>
+                      <button 
+                        onClick={() => handleAddTransaction(att.id)} 
+                        className={`btn ${styles.addPaymentBtn}`} 
+                        disabled={isProcessing || !txAmount} 
+                        title="Añadir Movimiento"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                   
                   {att.payments && att.payments.length > 0 && (
-                    <div className={styles.historySection}>
-                      <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Historial de Movimientos</h4>
-                      <ul className={styles.historyList}>
+                    <div className={styles.paymentsSection} style={{ marginTop: '0.75rem' }}>
+                      <div className={styles.paymentsTitle}>Historial de Movimientos</div>
+                      <div className={styles.paymentsList}>
                         {att.payments.map((p: any) => (
-                          <li key={p.id} className={styles.historyItem} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <span style={{ fontWeight: 'bold', color: p.type === 'INCOME' ? '#4ade80' : '#f87171' }}>
-                                {p.type === 'INCOME' ? '+' : '-'}{p.amount}€
-                              </span>
-                              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
-                                ({new Date(p.date).toLocaleDateString('es-ES')})
-                              </span>
-                            </div>
-                            <button 
-                              onClick={() => handleDeleteTransaction(p.id)}
-                              className={styles.deleteHistoryBtn}
-                              disabled={isProcessing}
-                              title="Borrar movimiento"
-                            >
+                          <div key={p.id} className={styles.paymentRow}>
+                            <span className={styles.paymentDate}>
+                              {new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })} 
+                              <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{p.registeredBy?.username || '?'})</span>
+                            </span>
+                            <span className={styles.paymentAmount} style={{ color: p.type === 'INCOME' ? '#4ade80' : '#f87171' }}>
+                              {p.type === 'INCOME' ? '+' : '-'}{p.amount}€
+                            </span>
+                            <button onClick={() => handleDeleteTransaction(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Movimiento">
                               ✕
                             </button>
-                          </li>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
                   
