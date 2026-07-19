@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { updateAttendeeDays, addPayment, deletePayment, deleteAttendee } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
+import SelectField from './SelectField';
 import styles from './AttendeesAdmin.module.css';
 
 export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { attendees: any[], pricingRules: any[], isAdmin: boolean }) {
@@ -33,12 +34,19 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     setNewDays(att.daysAttending);
   };
 
-  const handleUpdateDays = async (attId: string) => {
-    if (newDays === '') return;
+  const handleUpdateDays = async (attId: string, newVal: number) => {
+    const label = newVal === 0 ? 'No lo sé aún' : `${newVal} días`;
+    const confirmed = window.confirm(`¿Seguro que quieres cambiar la asistencia a "${label}"?`);
+    if (!confirmed) {
+      // Revert select back to current by forcing a re-render
+      setNewDays((prev) => prev === newVal ? '' : prev);
+      return;
+    }
+
     setLoading(`att-${attId}`);
-    const res = await updateAttendeeDays(attId, newDays);
+    const res = await updateAttendeeDays(attId, newVal);
     if (res.success) {
-      alert(`Días actualizados correctamente.`);
+      setNewDays(newVal);
     } else {
       alert(res.error || 'Error al actualizar días.');
     }
@@ -149,24 +157,22 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                     <div className={styles.editSection}>
                       <div className={styles.actionBox} style={{ marginBottom: '1rem' }}>
                         <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
-                        <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem' }}>
-                          <span className={styles.infoLabel}>Días:</span>
-                          <div className={styles.inputWrapper}>
-                            <select 
-                              className={`input-field`} 
+                        <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem', alignItems: 'center' }}>
+                          <span className={styles.infoLabel} style={{ minWidth: '40px' }}>Días:</span>
+                          <div style={{ flex: 1, maxWidth: '250px' }}>
+                            <SelectField
                               value={newDays}
-                              onChange={e => setNewDays(e.target.value ? Number(e.target.value) : '')}
+                              onChange={e => handleUpdateDays(att.id, Number(e.target.value))}
+                              disabled={isProcessing}
+                              containerStyle={{ width: '100%', marginBottom: 0 }}
+                              style={{ opacity: isProcessing ? 0.6 : 1 }}
                             >
-                              <option value="" disabled>Elige...</option>
                               <option value={0}>No lo sé aún</option>
                               {pricingRules.map(r => (
                                 <option key={r.id} value={r.days}>{r.days} días ({r.price}€)</option>
                               ))}
-                            </select>
+                            </SelectField>
                           </div>
-                          <button onClick={() => handleUpdateDays(att.id)} className={`btn btn-primary`} disabled={isProcessing || newDays === '' || newDays === att.daysAttending} style={{ padding: '0.75rem 1rem', borderRadius: '8px', fontSize: '0.9rem' }} title="Guardar">
-                            Guardar
-                          </button>
                         </div>
                       </div>
 
@@ -177,7 +183,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                             {att.history.map((h: any) => (
                               <div key={h.id} className={styles.paymentRow}>
                                 <span className={styles.paymentDate}>{new Date(h.date).toLocaleDateString('es-ES')} <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{h.changedBy?.username || '?'})</span></span>
-                                <span className={styles.paymentAmount} style={{ color: 'var(--text-primary)' }}>{h.oldDays} ➡️ {h.newDays}</span>
+                                <span className={styles.paymentAmount} style={{ color: 'var(--text-primary)' }}>{h.newDays}</span>
                               </div>
                             ))}
                           </div>
@@ -185,22 +191,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                       )}
 
                       <div className={styles.paymentsSection} style={{ marginTop: '1rem' }}>
-                        <div className={styles.paymentsTitle}>Historial de Pagos</div>
-                        <div className={styles.paymentsList}>
-                          {att.payments?.map((p: any) => (
-                            <div key={p.id} className={styles.paymentRow}>
-                              <span className={styles.paymentDate}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })} <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{p.registeredBy?.username || '?'})</span></span>
-                              <span className={styles.paymentAmount}>+{p.amount}€</span>
-                              <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
-                                <TrashIcon />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                        {(!att.payments || att.payments.length === 0) && (
-                          <div className={styles.noPayments}>Ningún pago registrado.</div>
-                        )}
-                        <div className={styles.addPaymentRow}>
+                        <div className={styles.addPaymentRow} style={{ marginBottom: '1rem' }}>
                           <span className={styles.infoLabel}>Añadir Pago:</span>
                           <div className={styles.inputWrapper}>
                             <input 
@@ -216,6 +207,21 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                             +
                           </button>
                         </div>
+                        <div className={styles.paymentsTitle}>Historial de Pagos</div>
+                        <div className={styles.paymentsList}>
+                          {att.payments?.map((p: any) => (
+                            <div key={p.id} className={styles.paymentRow}>
+                              <span className={styles.paymentDate}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })} <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{p.registeredBy?.username || '?'})</span></span>
+                              <span className={styles.paymentAmount}>+{p.amount}€</span>
+                              <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
+                                <TrashIcon />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        {(!att.payments || att.payments.length === 0) && (
+                          <div className={styles.noPayments}>Ningún pago registrado.</div>
+                        )}
                       </div>
                       <div className={styles.deleteAttendeeContainer}>
                         <button 
@@ -294,24 +300,20 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                           <div className={styles.desktopActions}>
                             <div className={styles.actionBox}>
                               <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
-                              <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem' }}>
-                                <div className={styles.tableInputWrapper} style={{ width: '100%' }}>
-                                  <select 
-                                    className={`input-field`} 
+                              <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem', alignItems: 'center' }}>
+                                <div style={{ flex: 1 }}>
+                                  <SelectField
                                     value={newDays}
-                                    onChange={e => setNewDays(e.target.value ? Number(e.target.value) : '')}
-                                    style={{ padding: '0.5rem', fontSize: '0.75rem', height: '100%' }}
+                                    onChange={e => setNewDays(Number(e.target.value))}
+                                    disabled={isProcessing}
+                                    containerStyle={{ width: '100%', marginBottom: 0 }}
                                   >
-                                    <option value="" disabled>Elige...</option>
                                     <option value={0}>No lo sé aún</option>
                                     {pricingRules.map(r => (
-                                      <option key={r.id} value={r.days}>{r.days} d ({r.price}€)</option>
+                                      <option key={r.id} value={r.days}>{r.days} días ({r.price}€)</option>
                                     ))}
-                                  </select>
+                                  </SelectField>
                                 </div>
-                                <button onClick={() => handleUpdateDays(att.id)} className={`btn btn-primary`} disabled={isProcessing || newDays === '' || newDays === att.daysAttending} style={{ padding: '0.5rem 0.75rem', fontSize: '0.75rem', borderRadius: '6px' }} title="Guardar">
-                                  Guardar
-                                </button>
                               </div>
                               
                               {att.history && att.history.length > 0 && (
@@ -321,7 +323,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                     {att.history.map((h: any) => (
                                       <div key={h.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
                                         <span className={styles.paymentDate}>{new Date(h.date).toLocaleDateString('es-ES')} <span style={{opacity: 0.6}}>(@{h.changedBy?.username || '?'})</span></span>
-                                        <span style={{ fontWeight: 'bold' }}>{h.oldDays} ➡️ {h.newDays}</span>
+                                        <span style={{ fontWeight: 'bold' }}>{h.newDays}</span>
                                       </div>
                                     ))}
                                   </div>
@@ -330,22 +332,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                             </div>
 
                             <div className={styles.actionBox}>
-                              <div className={styles.actionBoxTitleAlt}>Historial de Pagos</div>
-                              <div className={styles.paymentsList}>
-                                {att.payments?.map((p: any) => (
-                                  <div key={p.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
-                                    <span className={styles.paymentDate}>{new Date(p.date).toLocaleDateString('es-ES')} <span style={{opacity: 0.6}}>(@{p.registeredBy?.username || '?'})</span></span>
-                                    <span className={styles.paymentAmount}>+{p.amount}€</span>
-                                    <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
-                                      <TrashIcon />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                              {(!att.payments || att.payments.length === 0) && (
-                                <div className={styles.noPayments}>Ningún pago.</div>
-                              )}
-                              <div className={styles.addPaymentRow} style={{ marginTop: '0.75rem' }}>
+                              <div className={styles.addPaymentRow} style={{ marginBottom: '0.75rem' }}>
                                 <span className={styles.infoLabel}>Añadir Pago:</span>
                                 <div className={styles.tableInputWrapper}>
                                   <input 
@@ -361,6 +348,21 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                   +
                                 </button>
                               </div>
+                              <div className={styles.actionBoxTitleAlt}>Historial de Pagos</div>
+                              <div className={styles.paymentsList}>
+                                {att.payments?.map((p: any) => (
+                                  <div key={p.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
+                                    <span className={styles.paymentDate}>{new Date(p.date).toLocaleDateString('es-ES')} <span style={{opacity: 0.6}}>(@{p.registeredBy?.username || '?'})</span></span>
+                                    <span className={styles.paymentAmount}>+{p.amount}€</span>
+                                    <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
+                                      <TrashIcon />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                              {(!att.payments || att.payments.length === 0) && (
+                                <div className={styles.noPayments}>Ningún pago.</div>
+                              )}
                             </div>
                             <div className={styles.deleteAttendeeContainer} style={{ marginTop: "0.25rem" }}>
                               <button 
