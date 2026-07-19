@@ -188,7 +188,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                       onClick={() => isEditing ? setEditingAttendee(null) : startEditing(att)} 
                       className={`btn btn-secondary ${styles.editBtnSmall}`}
                     >
-                      {isEditing ? '⬆️' : (isAdmin ? '✏️' : '👁️')}
+                      {isEditing ? '▲' : (isAdmin ? '✏️' : '👁️')}
                     </button>
                   </div>
                   
@@ -371,7 +371,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                               className={`btn btn-secondary ${styles.manageBtn}`} 
                               style={{ marginBottom: '1rem' }}
                             >
-                              ⬆️ Cerrar Panel
+                              ▲ Cerrar Panel
                             </button>
                             <div className={styles.actionBox}>
                               {isAdmin && (
