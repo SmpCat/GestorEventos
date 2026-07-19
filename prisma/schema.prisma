@@ -34,6 +34,7 @@ model User {
   // Auditoría
   attendanceHistoryChanges AttendanceHistory[] @relation("HistoryChangedBy")
   registeredPayments       Payment[]           @relation("PaymentRegisteredBy")
+  shoppingHistoryChanges   ShoppingListHistory[] @relation("ShoppingHistoryUser")
 }
 
 // ---------------------------------------------------------
@@ -133,6 +134,9 @@ model ShoppingListItem {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Historial de cambios
+  history     ShoppingListHistory[]
+
   @@index([eventId])
   @@index([assigneeId])
 }
@@ -216,4 +220,21 @@ model AttendanceHistory {
 
   @@index([attendeeId])
   @@index([changedById])
+}
+
+model ShoppingListHistory {
+  id                 String   @id @default(uuid())
+  shoppingListItemId String
+  shoppingListItem   ShoppingListItem @relation(fields: [shoppingListItemId], references: [id], onDelete: Cascade)
+  
+  action             String   // "CREATED", "PURCHASED", "UNPURCHASED"
+  
+  // Usuario que hizo el cambio
+  userId             String
+  user               User     @relation("ShoppingHistoryUser", fields: [userId], references: [id])
+  
+  date               DateTime @default(now())
+
+  @@index([shoppingListItemId])
+  @@index([userId])
 }

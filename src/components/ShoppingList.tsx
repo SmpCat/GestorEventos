@@ -19,7 +19,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     e.preventDefault();
     if (!newItemName.trim()) return;
     setLoading('add');
-    await addShoppingItem(eventId, newItemName);
+    await addShoppingItem(eventId, newItemName, currentUser.id);
     router.refresh();
     setNewItemName('');
     setLoading(null);
@@ -32,7 +32,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
       
     if (window.confirm(msg)) {
       setLoading(`toggle-${itemId}`);
-      await togglePurchased(itemId, !currentStatus);
+      await togglePurchased(itemId, !currentStatus, currentUser.id);
       router.refresh();
       setLoading(null);
     }
@@ -45,7 +45,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
     if (window.confirm(msg)) {
       setLoading('toggle-bulk');
-      await togglePurchasedBulk(itemIds, targetStatus);
+      await togglePurchasedBulk(itemIds, targetStatus, currentUser.id);
       router.refresh();
       setLoading(null);
     }
@@ -161,10 +161,26 @@ export default function ShoppingList({ items, evidences, eventId, users, current
               className={styles.checkbox}
               title={item.isPurchased ? "Devolver a pendientes" : "Marcar como comprado"}
             />
-            <span className={`${styles.itemName} ${item.isPurchased ? styles.itemNamePurchased : styles.itemNamePending}`}>
-              {item.name}
-            </span>
-          </div>
+              <div className={styles.itemNameWrapper}>
+                <span className={styles.itemName} style={{ textDecoration: item.isPurchased ? 'line-through' : 'none' }}>
+                  {item.name}
+                </span>
+                {item.history && item.history.length > 0 && (
+                  <div style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '2px', lineHeight: '1.2' }}>
+                    {item.history.map((h: any, idx: number) => {
+                      const dateStr = new Date(h.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                      const actionText = h.action === 'CREATED' ? 'Añadido' : h.action === 'PURCHASED' ? 'Comprado' : 'Desmarcado';
+                      return (
+                        <span key={h.id}>
+                          {actionText} por @{h.user?.username || '?'} ({dateStr})
+                          {idx < item.history.length - 1 ? ' • ' : ''}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
 
           {!item.isPurchased && (
             <button 

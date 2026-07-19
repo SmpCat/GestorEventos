@@ -14,6 +14,12 @@ export async function getShoppingList(eventId: string) {
       include: {
         assignee: {
           select: { id: true, name: true }
+        },
+        history: {
+          include: {
+            user: { select: { username: true } }
+          },
+          orderBy: { date: 'asc' }
         }
       },
       orderBy: [
@@ -28,12 +34,18 @@ export async function getShoppingList(eventId: string) {
 }
 
 // Añadir un artículo manualmente
-export async function addShoppingItem(eventId: string, name: string) {
+export async function addShoppingItem(eventId: string, name: string, userId: string) {
   try {
     const item = await prisma.shoppingListItem.create({
       data: {
         name,
         eventId,
+        history: {
+          create: {
+            action: 'CREATED',
+            userId
+          }
+        }
       },
     });
     revalidatePath('/shopping');
@@ -44,11 +56,19 @@ export async function addShoppingItem(eventId: string, name: string) {
 }
 
 // Marcar como comprado o no comprado
-export async function togglePurchased(itemId: string, isPurchased: boolean) {
+export async function togglePurchased(itemId: string, isPurchased: boolean, userId: string) {
   try {
     const item = await prisma.shoppingListItem.update({
       where: { id: itemId },
-      data: { isPurchased },
+      data: { 
+        isPurchased,
+        history: {
+          create: {
+            action: isPurchased ? 'PURCHASED' : 'UNPURCHASED',
+            userId
+          }
+        }
+      },
     });
     revalidatePath('/shopping');
     return { success: true, data: item };
@@ -58,12 +78,26 @@ export async function togglePurchased(itemId: string, isPurchased: boolean) {
 }
 
 // Marcar múltiples artículos como comprados o no comprados a la vez
-export async function togglePurchasedBulk(itemIds: string[], isPurchased: boolean) {
+export async function togglePurchasedBulk(itemIds: string[], isPurchased: boolean, userId: string) {
   try {
-    await prisma.shoppingListItem.updateMany({
-      where: { id: { in: itemIds } },
-      data: { isPurchased },
+    // Para actualizar múltiples artículos con su historial, necesitamos hacer un $transaction
+    await prisma.$transaction(async (tx) => {
+      await tx.shoppingListItem.updateMany({
+        where: { id: { in: itemIds } },
+        data: { isPurchased },
+      });
+      
+      const historyData = itemIds.map(id => ({
+        shoppingListItemId: id,
+        action: isPurchased ? 'PURCHASED' : 'UNPURCHASED',
+        userId
+      }));
+      
+      await tx.shoppingListHistory.createMany({
+        data: historyData
+      });
     });
+
     revalidatePath('/shopping');
     return { success: true };
   } catch (error: any) {
