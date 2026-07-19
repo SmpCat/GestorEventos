@@ -25,3 +25,10 @@ Lista de tareas pendientes que abordaremos en las próximas sesiones para remata
 - [ ] **Transparencia Total (El "Ojo" Mágico):** Añadir un icono de un ojo junto a cada asistente en la lista pública. Cualquier usuario normal podrá pinchar y ver el historial detallado de esa persona (cuándo pagó, cuándo cambió de días), replicando el panel de detalle del admin pero en modo "Solo lectura".
 - [ ] **Métrica de "Rezagados":** En la pestaña de Ingresos y Gastos, crear un panel de cristal destacado que sume automáticamente cuánto dinero falta por recaudar de la gente que está en números rojos.
 - [x] **Contabilidad Blindada (Quitar Ajuste de Cuota):** Eliminar por completo el panel que permite al administrador modificar la cuota de un usuario a mano. La cuota debe calcularse de forma 100% matemática y estricta en base a los días de asistencia para garantizar la transparencia del sistema.
+
+### 5. 💰 Refactor Financiero (Próximamente)
+- [ ] **Separación de Responsabilidades:** En la sección "Asistentes" se eliminará toda la gestión de pagos (añadir pago, historial de pagos). Sólo se mantendrá la gestión de los "Días de Asistencia" y su histórico.
+- [ ] **Nueva Tarjeta "Ingresos y Gastos":** Se creará una nueva tarjeta en el Dashboard, ubicada justo antes de "Balance".
+- [ ] **Ingresos (Ex-Pagos):** Dinero que un asistente aporta al bote común.
+- [ ] **Gastos:** Dinero que sale del bote común y se le entrega a un asistente para realizar compras (ej. listas de la compra).
+- [ ] **Diseño UI/UX:** Queda pendiente definir la interfaz y funcionalidades exactas de esta nueva pantalla.
