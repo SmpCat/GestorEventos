@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { registerPublicUser } from '@/actions/users';
+import { login } from '@/actions/auth';
 import Link from 'next/link';
 
 export default function RegisterPage() {
@@ -15,7 +16,6 @@ export default function RegisterPage() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,33 +31,15 @@ export default function RegisterPage() {
     const res = await registerPublicUser(formData);
 
     if (res.success) {
-      setSuccess(true);
+      // Hacemos auto-login con los datos recién creados
+      await login({ username: formData.username, password: formData.password });
+      // Redirección instantánea al Dashboard en lugar de mostrar mensaje intermedio
+      window.location.href = '/';
     } else {
       setError(res.error || 'Ocurrió un error al registrarse.');
+      setLoading(false);
     }
-    setLoading(false);
   };
-
-  if (success) {
-    return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="glass-panel text-center" style={{ maxWidth: '400px', padding: '3rem 2rem' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
-          <h2>¡Registro Completado!</h2>
-          <p className="text-secondary mt-4">
-            Tu cuenta ha sido creada con éxito. Pide al Administrador que te agregue al evento activo para empezar a subir facturas.
-          </p>
-          <button 
-            className="btn mt-6 w-full"
-            style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}
-            onClick={() => window.location.href = '/'}
-          >
-            Ir al inicio
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh]">

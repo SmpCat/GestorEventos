@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { getSession } from "@/actions/auth";
 import Navbar from "@/components/Navbar";
+import SessionTimeout from "@/components/SessionTimeout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,10 +45,15 @@ export default async function RootLayout({
         )}
       </head>
       <body className={inter.className}>
-        <Navbar session={session} />
+        {session && <Navbar session={session} />}
         <main style={{ padding: '0 1rem 2rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
           {children}
         </main>
+        
+        {/* Timeout de inactividad */}
+        {session && <SessionTimeout />}
+        
+        {/* PWA Instalación Banner Global (Futuro) */}
       </body>
     </html>
   );
