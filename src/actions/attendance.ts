@@ -297,3 +297,50 @@ export async function deleteAttendee(attId: string) {
     return { success: false, error: 'Error al eliminar asistente: ' + error.message };
   }
 }
+
+// Expulsar masivamente a todos los asistentes NO administradores (sin borrarlos del sistema global)
+export async function expelAllNonAdminAttendees(eventId: string) {
+  try {
+    const session = await getSession();
+    if (!session || !session.isAdmin) return { success: false, error: 'No autorizado' };
+
+    const attendees = await prisma.eventAttendee.findMany({
+      where: { 
+        eventId,
+        user: { isAdmin: false } 
+      },
+      include: {
+        payments: true,
+        user: {
+          include: {
+            expenses: { where: { eventId } },
+            assignedItems: { where: { eventId } }
+          }
+        }
+      }
+    });
+
+    let deletedCount = 0;
+    let skippedCount = 0;
+
+    for (const att of attendees) {
+      const hasExpenses = att.user.expenses.length > 0;
+      const hasPayments = att.payments.length > 0;
+      const hasShoppingItems = att.user.assignedItems && att.user.assignedItems.length > 0;
+
+      if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+        await prisma.eventAttendee.delete({ where: { id: att.id } });
+        deletedCount++;
+      } else {
+        skippedCount++;
+      }
+    }
+
+    revalidatePath('/pricing/attendees');
+    revalidatePath('/pricing/rules');
+    revalidatePath('/pricing/results');
+    return { success: true, deletedCount, skippedCount };
+  } catch (error: any) {
+    return { success: false, error: 'Error al expulsar asistentes: ' + error.message };
+  }
+}

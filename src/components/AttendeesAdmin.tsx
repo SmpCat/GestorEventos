@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { updateAttendeeDays, addPayment, deletePayment, deleteAttendee } from '@/actions/attendance';
+import { updateAttendeeDays, addPayment, deletePayment, deleteAttendee, expelAllNonAdminAttendees } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
 import SelectField from './SelectField';
 import styles from './AttendeesAdmin.module.css';
@@ -15,6 +15,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
   // Nuevo pago y días
   const [newPaymentAmount, setNewPaymentAmount] = useState<number | ''>('');
   const [newDays, setNewDays] = useState<number | ''>('');
+
+  // Bulk Expel
+  const [isSelectAll, setIsSelectAll] = useState(false);
 
   // Interceptar el botón "Volver" global del Navbar
   useEffect(() => {
@@ -110,12 +113,58 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     }, 50);
   };
 
+  const handleBulkExpel = async () => {
+    if (attendees.length === 0) return;
+    const eventId = attendees[0].eventId;
+    if (!eventId) return;
+
+    if (window.confirm('🚨 ¿Estás SÚPER SEGURO de que quieres EXPULSAR a todos los asistentes del evento que no sean Administradores? Esta acción es irreversible y solo expulsará a aquellos que NO tengan pagos ni tickets asociados.')) {
+      setLoading('bulk-expel');
+      const res = await expelAllNonAdminAttendees(eventId);
+      if (res.success) {
+        alert(`¡Limpieza completada! Se expulsaron ${res.deletedCount} asistentes limpios. Se han conservado ${res.skippedCount} asistentes que tienen pagos o tickets registrados.`);
+        setIsSelectAll(false);
+      } else {
+        alert(res.error || 'Error al expulsar asistentes en lote.');
+      }
+      setLoading(null);
+    }
+  };
+
   return (
     <div className={`glass-panel ${styles.adminPanel}`}>
       {attendees.length === 0 ? (
         <div className={styles.emptyState}>Aún no hay nadie apuntado a este evento.</div>
       ) : (
         <>
+          {isAdmin && attendees.length > 0 && (
+            <div style={{ padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '0.5rem' }}>
+                <input 
+                  type="checkbox"
+                  checked={isSelectAll}
+                  onChange={(e) => setIsSelectAll(e.target.checked)}
+                  style={{ width: '1.1rem', height: '1.1rem', cursor: 'pointer' }}
+                  title="Selección Maestra de Expulsión"
+                />
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', cursor: 'pointer' }} onClick={() => setIsSelectAll(!isSelectAll)}>
+                  Selección maestra de expulsión
+                </span>
+                {isSelectAll && (
+                  <button 
+                    onClick={handleBulkExpel}
+                    disabled={loading === 'bulk-expel'}
+                    className={`btn ${styles.deleteAttendeeTableBtn}`}
+                    style={{ marginLeft: '1rem', padding: '0.2rem 0.5rem' }}
+                    title="Expulsar Todos los Asistentes No Administradores"
+                  >
+                    {loading === 'bulk-expel' ? '⏳' : <TrashIcon />} Expulsar en masa
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* VISTA MÓVIL (Cards) */}
           <div className={`desktop-hide ${styles.mobileList}`}>
             {attendees.map((att: any) => {

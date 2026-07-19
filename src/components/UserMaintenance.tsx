@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import UserFormModal from './UserFormModal';
 import TrashIcon from './TrashIcon';
-import { deleteUser } from '@/actions/users';
+import { deleteUser, deleteAllNonAdminUsers } from '@/actions/users';
 import styles from './UserMaintenance.module.css';
 
 export default function UserMaintenance({ users, session }: { users: any[], session: any }) {
@@ -12,6 +12,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
   const [editingUser, setEditingUser] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+  const [isSelectAll, setIsSelectAll] = useState(false);
 
   const toggleExpand = (id: string) => {
     setExpandedUserId(prev => prev === id ? null : id);
@@ -40,14 +41,47 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (window.confirm('🚨 ¿Estás SÚPER SEGURO de que quieres BORRAR a todos los usuarios que no sean Administradores? Esta acción es irreversible y solo borrará a los usuarios que NO tengan pagos ni tickets asociados.')) {
+      setActionLoading('bulk');
+      const res = await deleteAllNonAdminUsers();
+      if (res.success) {
+        alert(`¡Limpieza completada! Se borraron ${res.deletedCount} usuarios limpios. Se han conservado ${res.skippedCount} usuarios que tienen pagos o tickets registrados.`);
+        setIsSelectAll(false);
+      } else {
+        alert(res.error || 'Error al realizar el borrado masivo.');
+      }
+      setActionLoading(null);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
         <div>
-          <h1>Mantenimiento</h1>
+          <h1>Usuarios</h1>
           <p className="subtitle">Gestión de Usuarios del Sistema</p>
         </div>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '0.5rem' }}>
+            <input 
+              type="checkbox"
+              checked={isSelectAll}
+              onChange={(e) => setIsSelectAll(e.target.checked)}
+              style={{ width: '1.1rem', height: '1.1rem', cursor: 'pointer' }}
+              title="Selección Maestra de Borrado"
+            />
+            {isSelectAll && (
+              <button 
+                onClick={handleBulkDelete}
+                disabled={actionLoading === 'bulk'}
+                className={styles.deleteBtn}
+                title="Borrar Todos los Usuarios No Administradores"
+              >
+                {actionLoading === 'bulk' ? '⏳' : <TrashIcon />}
+              </button>
+            )}
+          </div>
           <button onClick={handleCreate} className={`btn ${styles.addBtn}`}>
             + Añadir Usuario
           </button>

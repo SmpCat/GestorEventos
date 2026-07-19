@@ -94,6 +94,48 @@ export async function deleteUser(id: string) {
   }
 }
 
+// Borrar a todos los usuarios NO administradores que no tengan ataduras
+export async function deleteAllNonAdminUsers() {
+  try {
+    const nonAdmins = await prisma.user.findMany({
+      where: { isAdmin: false },
+      include: {
+        expenses: true,
+        eventAttendances: {
+          include: { payments: true }
+        },
+        assignedItems: true
+      }
+    });
+
+    let deletedCount = 0;
+    let skippedCount = 0;
+
+    for (const user of nonAdmins) {
+      const hasExpenses = user.expenses.length > 0;
+      const hasPayments = user.eventAttendances.some(att => att.payments.length > 0);
+      const hasShoppingItems = user.assignedItems && user.assignedItems.length > 0;
+
+      if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+        // Safe to delete
+        // Note: EventAttendances and History will cascade or we can delete manually if needed, 
+        // but Prisma schema should have cascade on user delete for Attendee. 
+        // Let's delete attendees explicitly to be safe:
+        await prisma.eventAttendee.deleteMany({ where: { userId: user.id } });
+        await prisma.user.delete({ where: { id: user.id } });
+        deletedCount++;
+      } else {
+        skippedCount++;
+      }
+    }
+
+    revalidatePath('/admin/users');
+    return { success: true, deletedCount, skippedCount };
+  } catch (error: any) {
+    return { success: false, error: 'Error al hacer limpieza de usuarios: ' + error.message };
+  }
+}
+
 // Registro público (Fuerza isAdmin = false por seguridad)
 export async function registerPublicUser(data: any) {
   try {
