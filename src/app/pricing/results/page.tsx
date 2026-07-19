@@ -41,13 +41,20 @@ export default async function ResultsPage() {
   // Calcular lo recaudado y lo pendiente en base a los asistentes
   let totalRecaudado = 0;
   let totalBoteEsperado = 0;
+  let deudaRezagados = 0;
+  let personasRezagadas = 0;
   
   attendees.forEach((att: any) => {
     const amountPaid = att.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
-    totalRecaudado += amountPaid;
-    
     const expected = att.expectedPayment !== null ? att.expectedPayment : 0;
+    
+    totalRecaudado += amountPaid;
     totalBoteEsperado += expected;
+
+    if (expected > amountPaid) {
+      deudaRezagados += (expected - amountPaid);
+      personasRezagadas++;
+    }
   });
   
   const saldoFisico = totalRecaudado - totalGastado;
@@ -136,6 +143,22 @@ export default async function ResultsPage() {
             <h1 className="results-title">Ingresos y Gastos</h1>
           </div>
         </div>
+
+        {deudaRezagados > 0 && (
+          <div className="glass-panel" style={{ marginBottom: '1.5rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+            <div className="inner-black-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
+              <div>
+                <h2 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--accent-danger)' }}>🚨 Pendiente de Cobro</h2>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                  Aún faltan por pagar <strong>{personasRezagadas} {personasRezagadas === 1 ? 'persona' : 'personas'}</strong> de la lista de asistentes.
+                </p>
+              </div>
+              <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--accent-danger)' }}>
+                {deudaRezagados}€
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
           <div className="inner-black-box">
