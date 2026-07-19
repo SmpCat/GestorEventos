@@ -1,7 +1,7 @@
 import { getSession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { getAttendees } from '@/actions/attendance';
+import { getAttendees, getPricingRules } from '@/actions/attendance';
 import Link from 'next/link';
 import AttendeesAdmin from '@/components/AttendeesAdmin';
 import { getActiveEventCached } from '@/lib/cache';
@@ -32,6 +32,9 @@ export default async function AttendeesPage() {
   const attRes = await getAttendees(activeEvent.id);
   const attendees = attRes.success && attRes.data ? attRes.data : [];
 
+  const rulesRes = await getPricingRules(activeEvent.id);
+  const pricingRules = rulesRes.success && rulesRes.data ? rulesRes.data : [];
+
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
@@ -42,6 +45,7 @@ export default async function AttendeesPage() {
 
       <AttendeesAdmin 
         attendees={attendees} 
+        pricingRules={pricingRules}
         isAdmin={session.isAdmin}
       />
     </div>

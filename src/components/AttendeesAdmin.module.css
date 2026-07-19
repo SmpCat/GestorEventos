@@ -145,9 +145,6 @@
 
 /* Pagos Mobile */
 .paymentsSection {
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 .paymentsTitle {
@@ -168,10 +165,13 @@
   align-items: center;
   gap: 1rem;
   background-color: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255,255,255,0.05);
-  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 0.6rem 0.75rem;
   border-radius: 8px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
 }
 
 .paymentDate {
@@ -184,7 +184,7 @@
 .paymentAmount {
   font-weight: bold;
   flex: 1;
-  text-align: right;
+  text-align: center;
   color: var(--accent-success);
   font-size: 1rem;
 }

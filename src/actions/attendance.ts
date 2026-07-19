@@ -66,6 +66,27 @@ export async function savePricingRules(eventId: string, rules: { days: number, p
 
 export async function getAttendees(eventId: string) {
   try {
+    // 1. Auto-registrar a cualquier usuario que no tenga registro para este evento
+    const usersWithoutAttendance = await prisma.user.findMany({
+      where: {
+        eventAttendances: {
+          none: { eventId }
+        }
+      }
+    });
+
+    if (usersWithoutAttendance.length > 0) {
+      await prisma.eventAttendee.createMany({
+        data: usersWithoutAttendance.map(u => ({
+          userId: u.id,
+          eventId: eventId,
+          daysAttending: 0,
+          expectedPayment: 0
+        }))
+      });
+    }
+
+    // 2. Obtener la lista completa
     const attendees = await prisma.eventAttendee.findMany({
       where: { eventId },
       include: {
@@ -77,7 +98,14 @@ export async function getAttendees(eventId: string) {
             expenses: { where: { eventId } }
           } 
         },
-        payments: { orderBy: { date: 'desc' } },
+        payments: { 
+          orderBy: { date: 'desc' },
+          include: { registeredBy: { select: { name: true, username: true } } }
+        },
+        history: { 
+          orderBy: { date: 'desc' },
+          include: { changedBy: { select: { name: true, username: true } } }
+        }
       },
       orderBy: { user: { name: 'asc' } },
     });
@@ -101,16 +129,19 @@ export async function checkAttendance(eventId: string, userId: string) {
 // Cuando un usuario se une al evento
 export async function joinEvent(eventId: string, userId: string, daysAttending: number) {
   try {
-    // Buscar la tarifa aplicable
-    const rule = await prisma.pricingRule.findUnique({
-      where: { eventId_days: { eventId, days: daysAttending } }
-    });
+    let expectedPayment = 0;
 
-    if (!rule) {
-      return { success: false, error: `No hay una tarifa configurada para ${daysAttending} días. Por favor, revisa los días o contacta al administrador.` };
+    if (daysAttending > 0) {
+      // Buscar la tarifa aplicable
+      const rule = await prisma.pricingRule.findUnique({
+        where: { eventId_days: { eventId, days: daysAttending } }
+      });
+
+      if (!rule) {
+        return { success: false, error: `No hay una tarifa configurada para ${daysAttending} días. Por favor, revisa los días o contacta al administrador.` };
+      }
+      expectedPayment = rule.price;
     }
-
-    const expectedPayment = rule.price;
 
     const attendee = await prisma.eventAttendee.create({
       data: {
@@ -118,6 +149,13 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
         eventId,
         daysAttending,
         expectedPayment,
+        history: {
+          create: {
+            oldDays: 0,
+            newDays: daysAttending,
+            changedById: userId
+          }
+        }
       }
     });
 
@@ -128,22 +166,58 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
   }
 }
 
-// Admin actualiza a un asistente
-export async function updateAttendeeAdmin(attendeeId: string, customPrice: number | null, adminComment: string | null) {
+
+export async function updateAttendeeDays(attendeeId: string, newDays: number) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: 'No autorizado' };
+
+    const attendee = await prisma.eventAttendee.findUnique({ where: { id: attendeeId } });
+    if (!attendee) return { success: false, error: 'Asistente no encontrado' };
+
+    // Solo el propio usuario o un admin puede cambiar sus días
+    if (attendee.userId !== session.id && !session.isAdmin) {
+      return { success: false, error: 'No tienes permiso para modificar a este asistente' };
+    }
+
+    if (attendee.daysAttending === newDays) {
+      return { success: true }; // Nada que cambiar
+    }
+
+    let expectedPayment = 0;
+    if (newDays > 0) {
+      const rule = await prisma.pricingRule.findUnique({
+        where: { eventId_days: { eventId: attendee.eventId, days: newDays } }
+      });
+
+      if (!rule) {
+        return { success: false, error: `No hay una tarifa configurada para ${newDays} días.` };
+      }
+      expectedPayment = rule.price;
+    }
+
     await prisma.eventAttendee.update({
       where: { id: attendeeId },
       data: {
-        expectedPayment: customPrice,
-        adminComment,
+        daysAttending: newDays,
+        expectedPayment,
+        history: {
+          create: {
+            oldDays: attendee.daysAttending,
+            newDays: newDays,
+            changedById: session.id
+          }
+        }
       }
     });
+
+    revalidatePath('/'); // For dashboard
     revalidatePath('/pricing/rules');
     revalidatePath('/pricing/attendees');
     revalidatePath('/pricing/results');
     return { success: true };
   } catch (error: any) {
-    return { success: false, error: 'Error al actualizar asistente: ' + error.message };
+    return { success: false, error: 'Error al actualizar días: ' + error.message };
   }
 }
 
@@ -154,8 +228,15 @@ export async function addPayment(attendeeId: string, amount: number) {
     return { success: false, error: 'El importe del pago debe ser mayor que 0.' };
   }
   try {
+    const session = await getSession();
+    if (!session || !session.isAdmin) return { success: false, error: 'No autorizado' };
+
     await prisma.payment.create({
-      data: { attendeeId, amount }
+      data: { 
+        attendeeId, 
+        amount,
+        registeredById: session.id
+      }
     });
     revalidatePath('/pricing/attendees');
     revalidatePath('/pricing/results');

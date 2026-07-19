@@ -30,6 +30,10 @@ model User {
   eventAttendances EventAttendee[]
   expenses         Expense[]
   shoppingTasks    ShoppingListItem[] // Tareas de compra asignadas
+  
+  // Auditoría
+  attendanceHistoryChanges AttendanceHistory[] @relation("HistoryChangedBy")
+  registeredPayments       Payment[]           @relation("PaymentRegisteredBy")
 }
 
 // ---------------------------------------------------------
@@ -75,6 +79,9 @@ model EventAttendee {
 
   // Pagos realizados por el asistente
   payments      Payment[]
+  
+  // Historial de cambios de días
+  history       AttendanceHistory[] @relation("AttendeeHistory")
 }
 
 model Payment {
@@ -85,7 +92,12 @@ model Payment {
   attendeeId  String
   attendee    EventAttendee @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
 
+  // Auditoría
+  registeredById String?
+  registeredBy   User?   @relation("PaymentRegisteredBy", fields: [registeredById], references: [id])
+
   @@index([attendeeId])
+  @@index([registeredById])
 }
 
 model PricingRule {
@@ -182,4 +194,26 @@ model ExpenseItem {
   shoppingListItem ShoppingListItem?
 
   @@index([expenseId])
+}
+
+// ---------------------------------------------------------
+// MODELOS DE AUDITORÍA Y REGISTRO
+// ---------------------------------------------------------
+
+model AttendanceHistory {
+  id          String   @id @default(uuid())
+  attendeeId  String
+  attendee    EventAttendee @relation("AttendeeHistory", fields: [attendeeId], references: [id], onDelete: Cascade)
+  
+  oldDays     Int      // Días que tenía antes (0 si es nuevo)
+  newDays     Int      // Días nuevos asignados
+  
+  // Usuario que hizo el cambio
+  changedById String
+  changedBy   User     @relation("HistoryChangedBy", fields: [changedById], references: [id])
+  
+  date        DateTime @default(now())
+
+  @@index([attendeeId])
+  @@index([changedById])
 }

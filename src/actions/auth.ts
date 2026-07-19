@@ -9,8 +9,8 @@ import { revalidatePath } from 'next/cache';
 const secretKey = process.env.JWT_SECRET || 'super-secret-key-para-desarrollo-gestor-eventos';
 const key = new TextEncoder().encode(secretKey);
 
-// Tiempo de sesión: 30 días
-const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
+// Tiempo de sesión inactiva: 2 horas
+const SESSION_DURATION = 2 * 60 * 60 * 1000;
 
 export async function login(data: any) {
   try {
@@ -38,7 +38,7 @@ export async function login(data: any) {
       isAdmin: user.isAdmin 
     })
       .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('30d')
+      .setExpirationTime('2h')
       .sign(key);
 
     // Guardar en Cookie HttpOnly
@@ -60,10 +60,13 @@ export async function login(data: any) {
 
 export async function logout() {
   const cookieStore = await cookies();
+  
+  // 1. Borrar sesión
   cookieStore.set('session', '', {
     expires: new Date(0),
     path: '/',
   });
+
   revalidatePath('/');
 }
 

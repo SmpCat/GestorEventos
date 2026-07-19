@@ -1,20 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { updateAttendeeAdmin, addPayment, deletePayment, deleteAttendee } from '@/actions/attendance';
+import { updateAttendeeDays, addPayment, deletePayment, deleteAttendee } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
 import styles from './AttendeesAdmin.module.css';
 
-export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[], isAdmin: boolean }) {
+export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { attendees: any[], pricingRules: any[], isAdmin: boolean }) {
   const [loading, setLoading] = useState<string | null>(null);
 
   // Estados para el editor manual de asistentes
   const [editingAttendee, setEditingAttendee] = useState<string | null>(null);
-  const [editPrice, setEditPrice] = useState<number | ''>('');
-  const [editComment, setEditComment] = useState('');
   
-  // Nuevo pago
+  // Nuevo pago y días
   const [newPaymentAmount, setNewPaymentAmount] = useState<number | ''>('');
+  const [newDays, setNewDays] = useState<number | ''>('');
 
   // Interceptar el botón "Volver" global del Navbar
   useEffect(() => {
@@ -30,26 +29,23 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
 
   const startEditing = (att: any) => {
     setEditingAttendee(att.id);
-    setEditPrice(att.expectedPayment !== null ? att.expectedPayment : '');
-    setEditComment(att.adminComment || '');
     setNewPaymentAmount('');
+    setNewDays(att.daysAttending);
   };
 
-  const saveAttendee = async (attId: string) => {
-    if (!window.confirm('¿Seguro que quieres guardar los cambios en la cuota de este asistente?')) {
-      return;
-    }
+  const handleUpdateDays = async (attId: string) => {
+    if (newDays === '') return;
     setLoading(`att-${attId}`);
-    const finalPrice = editPrice === '' ? null : Number(editPrice);
-    const res = await updateAttendeeAdmin(attId, finalPrice, editComment);
+    const res = await updateAttendeeDays(attId, newDays);
     if (res.success) {
-      alert('Cuota guardada correctamente.');
-      setEditingAttendee(null);
+      alert(`Días actualizados correctamente.`);
     } else {
-      alert(res.error || 'Error al guardar.');
+      alert(res.error || 'Error al actualizar días.');
     }
     setLoading(null);
   };
+
+
 
   const handleAddPayment = async (attId: string) => {
     if (newPaymentAmount === '' || Number(newPaymentAmount) <= 0) return;
@@ -151,39 +147,49 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                     </div>
                   ) : (
                     <div className={styles.editSection}>
-                      <div className={styles.editTitle}>Ajuste de Cuota</div>
-                      <div className="flex flex-col gap-1">
-                        <span className={styles.infoLabel}>Cuota de {att.daysAttending} días:</span>
-                        <div className={styles.inputWrapper}>
-                          <input 
-                            type="number" 
-                            className={`input-field ${styles.currencyInput}`}
-                            value={editPrice}
-                            onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
-                            placeholder="Automático"
-                          />
-                          <span className={styles.currencySymbol}>€</span>
+                      <div className={styles.actionBox} style={{ marginBottom: '1rem' }}>
+                        <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
+                        <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem' }}>
+                          <span className={styles.infoLabel}>Días:</span>
+                          <div className={styles.inputWrapper}>
+                            <select 
+                              className={`input-field`} 
+                              value={newDays}
+                              onChange={e => setNewDays(e.target.value ? Number(e.target.value) : '')}
+                            >
+                              <option value="" disabled>Elige...</option>
+                              <option value={0}>No lo sé aún</option>
+                              {pricingRules.map(r => (
+                                <option key={r.id} value={r.days}>{r.days} días ({r.price}€)</option>
+                              ))}
+                            </select>
+                          </div>
+                          <button onClick={() => handleUpdateDays(att.id)} className={`btn btn-primary`} disabled={isProcessing || newDays === '' || newDays === att.daysAttending} style={{ padding: '0.75rem 1rem', borderRadius: '8px', fontSize: '0.9rem' }} title="Guardar">
+                            Guardar
+                          </button>
                         </div>
                       </div>
-                      <input 
-                        type="text" 
-                        className={`input-field ${styles.commentInput}`}
-                        placeholder="Comentario interno (opcional)..."
-                        value={editComment}
-                        onChange={e => setEditComment(e.target.value)}
-                      />
-                      <div className="flex mobile-col gap-2 mt-1">
-                        <button onClick={() => saveAttendee(att.id)} className={`btn ${styles.saveBtn}`} disabled={isProcessing}>
-                          Guardar Cuota
-                        </button>
-                      </div>
 
-                      <div className={styles.paymentsSection}>
+                      {att.history && att.history.length > 0 && (
+                        <div className={styles.paymentsSection} style={{ marginTop: 0 }}>
+                          <div className={styles.paymentsTitle}>Historial de Días</div>
+                          <div className={styles.paymentsList}>
+                            {att.history.map((h: any) => (
+                              <div key={h.id} className={styles.paymentRow}>
+                                <span className={styles.paymentDate}>{new Date(h.date).toLocaleDateString('es-ES')} <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{h.changedBy?.username || '?'})</span></span>
+                                <span className={styles.paymentAmount} style={{ color: 'var(--text-primary)' }}>{h.oldDays} ➡️ {h.newDays}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className={styles.paymentsSection} style={{ marginTop: '1rem' }}>
                         <div className={styles.paymentsTitle}>Historial de Pagos</div>
                         <div className={styles.paymentsList}>
                           {att.payments?.map((p: any) => (
                             <div key={p.id} className={styles.paymentRow}>
-                              <span className={styles.paymentDate}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}</span>
+                              <span className={styles.paymentDate}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })} <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{p.registeredBy?.username || '?'})</span></span>
                               <span className={styles.paymentAmount}>+{p.amount}€</span>
                               <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
                                 <TrashIcon />
@@ -268,22 +274,9 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                       <td className={`${styles.tableCell} ${styles.tableDays}`}>{att.daysAttending}</td>
                       
                       <td className={styles.tableCell} style={{ textAlign: "right" }}>
-                        {isEditing ? (
-                          <div className={styles.tableInputWrapper}>
-                            <input 
-                              type="number" 
-                              className={`input-field ${styles.tableCurrencyInput}`}
-                              value={editPrice}
-                              onChange={e => setEditPrice(e.target.value ? Number(e.target.value) : '')}
-                              placeholder="Auto"
-                            />
-                            <span className={styles.tableCurrencySymbol}>€</span>
-                          </div>
-                        ) : (
-                          <span style={{ color: att.adminComment ? 'var(--accent-warning)' : 'inherit', fontWeight: 'bold' }}>
-                            {att.expectedPayment !== null ? `${att.expectedPayment}€` : '??'}
-                          </span>
-                        )}
+                        <span style={{ fontWeight: 'bold' }}>
+                          {att.expectedPayment !== null ? `${att.expectedPayment}€` : '0€'}
+                        </span>
                       </td>
 
                       <td className={styles.tableCell} style={{ textAlign: "right" }}>
@@ -300,27 +293,48 @@ export default function AttendeesAdmin({ attendees, isAdmin }: { attendees: any[
                         {isEditing && isAdmin ? (
                           <div className={styles.desktopActions}>
                             <div className={styles.actionBox}>
-                              <div className={styles.actionBoxTitle}>Ajuste Cuota</div>
-                              <input 
-                                type="text" 
-                                className={`input-field ${styles.actionInput}`}
-                                placeholder="Comentario (opcional)"
-                                value={editComment}
-                                onChange={e => setEditComment(e.target.value)}
-                              />
-                              <div className="flex gap-2">
-                                <button onClick={() => saveAttendee(att.id)} className={`btn ${styles.actionSaveBtn}`} disabled={isProcessing}>
-                                  Guardar Cuota
+                              <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
+                              <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem' }}>
+                                <div className={styles.tableInputWrapper} style={{ width: '100%' }}>
+                                  <select 
+                                    className={`input-field`} 
+                                    value={newDays}
+                                    onChange={e => setNewDays(e.target.value ? Number(e.target.value) : '')}
+                                    style={{ padding: '0.5rem', fontSize: '0.75rem', height: '100%' }}
+                                  >
+                                    <option value="" disabled>Elige...</option>
+                                    <option value={0}>No lo sé aún</option>
+                                    {pricingRules.map(r => (
+                                      <option key={r.id} value={r.days}>{r.days} d ({r.price}€)</option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <button onClick={() => handleUpdateDays(att.id)} className={`btn btn-primary`} disabled={isProcessing || newDays === '' || newDays === att.daysAttending} style={{ padding: '0.5rem 0.75rem', fontSize: '0.75rem', borderRadius: '6px' }} title="Guardar">
+                                  Guardar
                                 </button>
                               </div>
+                              
+                              {att.history && att.history.length > 0 && (
+                                <div style={{ marginTop: '0.75rem' }}>
+                                  <div className={styles.actionBoxTitleAlt}>Historial de Días</div>
+                                  <div className={styles.paymentsList}>
+                                    {att.history.map((h: any) => (
+                                      <div key={h.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
+                                        <span className={styles.paymentDate}>{new Date(h.date).toLocaleDateString('es-ES')} <span style={{opacity: 0.6}}>(@{h.changedBy?.username || '?'})</span></span>
+                                        <span style={{ fontWeight: 'bold' }}>{h.oldDays} ➡️ {h.newDays}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            
+
                             <div className={styles.actionBox}>
-                              <div className={styles.actionBoxTitleAlt}>Pagos</div>
+                              <div className={styles.actionBoxTitleAlt}>Historial de Pagos</div>
                               <div className={styles.paymentsList}>
                                 {att.payments?.map((p: any) => (
-                                  <div key={p.id} className={styles.paymentRow}>
-                                    <span className={styles.paymentDate}>{new Date(p.date).toLocaleDateString('es-ES')}</span>
+                                  <div key={p.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
+                                    <span className={styles.paymentDate}>{new Date(p.date).toLocaleDateString('es-ES')} <span style={{opacity: 0.6}}>(@{p.registeredBy?.username || '?'})</span></span>
                                     <span className={styles.paymentAmount}>+{p.amount}€</span>
                                     <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
                                       <TrashIcon />
