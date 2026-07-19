@@ -284,8 +284,12 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
             ) : (
               expenses.map((expense) => {
                 const canDelete = isAdmin || expense.purchaserId === currentUserId;
-                const dateStr = new Date(expense.date).toLocaleDateString('es-ES', {
-                  day: '2-digit', month: '2-digit', year: 'numeric'
+                const dateStr = new Date(expense.date).toLocaleString('es-ES', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
                 });
 
                 return (
