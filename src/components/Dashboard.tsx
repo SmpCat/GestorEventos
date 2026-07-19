@@ -108,7 +108,7 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
 
             <Link href="/pricing/results" className={styles.menuItem}>
               <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Balance</h3>
                 <p className={styles.menuItemSubtitle}>Resumen financiero</p>
               </div>
               <div style={{ fontSize: '2rem' }}>📈</div>
