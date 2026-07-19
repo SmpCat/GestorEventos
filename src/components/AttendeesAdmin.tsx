@@ -138,27 +138,29 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
       ) : (
         <>
           {isAdmin && attendees.length > 0 && (
-            <div style={{ padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '0.5rem' }}>
-                <input 
-                  type="checkbox"
-                  checked={isSelectAll}
-                  onChange={(e) => setIsSelectAll(e.target.checked)}
-                  style={{ width: '1.1rem', height: '1.1rem', cursor: 'pointer' }}
-                  title="Selección Maestra de Expulsión"
-                />
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', cursor: 'pointer' }} onClick={() => setIsSelectAll(!isSelectAll)}>
-                  Selección maestra de expulsión
-                </span>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div className={styles.mobileCard} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <input 
+                    type="checkbox"
+                    checked={isSelectAll}
+                    onChange={(e) => setIsSelectAll(e.target.checked)}
+                    style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', flexShrink: 0 }}
+                    title="Selección Maestra de Expulsión"
+                  />
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
+                    Expulsión Masiva
+                  </span>
+                </div>
                 {isSelectAll && (
                   <button 
                     onClick={handleBulkExpel}
                     disabled={loading === 'bulk-expel'}
                     className={`btn ${styles.deleteAttendeeTableBtn}`}
-                    style={{ marginLeft: '1rem', padding: '0.2rem 0.5rem' }}
+                    style={{ padding: '0.3rem 0.6rem' }}
                     title="Expulsar Todos los Asistentes No Administradores"
                   >
-                    {loading === 'bulk-expel' ? '⏳' : <TrashIcon />} Expulsar en masa
+                    {loading === 'bulk-expel' ? '⏳' : <TrashIcon />} Expulsar
                   </button>
                 )}
               </div>
