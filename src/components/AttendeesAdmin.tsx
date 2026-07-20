@@ -19,6 +19,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
   // Bulk Expel
   const [isSelectAll, setIsSelectAll] = useState(false);
 
+  // Buscador
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Interceptar el botón "Volver" global del Navbar
   useEffect(() => {
     const handleVolver = (e: Event) => {
@@ -131,12 +134,33 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     }
   };
 
+  const filteredAttendees = attendees.filter((att: any) => 
+    att.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    att.user.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className={`glass-panel ${styles.adminPanel}`}>
       {attendees.length === 0 ? (
         <div className={styles.emptyState}>Aún no hay nadie apuntado a este evento.</div>
       ) : (
         <>
+          <div style={{ marginBottom: '1.5rem', position: 'relative' }}>
+            <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+            <input 
+              type="text" 
+              className="input-field" 
+              placeholder="Buscar por nombre o nick..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: '100%', paddingLeft: '2.5rem', borderRadius: '12px' }}
+            />
+          </div>
+
+          {filteredAttendees.length === 0 && (
+            <div className={styles.emptyState}>No se encontraron asistentes con ese nombre.</div>
+          )}
+
           {isAdmin && attendees.length > 0 && (
             <div style={{ marginBottom: '1.5rem' }}>
               <div className={styles.mobileCard} style={{ padding: '1rem' }}>
@@ -169,9 +193,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
             </div>
           )}
 
-          {/* VISTA MÓVIL (Cards) */}
-          <div className={`desktop-hide ${styles.mobileList}`}>
-            {attendees.map((att: any) => {
+          {/* VISTA MÓVIL (Tarjetas) */}
+          <div className="desktop-hide" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {filteredAttendees.map((att: any) => {
               const isEditing = editingAttendee === att.id;
               const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
               const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
@@ -325,7 +349,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                 </tr>
               </thead>
               <tbody>
-                {attendees.map((att: any) => {
+                {filteredAttendees.map((att: any) => {
                   const isEditing = editingAttendee === att.id;
                   const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
                   const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
