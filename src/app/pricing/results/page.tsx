@@ -147,7 +147,7 @@ export default async function ResultsPage() {
       <div className="results-container">
         <div className="results-header">
           <div>
-            <h1 className="results-title">Balance</h1>
+            <h1 className="results-title">Resumen de caja</h1>
           </div>
         </div>
 

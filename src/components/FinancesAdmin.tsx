@@ -48,7 +48,7 @@ export default function FinancesAdmin({ attendees, eventId, currentUser }: { att
   return (
     <div className={styles.adminContainer}>
       <div className={styles.headerRow}>
-        <h2 className={styles.title}>Ingresos y Gastos</h2>
+        <h2 className={styles.title}>Flujo de Caja</h2>
       </div>
 
       <div className={styles.gridCards}>
