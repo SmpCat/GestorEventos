@@ -106,22 +106,22 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
               <div style={{ fontSize: '2rem' }}>⚙️</div>
             </Link>
 
-            {/* Finanzas (Nueva) */}
-            <Link href="/finances" className={styles.menuItem}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Ingresos y Gastos</h3>
-                <p className={styles.menuItemSubtitle}>Pagos y adelantos</p>
-              </div>
-              <div style={{ fontSize: '2rem' }}>💳</div>
-            </Link>
-
-            {/* Balance Financiero (Antes llamado Ingresos y Gastos) */}
+            {/* Resumen de caja (Antes llamado Balance) */}
             <Link href="/pricing/results" className={styles.menuItem}>
               <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Balance</h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Resumen de caja</h3>
                 <p className={styles.menuItemSubtitle}>Resumen financiero</p>
               </div>
               <div style={{ fontSize: '2rem' }}>📈</div>
+            </Link>
+
+            {/* Flujo de Caja (Antes Ingresos y Gastos) */}
+            <Link href="/finances" className={styles.menuItem}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Flujo de Caja</h3>
+                <p className={styles.menuItemSubtitle}>Pagos y adelantos</p>
+              </div>
+              <div style={{ fontSize: '2rem' }}>💳</div>
             </Link>
 
             <Link href="/shopping" className={styles.menuItem}>
