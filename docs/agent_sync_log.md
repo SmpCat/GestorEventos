@@ -2,20 +2,22 @@
 
 Este archivo sirve para transferir contexto entre las sesiones del portátil de Windows y del Mac.
 
-## Sesión: Mac (19 Julio 2026)
+## Sesión: Mac (20 Julio 2026)
 
 **Cambios implementados:**
-1. **Refactor Financiero**: 
-   - Se ha añadido el campo `type` (String, default "INCOME") a la tabla `Payment` de Prisma. (Migración `db push` realizada sin pérdida de datos).
-   - Se ha creado una nueva pantalla de **Ingresos y Gastos** en la ruta `/finances` con su propio componente visual (`FinancesAdmin.tsx`) reutilizando estilos oscuros (`actionBox`, `SelectField`).
-   - Se ha modificado el `Dashboard.tsx` para incluir el acceso a Finanzas.
-   - Se ha modificado el balance global (`results/page.tsx`) para que sólo sume los ingresos (`type === 'INCOME'`) a la hora de calcular el total recaudado.
+1. **Restauración en Asistentes:** 
+   - Se ha vuelto a incorporar la funcionalidad de añadir pagos y ver el historial dentro de la tarjeta de cada usuario en la pantalla de Asistentes (`AttendeesAdmin.tsx`), a petición del usuario.
+   - La lógica matemática de esta pantalla se ha adaptado para que sólo sume los registros de tipo `INCOME` (Ingresos) y muestre visualmente si un movimiento fue un gasto (con un signo `-`).
+2. **Buscador de Asistentes:**
+   - Se ha implementado una barra de búsqueda en la pantalla de Asistentes que permite filtrar la lista en tiempo real por nombre o nick. Incluye un botón "✕" para limpiar la búsqueda rápidamente.
+3. **Limpieza de UI:**
+   - Se ha eliminado por completo la funcionalidad y el botón rojo de "Expulsión Masiva" para evitar accidentes.
+4. **Renombrado y Reordenación (Dashboard y Pantallas):**
+   - El apartado que antes era "Balance" ahora se llama **"Resumen de caja"** y aparece primero.
+   - El apartado que antes era "Ingresos y Gastos" ahora se llama **"Flujo de Caja"** y aparece después.
 
-2. **Limpieza de Asistentes**:
-   - En la vista de `AttendeesAdmin.tsx`, se ha eliminado toda la lógica para registrar y eliminar pagos, aislando esta pantalla únicamente para la gestión de los días de asistencia de las personas.
-
-**Trabajo Pendiente / Plan para la siguiente sesión:**
-- Existe un plan pendiente de ejecución en el que se propone transformar la información visual de la tarjeta no expandida de `AttendeesAdmin.tsx` en un sistema de **semáforo** (Verde: Al día, Rojo: Pago pendiente, Amarillo: Excedente) y eliminar el desglose numérico detallado de euros para que solo se vea en la sección de Finanzas.
+**Estado actual:**
+- Todo optimizado, sin errores críticos de build, y subido a la rama principal (Producción).
 
 ---
 *(Por favor, asegúrate de revisar este archivo y mantenerlo actualizado tras tus sesiones importantes)*
