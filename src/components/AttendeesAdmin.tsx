@@ -153,8 +153,17 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
               placeholder="Buscar por nombre o nick..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', paddingLeft: '2.5rem', borderRadius: '12px' }}
+              style={{ width: '100%', paddingLeft: '2.5rem', paddingRight: '2.5rem', borderRadius: '12px' }}
             />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', padding: '0.5rem' }}
+                title="Borrar búsqueda"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           {filteredAttendees.length === 0 && (
