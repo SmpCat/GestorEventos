@@ -15,7 +15,7 @@ ssh -t ${NAS_USER}@${NAS_IP} "sudo mkdir -p ${NAS_DIR} && sudo chown -R ${NAS_US
 
 # 1. Sincronizar archivos (ignorar dependencias y archivos ocultos pesados)
 echo "📦 Transfiriendo archivos nuevos al NAS..."
-rsync -rlv --update --exclude 'node_modules' --exclude '.next' --exclude '.git' ./ ${NAS_USER}@${NAS_IP}:${NAS_DIR}/
+rsync -rlv --delete --update --exclude 'node_modules' --exclude '.next' --exclude '.git' ./ ${NAS_USER}@${NAS_IP}:${NAS_DIR}/
 
 if [ $? -ne 0 ]; then
     echo "❌ Error al copiar los archivos. Revisa la conexión."
