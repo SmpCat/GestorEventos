@@ -56,6 +56,7 @@ model Event {
   expenses        Expense[]
   shoppingList    ShoppingListItem[]
   shoppingEvidences ShoppingListEvidence[]
+  payments        Payment[]
 }
 
 model EventAttendee {
@@ -89,15 +90,22 @@ model Payment {
   id          String   @id @default(uuid())
   amount      Float
   type        String   @default("INCOME") // "INCOME" o "EXPENSE"
+  description String?
   date        DateTime @default(now())
   
-  attendeeId  String
-  attendee    EventAttendee @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+  // Relación con el Evento (Requerida)
+  eventId     String?
+  event       Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // Relación con el Asistente (Opcional)
+  attendeeId  String?
+  attendee    EventAttendee? @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
 
   // Auditoría
   registeredById String?
   registeredBy   User?   @relation("PaymentRegisteredBy", fields: [registeredById], references: [id])
 
+  @@index([eventId])
   @@index([attendeeId])
   @@index([registeredById])
 }

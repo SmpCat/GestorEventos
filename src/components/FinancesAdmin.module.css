@@ -110,19 +110,20 @@
 }
 
 .currencyInput {
-  font-size: 0.875rem !important;
-  padding: 0.25rem !important;
-  padding-right: 1.5rem !important;
-  text-align: center;
+  font-size: 1.25rem !important;
+  font-weight: bold;
+  padding: 0.75rem 1rem !important;
+  padding-right: 2rem !important;
+  text-align: right;
   width: 100%;
 }
 
 .currencySymbol {
   font-weight: bold;
-  font-size: 0.875rem;
+  font-size: 1.1rem;
   color: var(--text-secondary);
   position: absolute;
-  right: 0.5rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
 }

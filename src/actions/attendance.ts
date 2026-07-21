@@ -231,9 +231,17 @@ export async function addPayment(attendeeId: string, amount: number) {
     const session = await getSession();
     if (!session || !session.isAdmin) return { success: false, error: 'No autorizado' };
 
+    const attendee = await prisma.eventAttendee.findUnique({
+      where: { id: attendeeId },
+      select: { eventId: true }
+    });
+
+    if (!attendee) return { success: false, error: 'Asistente no encontrado' };
+
     await prisma.payment.create({
       data: { 
         attendeeId, 
+        eventId: attendee.eventId,
         amount,
         registeredById: session.id
       }

@@ -1,6 +1,7 @@
 import { getSession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { getAttendees } from '@/actions/attendance';
+import { getEventPayments } from '@/actions/finances';
 import { getActiveEventCached } from '@/lib/cache';
 import FinancesAdmin from '@/components/FinancesAdmin';
 import Link from 'next/link';
@@ -27,9 +28,12 @@ export default async function FinancesPage() {
     );
   }
 
-  // Obtener los datos (usamos la misma lógica que asistentes porque incluye los payments)
-  const result = await getAttendees(activeEvent.id);
-  const attendees = result.success && result.data ? result.data : [];
+  // Obtener los datos 
+  const attendeesResult = await getAttendees(activeEvent.id);
+  const attendees = attendeesResult.success && attendeesResult.data ? attendeesResult.data : [];
+
+  const paymentsResult = await getEventPayments(activeEvent.id);
+  const payments = paymentsResult.success && paymentsResult.data ? paymentsResult.data : [];
 
   return (
     <div className="px-4 space-y-10">
@@ -39,6 +43,7 @@ export default async function FinancesPage() {
       
       <FinancesAdmin 
         attendees={attendees} 
+        payments={payments}
         eventId={activeEvent.id} 
         currentUser={session}
       />
