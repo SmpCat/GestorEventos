@@ -217,20 +217,7 @@
   margin-top: 1.5rem;
 }
 
-.addPaymentBtn {
-  background-color: rgba(15, 23, 42, 0.6) !important;
-  color: #fff !important;
-  width: 32px !important;
-  height: 32px !important;
-  padding: 0 !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  border-radius: 6px !important;
-  font-size: 1.25rem !important;
-  font-weight: bold !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
+
 
 .deleteAttendeeContainer {
   display: flex;

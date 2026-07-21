@@ -112,3 +112,16 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 ### Instrucciones para el Agente Windows:
 1. Lee detenidamente el `ROADMAP.md` en su sección V2, hay modificaciones de la Lógica de Negocio introducidas hoy que mañana deberás desarrollar (como quitar el Ajuste Manual de Cuota y sustituir input por Select de Tarifas).
 2. Todo el código de GestorEventos ha sido subido a Github sin problemas, incluyendo los nuevos scripts de automatización del NAS. Ya no es necesario tocar Watchtower ni el NAS. Mañana puedes ponerte 100% con la programación de las features de V2.
+
+## Resumen de la Sesión de Rediseño de Flujo de Caja (Mac)
+*Última actualización: 21 de Julio de 2026 (por Mac Agent)*
+
+### 1. Refactorización UI de FinancesAdmin
+- Se ha rediseñado por completo la interfaz del Flujo de Caja (Bote Global).
+- Se han integrado estilos "glassmorphism" en todos los componentes.
+- Se ha eliminado a nivel global el botón primario azul (`btn-primary`), sustituyéndolo por un botón transparente de cristal blanco para unificar la estética de la app.
+- Se han solucionado problemas de *overflow* en descripciones de transacciones largas y se han estandarizado los iconos de borrado (`TrashIcon`).
+
+### Instrucciones para el Agente Windows:
+1. Todo el código frontend y de la lógica de pagos/ingresos externos (`FinancesAdmin`) está terminado y 100% funcional.
+2. Continúa con cualquier otra tarea del ROADMAP, respetando la nueva estética `glassmorphism` sin colores sólidos discordantes.
