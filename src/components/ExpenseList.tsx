@@ -192,7 +192,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               <div className={styles.previewImageCol}>
                 <span className={styles.previewLabel}>Ticket Original</span>
                 <div className={styles.previewImageWrapper}>
-                  <img src={receiptData.imageUrl} alt="Ticket" className={styles.previewImage} />
+                  <img src={`/api${receiptData.imageUrl}`} alt="Ticket" className={styles.previewImage} />
                 </div>
               </div>
               
@@ -375,7 +375,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               <div className={styles.innerBlackBox}>
                 <div className={styles.galleryGrid}>
                   {allImages.map((ev: any) => {
-                    const apiImageUrl = ev.url;
+                    const apiImageUrl = `/api${ev.url}`;
                     const dateStr = new Date(ev.createdAt).toLocaleString('es-ES', {
                       day: '2-digit', month: '2-digit', year: '2-digit',
                       hour: '2-digit', minute: '2-digit'
