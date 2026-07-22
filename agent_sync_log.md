@@ -125,3 +125,27 @@ En esta sesión se preparó GestorEventos para su despliegue final en el QNAP TS
 ### Instrucciones para el Agente Windows:
 1. Todo el código frontend y de la lógica de pagos/ingresos externos (`FinancesAdmin`) está terminado y 100% funcional.
 2. Continúa con cualquier otra tarea del ROADMAP, respetando la nueva estética `glassmorphism` sin colores sólidos discordantes.
+
+## Resumen de la Sesión de Correcciones en Producción PWA (Mac)
+*Última actualización: 22 de Julio de 2026 (por Mac Agent)*
+
+### 1. Corrección de Archivos Estáticos en Producción (Next.js Standalone)
+- **Problema:** Los tickets del Bote Global no se mostraban en producción tras ser subidos, devolviendo 404 porque el servidor estático no refrescaba el disco duro.
+- **Solución:** Se replicó la arquitectura de la Lista de la Compra creando una ruta dinámica nativa `/api/uploads/receipts/[filename]/route.ts` que lee directamente del disco y evita la caché de Next.js, modificando el Frontend para apuntar siempre a `/api/uploads/...`.
+
+### 2. Safeguard de Seguridad de JWT (Session Drift)
+- **Problema:** Un token de sesión JWT antiguo (ej. persistente tras reconstruir `prod.db` o reiniciar desde cero) pasaba la validación de firma y generaba un error de Foreign Key Constraints (500) en Prisma al intentar crear gastos para un `userId` huérfano.
+- **Solución:** Se parcheó `src/actions/auth.ts` (`getSession`). Ahora hace una query obligatoria al vuelo a SQLite (`prisma.user.findUnique`) tras desencriptar el JWT para cerciorarse de que el usuario sigue vivo.
+
+### 3. UX de la Inteligencia Artificial (Loading Overlay)
+- Se desarrolló el componente `AiLoadingOverlay.tsx` (estilo glassmorphism) para frenar la incertidumbre del usuario durante los 6 segundos de proceso de Gemini. 
+- Implementado globalmente tanto en Supermercado como Bote Global (animaciones láser, pulse-dots).
+
+### 4. PWA Lightbox (Fijación Bug PWA iOS)
+- **Problema:** Al ser una PWA instalada en móvil, el `target="_blank"` navegaba a la imagen pura, escondiendo la interfaz y atrapando al usuario sin botón Atrás.
+- **Solución:** Se deprecó el uso de enlaces `<a>` para ampliar tickets y se implementó un `ImageLightbox.tsx` interno flotante con botón de cerrado, manteniendo al usuario dentro del DOM de la aplicación en todo momento.
+
+### Instrucciones para el Agente Windows:
+1. Toda la documentación de esta sincronización está actualizada y los scripts python basura eliminados del proyecto de Orico. 
+2. Puedes usar las nuevas utilidades de interfaz (Lightbox/Overlay) si creas nuevas vistas.
+3. El frontend de producción está perfecto. Continúa iterando el ROADMAP.
