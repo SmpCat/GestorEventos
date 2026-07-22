@@ -373,6 +373,8 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                         </div>
                         <a 
                           href={apiImageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className={styles.galleryLink}
                           style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1 }}
                         >
