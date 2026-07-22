@@ -77,7 +77,18 @@ export async function getSession() {
 
   try {
     const { payload } = await jwtVerify(session, key);
-    return payload as { id: string, username: string, name: string, isAdmin: boolean };
+    
+    // VERIFICACIÓN DE SEGURIDAD: Comprobar que el usuario sigue existiendo en la base de datos
+    const dbUser = await prisma.user.findUnique({
+      where: { id: payload.id as string },
+      select: { id: true, username: true, name: true, isAdmin: true }
+    });
+    
+    if (!dbUser) {
+      return null; // El usuario fue borrado de la BD o la BD se reinició
+    }
+    
+    return dbUser;
   } catch (error) {
     return null; // JWT Inválido o caducado
   }
