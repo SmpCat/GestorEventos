@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
+import AiLoadingOverlay from './AiLoadingOverlay';
 
 export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expenses: any[], isAdmin: boolean, currentUserId: string }) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -99,6 +100,8 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
   return (
     <div className={styles.container}>
+      <AiLoadingOverlay isVisible={isUploading} message="Extrayendo comercio, importe y fecha con IA..." />
+      
       <div className={styles.headerRow}>
         <div>
           <h1>Gastos Registrados</h1>

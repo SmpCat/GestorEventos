@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, scanShoppingListAI, deleteShoppingListEvidence } from '@/actions/shopping';
 import TrashIcon from './TrashIcon';
+import AiLoadingOverlay from './AiLoadingOverlay';
 import styles from './ShoppingList.module.css';
 
 export default function ShoppingList({ items, evidences, eventId, users, currentUser }: { items: any[], evidences?: any[], eventId: string, users: any[], currentUser: any }) {
@@ -217,6 +218,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
   return (
     <div className={styles.container}>
+      <AiLoadingOverlay isVisible={loading === 'scanning'} message="Vinculando productos del ticket con la lista..." />
       
       <div className={styles.headerRow}>
         <div>
