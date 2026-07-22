@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, scanShoppingListAI, deleteShoppingListEvidence } from '@/actions/shopping';
 import TrashIcon from './TrashIcon';
 import AiLoadingOverlay from './AiLoadingOverlay';
+import ImageLightbox from './ImageLightbox';
 import styles from './ShoppingList.module.css';
 
 export default function ShoppingList({ items, evidences, eventId, users, currentUser }: { items: any[], evidences?: any[], eventId: string, users: any[], currentUser: any }) {
   const router = useRouter();
   const [newItemName, setNewItemName] = useState('');
   const [loading, setLoading] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pending' | 'purchased'>('pending');
 
   const pendingItems = items.filter(item => !item.isPurchased);
@@ -373,15 +375,13 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                             {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
                           </button>
                         </div>
-                        <a 
-                          href={apiImageUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <div 
+                          onClick={() => setLightboxImage(apiImageUrl)}
                           className={styles.galleryLink}
-                          style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1 }}
+                          style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1, cursor: 'pointer' }}
                         >
                           <img src={apiImageUrl} alt="Ticket" className={styles.galleryImg} />
-                        </a>
+                        </div>
                       </div>
                   );
                 })}
@@ -390,7 +390,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
           </div>
         </div>
       )}
-
+      <ImageLightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />
     </div>
   );
 }

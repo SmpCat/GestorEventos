@@ -5,9 +5,11 @@ import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManua
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
 import AiLoadingOverlay from './AiLoadingOverlay';
+import ImageLightbox from './ImageLightbox';
 
 export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expenses: any[], isAdmin: boolean, currentUserId: string }) {
   const [loading, setLoading] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -194,7 +196,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               {/* Imagen */}
               <div className={styles.previewImageCol}>
                 <span className={styles.previewLabel}>Ticket Original</span>
-                <div className={styles.previewImageWrapper}>
+                <div className={styles.previewImageWrapper} onClick={() => setLightboxImage(`/api${receiptData.imageUrl}`)} style={{ cursor: 'pointer' }}>
                   <img src={`/api${receiptData.imageUrl}`} alt="Ticket" className={styles.previewImage} />
                 </div>
               </div>
@@ -398,15 +400,13 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                             {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
                           </button>
                         </div>
-                        <a 
-                          href={apiImageUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <div 
+                          onClick={() => setLightboxImage(apiImageUrl)}
                           className={styles.galleryLink}
-                          style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1 }}
+                          style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1, cursor: 'pointer' }}
                         >
                           <img src={apiImageUrl} alt="Ticket" className={styles.galleryImg} />
-                        </a>
+                        </div>
                       </div>
                     );
                   })}
@@ -416,7 +416,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
           </div>
         );
       })()}
-
+    <ImageLightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />
     </div>
   );
 }
