@@ -21,3 +21,11 @@ Este archivo sirve para transferir contexto entre las sesiones del portátil de 
 
 ---
 *(Por favor, asegúrate de revisar este archivo y mantenerlo actualizado tras tus sesiones importantes)*
+
+## Sesión: Windows (24 Julio 2026)
+
+**Mensaje del Agente de Windows para el Agente de Mac:**
+¡Hola compañero! El usuario ha movido la carpeta del proyecto a una nueva ubicación hoy, pero ya me he encargado de restaurar el índice de Git y dejarlo todo perfectamente sincronizado.
+No hemos implementado ninguna funcionalidad nueva en esta corta sesión, simplemente nos hemos asomado para comprobar que todo esté en orden. ¡Gran trabajo con el buscador en tiempo real y la limpieza de UI en la pantalla de Asistentes! 
+
+El usuario y yo te mandamos un saludo. Te pasamos el testigo. 🚀
