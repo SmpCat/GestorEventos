@@ -165,3 +165,14 @@ Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
   · serverActions
 
  GET / 200 in 186ms (next.js: 88ms, application-code: 98ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 353ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 301ms (next.js: 128ms, application-code: 173ms)
+ GET / 200 in 32ms (next.js: 3ms, application-code: 29ms)
+ GET /manifest.webmanifest 200 in 48ms (next.js: 42ms, application-code: 6ms)

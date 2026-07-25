@@ -1,47 +1,46 @@
-# Registro de Sincronización Mente Colmena V2 - GestorArranque & Homelab
+# Registro de Sincronización Mente Colmena V2 - Cierre de Sesión Completo
 
-**Fecha de Sincronización:** 2026-07-25  
+**Fecha:** 2026-07-26  
 **Dispositivo Origen:** Mac Mini M4 (macOS) ➔ **Dispositivo Destino:** Portátil Windows (Hive Mind Sync)
 
 ---
 
-## 📌 Estado de Servicios & Homelab
+## 📌 Resumen de Cambios & Hitos Alcanzados en esta Sesión
 
-### 1. GestorArranque.app
-- **Geometría y Centrado:** Ventana ajustada a `980x820` centrada automáticamente en pantalla al iniciar para evitar parpadeos en macOS/Windows.
-- **Monitoreo Asíncrono:** Todas las comprobaciones de red se ejecutan en un hilo secundario (`threading.Thread`) con feedback visual instantáneo (`⏳ Actualizando...`).
-- **Botón Global Header:** Ubicado en la cabecera del tab superior (`🔄 Actualizar Todos los Servicios`).
+### 1. Router FRITZ!Box 5690 Pro - Protección contra Revinculación DNS (DNS Rebind Protection)
+- **Causa Raíz Diagnosticada:** El FRITZ!Box bloqueaba peticiones de dominios públicos que apuntaban a IPs locales (`192.168.178.60`), devolviendo `DNS_PROBE_FINISHED_NXDOMAIN`.
+- **Excepciones Configuradas & Confirmadas en FRITZ!Box:**
+  - `myqnapcloud.com` (Acceso seguro NAS QNAP: `nasts4648.myqnapcloud.com`)
+  - `duckdns.org` (Dominios públicos: `eventos-pro.duckdns.org`, `eventos-dev.duckdns.org`, `smpha.duckdns.org`)
+  - `plex.direct` (Conexiones locales directas HTTPS en 4K sin ralentizaciones para la app de Plex, Smart TV, iPhone y Apple TV)
 
-### 2. GestorEventos DEV (Desarrollo)
-- **Puerto:** `3000` (Binding: `0.0.0.0`)
-- **Dominio Proxy:** `https://eventos-dev.duckdns.org`
-- **Controlador:** Botón interruptor dinámico (*Toggle Switch*):
-  - 🟢 `🟢 Arrancar Servicio Dev (3000)`
-  - 🔴 `🔴 Detener Servicio Dev (3000)`
-- **Aislamiento de Proceso:** Se lanza con `start_new_session=True`, inyección de `PATH` de Homebrew (`/opt/homebrew/bin`) y redirección de salida a `next_dev.log` para prevenir fallos por `EPIPE`.
-- **Apagado Seguro:** Utiliza `lsof -ti:3000 -sTCP:LISTEN` excluyendo el PID de la propia app (`os.getpid()`) para que el apagado del servidor Dev no cierre jamás la ventana del Gestor de Arranque.
+### 2. Estabilidad de IP & MAC de Pi-hole en FRITZ!Box (Solución PC-XXXXXXX)
+- **Problema Solucionado:** Docker generaba una MAC aleatoria tras actualizar o reiniciar el contenedor de Pi-hole, lo que provocaba que el FRITZ!Box lo detectase como equipo nuevo (`PC-XXXXXXX`) y desmarcase "Asignar dirección IPv4 permanentemente".
+- **Solución Aplicada en Compose/QNAP:** Fijada la dirección MAC estática `"02:42:1a:2b:31:79"` en la red `qnet-net` (IP `.101`), garantizando que Pi-hole conserve su nombre y su IP estática fija tras cualquier reinicio o actualización con Watchtower.
 
-### 3. GestorEventos PRO (Producción)
-- **Host:** Contenedor Docker `gestoreventos` en NAS QNAP (`192.168.178.60`).
-- **Dominio Proxy:** `https://eventos-pro.duckdns.org`
-- **Comprobación:** Consulta estrictamente `https://eventos-pro.duckdns.org` (o IP NAS) requiriendo `HTTP 200 OK` (evita falsos positivos con localhost).
-- **Acceso:** Botón verde **`🚀 Abrir Container Station (QNAP)`** (`https://192.168.178.60:8444/container-station/`).
+### 3. GestorArranque.app & GestorEventos (DEV & PRO)
+- **GestorEventos DEV (Desarrollo):**
+  - Configurado en puerto `3000` (`0.0.0.0`) mapeado con `eventos-dev.duckdns.org` en Nginx Proxy Manager.
+  - Botón conmutador dinámico (*Toggle Switch*): `🟢 Arrancar` / `🔴 Detener`.
+  - Daemonizado con `start_new_session=True` e inyección de `PATH` de Homebrew para prevenir cierres por `EPIPE`.
+  - Apagado seguro con `lsof -ti:3000 -sTCP:LISTEN` excluyendo el PID propio (`os.getpid()`) para no cerrar jamás la ventana de la app.
+- **GestorEventos PRO (Producción):**
+  - Monitoreo mediante consulta HTTPS a `https://eventos-pro.duckdns.org` (excluyendo `localhost`).
+  - Botón directo **`🚀 Abrir Container Station (QNAP)`** (`https://192.168.178.60:8444/container-station/`).
 
-### 4. Monitor DNS FRITZ!Box & Pi-hole
-- **IP Pi-hole:** `192.168.178.101`
-- **Diagnóstico Semafórico de 5 Niveles:**
-  - 🟢 **100% Protegido:** Ambas DNS = `.101` + Pi-hole Online.
-  - 🟢 **Modo Emergencia Correcto:** DNS Públicas (`8.8.8.8`) + Pi-hole Offline.
-  - ⚠️ **Advertencia Filtrado Parcial:** DNS Mixta (Preferida `.101`, Secundaria `1.1.1.1`).
-  - ⚠️ **Advertencia Navegación Sin Filtrado:** DNS Públicas + Pi-hole Online.
-  - 🔴 **Error Crítico / Corte Total:** DNS = `.101` + Pi-hole Offline.
-- **Refresco RJ-45:** El botón **`🧹 Refrescar Caché RJ-45`** incluye un ciclo de interfaz Ethernet (`off` ➔ `on`) para renovar la concesión DHCP en macOS/Windows al cambiar de DNS en el router.
+### 4. Documentación de Sistemas & Respaldos
+- Confirmada la existencia del archivo completo de capturas en `Sistemas/docs/assets/`:
+  - `duckdns_dashboard.png` (Token privado & subdominios)
+  - `nginx_proxy_hosts.png` (Configuración de Proxy Hosts)
+  - `container_station_contenedores.png` (Contenedores QNAP)
+  - `pihole_local_dns.png` (DNS locales)
+  - `fritz_dyndns.png`, `fritz_dns_fallback.png`, `fritz_port80.png`, `fritz_port443.png`
 
 ---
 
-## 🚀 Repositorios Sincronizados a GitHub
-- `/Volumes/Orico/IA/Proyectos/GestorArranque` (`main`)
-- `/Volumes/Orico/IA/Proyectos/GestorEventos` (`main`)
-- `/Volumes/Orico/IA/Proyectos/Sistemas` (`main`)
-- `/Volumes/Orico/IA/Proyectos/TelegramBot` (`main`)
-- `~/.gemini/config` (`main`)
+## 🚀 Estado de Repositorios Sincronizados a GitHub (`main`)
+- `/Volumes/Orico/IA/Proyectos/GestorArranque`
+- `/Volumes/Orico/IA/Proyectos/GestorEventos`
+- `/Volumes/Orico/IA/Proyectos/Sistemas`
+- `/Volumes/Orico/IA/Proyectos/TelegramBot`
+- `~/.gemini/config`
