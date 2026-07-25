@@ -1,0 +1,167 @@
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 157ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 219ms (next.js: 105ms, application-code: 113ms)
+ GET / 200 in 30ms (next.js: 4ms, application-code: 26ms)
+ GET /? 200 in 32ms (next.js: 4ms, application-code: 29ms)
+ GET /manifest.webmanifest 200 in 56ms (next.js: 48ms, application-code: 8ms)
+ GET /? 200 in 27ms (next.js: 3ms, application-code: 24ms)
+ GET /manifest.webmanifest 200 in 6ms (next.js: 2ms, application-code: 4ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 133ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 209ms (next.js: 100ms, application-code: 109ms)
+ GET / 200 in 64ms (next.js: 32ms, application-code: 31ms)
+ GET /manifest.webmanifest 200 in 49ms (next.js: 44ms, application-code: 5ms)
+ POST / 200 in 121ms (next.js: 3ms, application-code: 118ms)
+  └─ ƒ login({"password":"smp","username":"smp"}) in 95ms src/actions/auth.ts
+ GET /manifest.webmanifest 200 in 6ms (next.js: 5ms, application-code: 1782µs)
+ GET / 200 in 42ms (next.js: 7ms, application-code: 35ms)
+ GET /manifest.webmanifest 200 in 7ms (next.js: 5ms, application-code: 2ms)
+ POST / 200 in 30ms (next.js: 3ms, application-code: 27ms)
+  └─ ƒ logout() in 3ms src/actions/auth.ts
+ GET /manifest.webmanifest 200 in 3ms (next.js: 1454µs, application-code: 1540µs)
+ GET / 200 in 22ms (next.js: 3ms, application-code: 19ms)
+ GET /manifest.webmanifest 200 in 9ms (next.js: 5ms, application-code: 4ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 272ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 221ms (next.js: 111ms, application-code: 110ms)
+ GET / 200 in 16ms (next.js: 1311µs, application-code: 15ms)
+ GET /manifest.webmanifest 200 in 47ms (next.js: 40ms, application-code: 7ms)
+ POST / 200 in 111ms (next.js: 4ms, application-code: 107ms)
+  └─ ƒ login({"password":"smp","username":"smp"}) in 84ms src/actions/auth.ts
+ GET /manifest.webmanifest 200 in 5ms (next.js: 4ms, application-code: 1529µs)
+ GET / 200 in 37ms (next.js: 1169µs, application-code: 36ms)
+ GET /manifest.webmanifest 200 in 13ms (next.js: 5ms, application-code: 8ms)
+ GET / 200 in 39ms (next.js: 21ms, application-code: 18ms)
+ GET / 200 in 16ms (next.js: 1141µs, application-code: 15ms)
+ GET / 200 in 15ms (next.js: 1032µs, application-code: 14ms)
+ GET / 200 in 15ms (next.js: 959µs, application-code: 14ms)
+ GET / 200 in 18ms (next.js: 1021µs, application-code: 17ms)
+ GET / 200 in 23ms (next.js: 1534µs, application-code: 21ms)
+ GET / 200 in 15ms (next.js: 889µs, application-code: 14ms)
+ GET / 200 in 15ms (next.js: 859µs, application-code: 14ms)
+ GET / 200 in 20ms (next.js: 7ms, application-code: 13ms)
+ GET / 200 in 13ms (next.js: 775µs, application-code: 13ms)
+ GET / 200 in 12ms (next.js: 849µs, application-code: 11ms)
+ GET / 200 in 12ms (next.js: 701µs, application-code: 11ms)
+ GET / 200 in 12ms (next.js: 877µs, application-code: 11ms)
+ GET / 200 in 16ms (next.js: 753µs, application-code: 15ms)
+ GET / 200 in 12ms (next.js: 925µs, application-code: 12ms)
+ GET / 200 in 11ms (next.js: 710µs, application-code: 10ms)
+ GET / 200 in 11ms (next.js: 704µs, application-code: 10ms)
+ GET / 200 in 14ms (next.js: 724µs, application-code: 13ms)
+ GET / 200 in 12ms (next.js: 1007µs, application-code: 11ms)
+ GET / 200 in 10ms (next.js: 715µs, application-code: 10ms)
+ GET / 200 in 15ms (next.js: 905µs, application-code: 14ms)
+ GET / 200 in 12ms (next.js: 694µs, application-code: 11ms)
+ GET / 200 in 11ms (next.js: 824µs, application-code: 10ms)
+ GET / 200 in 14ms (next.js: 659µs, application-code: 13ms)
+ GET / 200 in 12ms (next.js: 945µs, application-code: 11ms)
+ GET / 200 in 11ms (next.js: 1038µs, application-code: 10ms)
+ GET / 200 in 29ms (next.js: 3ms, application-code: 26ms)
+ GET / 200 in 20ms (next.js: 885µs, application-code: 19ms)
+ GET / 200 in 29ms (next.js: 2ms, application-code: 26ms)
+ GET / 200 in 12ms (next.js: 768µs, application-code: 11ms)
+ GET / 200 in 35ms (next.js: 3ms, application-code: 32ms)
+ GET / 200 in 13ms (next.js: 776µs, application-code: 12ms)
+ GET / 200 in 37ms (next.js: 11ms, application-code: 26ms)
+ GET / 200 in 41ms (next.js: 3ms, application-code: 38ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 286ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 57ms (next.js: 1245µs, application-code: 56ms)
+ GET / 200 in 295ms (next.js: 135ms, application-code: 160ms)
+ GET /manifest.webmanifest 200 in 48ms (next.js: 42ms, application-code: 6ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 152ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 216ms (next.js: 103ms, application-code: 114ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 147ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 189ms (next.js: 86ms, application-code: 103ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 131ms
+- Experiments (use with caution):
+  · serverActions
+
+⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[?25h
+ GET / 200 in 196ms (next.js: 91ms, application-code: 105ms)
+ GET / 200 in 16ms (next.js: 1447µs, application-code: 15ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 126ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 204ms (next.js: 99ms, application-code: 106ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 270ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 211ms (next.js: 97ms, application-code: 114ms)
+ GET / 200 in 70ms (next.js: 6ms, application-code: 64ms)
+ GET /manifest.webmanifest 200 in 65ms (next.js: 59ms, application-code: 6ms)
+ GET /pricing/attendees 200 in 43ms (next.js: 29ms, application-code: 15ms)
+ GET /manifest.webmanifest 200 in 3ms (next.js: 1512µs, application-code: 1553µs)
+ GET / 200 in 27ms (next.js: 3ms, application-code: 24ms)
+ GET /manifest.webmanifest 200 in 5ms (next.js: 1883µs, application-code: 4ms)
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 224ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 186ms (next.js: 88ms, application-code: 98ms)
