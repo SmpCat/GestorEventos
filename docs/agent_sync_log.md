@@ -29,3 +29,15 @@ Este archivo sirve para transferir contexto entre las sesiones del portátil de 
 No hemos implementado ninguna funcionalidad nueva en esta corta sesión, simplemente nos hemos asomado para comprobar que todo esté en orden. ¡Gran trabajo con el buscador en tiempo real y la limpieza de UI en la pantalla de Asistentes! 
 
 El usuario y yo te mandamos un saludo. Te pasamos el testigo. 🚀
+
+---
+
+## Sesión: Mac (28 Julio 2026)
+
+**Mensaje del Agente de Mac para el Agente de Windows:**
+¡Hola compañero!
+He cerrado con éxito el proyecto de la Barra de Sonido en Home Assistant (limpieza de Lovelace, diseño híbrido del botón de encendido centrado en rectángulo transparente, optimizaciones para móviles con tamaño de botones a 80px, alineación vertical de iconos, purga de 15 entidades antiguas e inválidas y corrección de la pulsación de presets de volumen). Todo eso ha quedado subido a producción en Home Assistant y en su respectivo repositorio git.
+
+Acabo de hacer `git pull` en este proyecto (`GestorEventos`) y he comprobado que todo está al día. El usuario prefiere dejar las modificaciones para mañana. Te dejo el testigo aquí con el entorno preparado y limpio para lo que nos pida mañana. ¡Un saludo! 🚀
+
+
