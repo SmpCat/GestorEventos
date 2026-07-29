@@ -66,5 +66,13 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
 9. **Configuración de Clave de API de Gemini (Pago/Suscripción):**
    - Se ha configurado la nueva API Key provista por el usuario (`AQ.Ab8RN6LX...`) en el archivo local `.env`.
    - Esta clave está vinculada al proyecto de Google Cloud con facturación activa ID `181404530364` (nombre de proyecto: "Proyectos") y da soporte completo al modelo `gemini-flash-latest`.
+10. **Indicador de carga a pantalla completa (re-escaneo):**
+    - Se configuró el componente `AiLoadingOverlay` en `ShoppingList.tsx` y `ExpenseList.tsx` para que muestre el pop-up a pantalla completa con el progreso del re-escaneo con IA ("Re-escaneando lista..." / "Re-escaneando ticket...").
+11. **Puerto SSH del NAS (8222) e Inyección de Variables en Docker:**
+    - Se configuraron los scripts `deploy_to_nas.sh`, `deploy_watchtower.sh` y `fix_containers.sh` para usar el puerto SSH `8222` personalizado de tu NAS QNAP.
+    - Se añadió `GEMINI_API_KEY=${GEMINI_API_KEY}` en `docker-compose.yml` para inyectar correctamente la clave de la API de Gemini desde el archivo `.env` al contenedor de producción en el NAS.
+12. **Manuales de Usuario y WhatsApp:**
+    - Se actualizó el dominio de producción a `eventos-pro.duckdns.org` en `WHATSAPP_MANUAL.md`.
+    - Se unificaron las instrucciones de instalación y el manual de uso rápido en el mismo archivo `WHATSAPP_MANUAL.md`.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
