@@ -118,55 +118,61 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
           <div className={styles.uploadWrapper}>
             
             {/* Formulario de Entrada Manual */}
-            <form onSubmit={handleManualAdd} className={styles.addForm}>
-              <input 
-                type="text" 
-                className={`input-field ${styles.addInput}`} 
-                placeholder="Establecimiento o concepto..."
-                value={manualStore}
-                onChange={e => setManualStore(e.target.value)}
-                disabled={isManualLoading || isUploading}
-              />
-              <input 
-                type="number" 
-                step="0.01"
-                className={`input-field ${styles.addInputAmount}`} 
-                placeholder="0.00 €"
-                value={manualAmount}
-                onChange={e => setManualAmount(e.target.value ? Number(e.target.value) : '')}
-                disabled={isManualLoading || isUploading}
-              />
-              <button type="submit" className={`btn ${styles.addBtn}`} disabled={isManualLoading || isUploading || !manualStore.trim() || manualAmount === ''}>
-                {isManualLoading ? '⏳' : '+ Añadir'}
-              </button>
-            </form>
+            <div className={styles.inputRow}>
+              <span className={styles.rowLabel}>Manualmente</span>
+              <form onSubmit={handleManualAdd} className={styles.addForm}>
+                <input 
+                  type="text" 
+                  className={`input-field ${styles.addInput}`} 
+                  placeholder="Establecimiento o concepto..."
+                  value={manualStore}
+                  onChange={e => setManualStore(e.target.value)}
+                  disabled={isManualLoading || isUploading}
+                />
+                <input 
+                  type="number" 
+                  step="0.01"
+                  className={`input-field ${styles.addInputAmount}`} 
+                  placeholder="0.00 €"
+                  value={manualAmount}
+                  onChange={e => setManualAmount(e.target.value ? Number(e.target.value) : '')}
+                  disabled={isManualLoading || isUploading}
+                />
+                <button type="submit" className={`btn ${styles.addBtn}`} disabled={isManualLoading || isUploading || !manualStore.trim() || manualAmount === ''}>
+                  {isManualLoading ? '⏳' : '+ Añadir'}
+                </button>
+              </form>
+            </div>
 
             <div className={styles.orDivider}>
               <span className={styles.orText}>o escanea un ticket</span>
             </div>
 
             {/* Escáner de IA */}
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-            <button 
-              className={`btn ${styles.uploadBtn}`}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading || isManualLoading}
-              style={{ opacity: isUploading ? 0.7 : 1 }}
-            >
-              {isUploading && !receiptData ? (
-                '⏳ Procesando con IA...'
-              ) : (
-                <>
-                  <span style={{ fontSize: '1.5rem' }}>📸</span> Escanear Nuevo Ticket
-                </>
-              )}
-            </button>
+            <div className={styles.inputRow}>
+              <span className={styles.rowLabel}>Fotográficamente</span>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              <button 
+                className={`btn ${styles.uploadBtn}`}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading || isManualLoading}
+                style={{ opacity: isUploading ? 0.7 : 1 }}
+              >
+                {isUploading && !receiptData ? (
+                  '⏳ Procesando con IA...'
+                ) : (
+                  <>
+                    <span style={{ fontSize: '1.5rem' }}>📸</span> Escanear Nuevo Ticket
+                  </>
+                )}
+              </button>
+            </div>
             
             <div className={styles.uploadHelperText}>
               Sube una foto y la IA extraerá los datos automáticamente
