@@ -3,6 +3,7 @@
 NAS_USER="smp"
 NAS_IP="192.168.178.60"
 NAS_DIR="/share/CACHEDEV1_DATA/Container/watchtower"
+NAS_PORT="8222"
 
 echo "🚀 Iniciando instalación global de WatchTower en el NAS..."
 
@@ -24,15 +25,15 @@ EOF
 
 # 2. Preparar la carpeta en el NAS y ajustar permisos
 echo "🔧 Preparando la carpeta en el servidor..."
-ssh -t ${NAS_USER}@${NAS_IP} "sudo mkdir -p ${NAS_DIR} && sudo chown -R ${NAS_USER} ${NAS_DIR}"
+ssh -p ${NAS_PORT} -t ${NAS_USER}@${NAS_IP} "sudo mkdir -p ${NAS_DIR} && sudo chown -R ${NAS_USER} ${NAS_DIR}"
 
 # 3. Enviar el archivo
 echo "📦 Enviando configuración de WatchTower..."
-rsync -v watchtower-compose.yml ${NAS_USER}@${NAS_IP}:${NAS_DIR}/docker-compose.yml
+rsync -v -e "ssh -p ${NAS_PORT}" watchtower-compose.yml ${NAS_USER}@${NAS_IP}:${NAS_DIR}/docker-compose.yml
 
 # 4. Arrancar WatchTower en el NAS
 echo "⚙️  Arrancando WatchTower..."
-ssh -t ${NAS_USER}@${NAS_IP} "source /etc/profile && cd ${NAS_DIR} && sudo docker rm -f watchtower || true && sudo docker compose up -d"
+ssh -p ${NAS_PORT} -t ${NAS_USER}@${NAS_IP} "source /etc/profile && cd ${NAS_DIR} && sudo docker rm -f watchtower || true && sudo docker compose up -d"
 DEPLOY_STATUS=$?
 
 # 5. Limpieza local
