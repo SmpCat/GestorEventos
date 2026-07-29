@@ -78,10 +78,12 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
     try {
       const res = await processReceiptAction(formData);
-      if (res.success && res.data) {
-        setReceiptData(res.data);
-        if (res.scanError) {
-          setScanWarning(res.scanError);
+      if (res.success) {
+        if (res.isScanned && res.data) {
+          setReceiptData(res.data);
+        } else {
+          alert(res.message || "La IA no pudo leer el ticket, pero se ha guardado correctamente en la galería inferior de Tickets Originales.");
+          router.refresh();
         }
       } else {
         setError(res.error || "Error al leer el ticket.");
@@ -325,107 +327,114 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       )}
 
       {/* Listado de Elementos */}
-      <div className={styles.listHeader}>
-        <h3 className={styles.listHeaderTitle}>📊 Lista de Gastos</h3>
-        <div className={styles.listHeaderTotal}>
-          {expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}&nbsp;€
-        </div>
-      </div>
-      
-      <div className="glass-panel" style={{ marginBottom: '2rem' }}>
-        <div className={styles.innerBlackBox}>
-          <div className={styles.expensesList}>
-            {expenses.length === 0 ? (
-              <p className={styles.emptyState}>Aún no se ha registrado ningún gasto.</p>
-            ) : (
-              expenses.map((expense) => {
-                const canDelete = isAdmin || expense.purchaserId === currentUserId;
-                const dateStr = new Date(expense.date).toLocaleString('es-ES', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                });
+      {(() => {
+        const visibleExpenses = expenses.filter((exp: any) => exp.isScanned || exp.amount > 0);
+        return (
+          <>
+            <div className={styles.listHeader}>
+              <h3 className={styles.listHeaderTitle}>📊 Lista de Gastos</h3>
+              <div className={styles.listHeaderTotal}>
+                {visibleExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0).toFixed(2)}&nbsp;€
+              </div>
+            </div>
+            
+            <div className="glass-panel" style={{ marginBottom: '2rem' }}>
+              <div className={styles.innerBlackBox}>
+                <div className={styles.expensesList}>
+                  {visibleExpenses.length === 0 ? (
+                    <p className={styles.emptyState}>Aún no se ha registrado ningún gasto.</p>
+                  ) : (
+                    visibleExpenses.map((expense) => {
+                      const canDelete = isAdmin || expense.purchaserId === currentUserId;
+                      const dateStr = new Date(expense.date).toLocaleString('es-ES', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      });
 
-                return (
-                  <div key={expense.id} className={styles.expenseCard}>
-                    
-                    {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete/ReScan Buttons */}
-                    <div className={styles.expenseTopRow}>
-                      <div className={styles.expenseMeta}>
-                        <div className={styles.expenseMetaInfo}>
-                          <div className={styles.expenseDateUser}>
-                            {dateStr} <span style={{ margin: '0 0.25rem' }}>•</span> <strong className={styles.expenseUser}>{expense.purchaser.name}</strong>
-                            {!expense.isScanned && (
-                              <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', backgroundColor: 'rgba(234, 179, 8, 0.15)', color: '#fef08a', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                                ⚠️ No digitalizado
-                              </span>
-                            )}
+                      return (
+                        <div key={expense.id} className={styles.expenseCard}>
+                          
+                          {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete/ReScan Buttons */}
+                          <div className={styles.expenseTopRow}>
+                            <div className={styles.expenseMeta}>
+                              <div className={styles.expenseMetaInfo}>
+                                <div className={styles.expenseDateUser}>
+                                  {dateStr} <span style={{ margin: '0 0.25rem' }}>•</span> <strong className={styles.expenseUser}>{expense.purchaser.name}</strong>
+                                  {!expense.isScanned && (
+                                    <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', backgroundColor: 'rgba(234, 179, 8, 0.15)', color: '#fef08a', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                      ⚠️ No digitalizado
+                                    </span>
+                                  )}
+                                </div>
+                                {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && (
+                                  <div className={styles.expenseStore}>{expense.store}</div>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* Action Buttons */}
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                              {!expense.isScanned && expense.images.length > 0 && (
+                                <button
+                                  onClick={() => handleReScan(expense.id)}
+                                  disabled={loading === `rescan-exp-${expense.id}`}
+                                  className={styles.expenseReScanBtn}
+                                  title="Intentar volver a escanear ticket con IA"
+                                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '0.95rem' }}
+                                >
+                                  {loading === `rescan-exp-${expense.id}` ? '⏳' : '🔄'}
+                                </button>
+                              )}
+                              {canDelete && (
+                                <button 
+                                  onClick={() => handleDelete(expense.id)}
+                                  disabled={loading === expense.id}
+                                  className={styles.expenseDeleteBtn}
+                                  title="Eliminar gasto"
+                                >
+                                  {loading === expense.id ? '⏳' : <TrashIcon />}
+                                </button>
+                              )}
+                            </div>
                           </div>
-                          {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && (
-                            <div className={styles.expenseStore}>{expense.store}</div>
+                          
+                          {/* Description if present */}
+                          {expense.description && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
+                            <div className={styles.expenseDescription}>
+                              {expense.description}
+                            </div>
                           )}
-                        </div>
-                      </div>
-                      
-                      {/* Action Buttons */}
-                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        {!expense.isScanned && expense.images.length > 0 && (
-                          <button
-                            onClick={() => handleReScan(expense.id)}
-                            disabled={loading === `rescan-exp-${expense.id}`}
-                            className={styles.expenseReScanBtn}
-                            title="Intentar volver a escanear ticket con IA"
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '0.95rem' }}
-                          >
-                            {loading === `rescan-exp-${expense.id}` ? '⏳' : '🔄'}
-                          </button>
-                        )}
-                        {canDelete && (
-                          <button 
-                            onClick={() => handleDelete(expense.id)}
-                            disabled={loading === expense.id}
-                            className={styles.expenseDeleteBtn}
-                            title="Eliminar gasto"
-                          >
-                            {loading === expense.id ? '⏳' : <TrashIcon />}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Description if present */}
-                    {expense.description && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
-                      <div className={styles.expenseDescription}>
-                        {expense.description}
-                      </div>
-                    )}
 
-                    {/* Items and Total */}
-                    <div className={styles.expenseItemsContainer}>
-                      <div className={styles.expenseItemsList}>
-                        {expense.items.map((item: any, idx: number) => (
-                          <div key={idx} className={styles.expenseItemRow}>
-                            <span>{item.quantity}x {item.name}</span>
-                            {item.price > 0 && (
-                              <span className={styles.expenseItemPrice}>{item.price.toFixed(2)}&nbsp;€</span>
-                            )}
+                          {/* Items and Total */}
+                          <div className={styles.expenseItemsContainer}>
+                            <div className={styles.expenseItemsList}>
+                              {expense.items.map((item: any, idx: number) => (
+                                <div key={idx} className={styles.expenseItemRow}>
+                                  <span>{item.quantity}x {item.name}</span>
+                                  {item.price > 0 && (
+                                    <span className={styles.expenseItemPrice}>{item.price.toFixed(2)}&nbsp;€</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            <div className={styles.expenseTotalRow}>
+                              <span>Total</span>
+                              <span className={styles.expenseTotalValue}>{expense.amount.toFixed(2)}&nbsp;€</span>
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                      <div className={styles.expenseTotalRow}>
-                        <span>Total</span>
-                        <span className={styles.expenseTotalValue}>{expense.amount.toFixed(2)}&nbsp;€</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      })()}
 
       {/* Galería de Evidencias (Tickets Originales) */}
       {(() => {

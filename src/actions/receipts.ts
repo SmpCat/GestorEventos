@@ -43,33 +43,51 @@ export async function processReceiptAction(formData: FormData) {
 
     // 2. Analizar con Gemini AI
     // Escaneamos la imagen guardada. La función ya la convierte a base64
-    let aiData;
-    let scanError = null;
-    let isScanned = true;
     try {
-      aiData = await scanReceiptWithAI(imageUrl, file.type);
+      const aiData = await scanReceiptWithAI(imageUrl, file.type);
+      return {
+        success: true,
+        isScanned: true,
+        data: {
+          ...aiData,
+          imageUrl,
+          isScanned: true,
+        } as ReceiptData,
+      };
     } catch (err: any) {
-      console.error("Error al escanear con IA (fallback manual activo):", err);
-      scanError = "La IA no ha podido digitalizar el ticket automáticamente, pero la imagen se ha guardado correctamente. Introduce los detalles a continuación:";
-      isScanned = false;
-      aiData = {
-        store: "",
-        amount: 0,
-        date: new Date().toISOString().split('T')[0],
-        items: []
+      console.error("Error al escanear con IA (guardado directo a 0 activo):", err);
+      
+      const session = await getSession();
+      if (!session) return { success: false, error: "No autorizado" };
+
+      const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
+      if (!activeEvent) return { success: false, error: "No hay evento activo" };
+
+      // Creamos el gasto a 0€ directamente vinculando la imagen (se ocultará arriba pero saldrá en galería)
+      await prisma.expense.create({
+        data: {
+          description: `Compra en Comercio desconocido (Sin digitalizar)`,
+          store: "Comercio desconocido",
+          amount: 0,
+          date: new Date(),
+          isScanned: false,
+          eventId: activeEvent.id,
+          purchaserId: session.id,
+          images: {
+            create: [{ url: imageUrl }]
+          }
+        }
+      });
+
+      revalidatePath('/expenses');
+      revalidatePath('/pricing/results');
+
+      return {
+        success: true,
+        isScanned: false,
+        message: "La IA no pudo leer el ticket, pero se ha guardado correctamente en la galería inferior de Tickets Originales."
       };
     }
-
-    // Devolvemos los datos a la interfaz de usuario para que pueda revisarlos
-    return {
-      success: true,
-      scanError,
-      data: {
-        ...aiData,
-        imageUrl,
-        isScanned,
-      } as ReceiptData,
-    };
 } catch (error: any) {
     console.error("Error en processReceiptAction:", error);
     return { success: false, error: error.message || "Error desconocido procesando el ticket." };
