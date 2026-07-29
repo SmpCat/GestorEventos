@@ -175,7 +175,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
             </div>
 
             <div className={styles.orDivider}>
-              <span className={styles.orText}>o escanea un ticket</span>
+              <span className={styles.orText}>o alternativamente...</span>
             </div>
 
             {/* Escáner de IA */}
