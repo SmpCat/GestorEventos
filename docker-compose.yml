@@ -17,6 +17,7 @@ services:
       - DATABASE_URL=file:/app/data/prod.db
       - NEXT_PUBLIC_BASE_URL=https://eventos-pro.duckdns.org
       - JWT_SECRET=cambia_esta_clave_por_una_super_segura_para_el_nas
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     networks:
       - proxy_network
 
