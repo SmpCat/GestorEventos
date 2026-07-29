@@ -17,6 +17,7 @@ Lista de tareas pendientes que abordaremos en las próximas sesiones para remata
 - [ ] Programar un script automático que haga una copia de seguridad periódica de la configuración del router.
 - [ ] Guardar esas copias de seguridad de forma segura en el NAS QNAP.
 - [x] **Configurar WatchTower globalmente**: Reinstalar y configurar WatchTower a nivel general en el NAS (excluyendo a GestorEventos) para que actualice de forma automática y silenciosa el resto de aplicaciones públicas (Pi-Hole, Plex, etc.).
+- [ ] **Google TV Paula (Wi-Fi en suspensión)**: Activar las opciones de desarrollo en el Google TV/Chromecast de Paula y habilitar "Mantener Wi-Fi activo durante la suspensión" para que reporte el estado correcto `off` (amarillo) en standby en lugar de `unavailable` (gris) en Home Assistant.
 
 ### 4. 🚀 GestorEventos V2: Funcionalidad Avanzada y Transparencia
 - [x] **Modo "No lo sé aún" (Solo Lectura):** Permitir a los usuarios saltar la pantalla de "Únete a la fiesta" seleccionando que no saben sus días. Entrarán a la app con permisos capados (sin poder subir gastos) y un aviso elegante que les invite a confirmar sus días para desbloquear el 100% de la app.

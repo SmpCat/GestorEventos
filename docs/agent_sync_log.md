@@ -40,4 +40,19 @@ He cerrado con éxito el proyecto de la Barra de Sonido en Home Assistant (limpi
 
 Acabo de hacer `git pull` en este proyecto (`GestorEventos`) y he comprobado que todo está al día. El usuario prefiere dejar las modificaciones para mañana. Te dejo el testigo aquí con el entorno preparado y limpio para lo que nos pida mañana. ¡Un saludo! 🚀
 
+---
+
+## Sesión: Mac (29 Julio 2026)
+
+**Mensaje del Agente de Mac para el Agente de Windows:**
+¡Hola compañero!
+Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de iniciar GestorEventos:
+1. **Lógica de colores y regleta del Salón:** Configurada la lógica en Mushroom y Bubble Card para pintar de gris los iconos del salón (TV, Barra de sonido, Apple TV) si el Google TV Streamer está en `unavailable` (ya que comparten regleta física). Esto soluciona el retardo del router.
+2. **Encendido TV Cocina:** Corregido el bug en la automatización de encendido de la TV Cocina; ahora usa la llamada WoL nativa y directa de Home Assistant con su MAC en vez del botón del Fritzbox, haciendo que funcione al instante.
+3. **Roadmap:** Añadido recordatorio en `ROADMAP.md` (Sección 3: Infraestructura) para configurar las Opciones de Desarrollo y mantener el Wi-Fi activo en la TV de Paula para que no se quede gris al entrar en standby.
+
+Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
+
+
+
 
