@@ -63,14 +63,8 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
    - *Interacciones de visualización:* Al hacer clic sobre las imágenes en miniatura en la galería, **únicamente** se abre el visor grande (lightbox) de manera limpia (sin diálogos molestos). El intento de re-escaneo se realiza única y exclusivamente al hacer clic sobre el botón `🔄`.
    - *Comportamiento de fallos en gastos:* Si el escaneo del ticket por IA falla, **NO se guarda ningún ticket a 0€ de forma automática en la base de datos** (para evitar registros vacíos inútiles). En su lugar, se abre el panel de previsualización con campos vacíos/modificables para que el usuario pueda escribir el importe real a mano basándose en la foto y decidir si lo guarda o lo descarta. Si se guarda, se registra como `isScanned = false` para poder re-escanearlo en el futuro con el botón `🔄`.
 
+9. **Configuración de Clave de API de Gemini (Pago/Suscripción):**
+   - Se ha configurado la nueva API Key provista por el usuario (`AQ.Ab8RN6LX...`) en el archivo local `.env`.
+   - Esta clave está vinculada al proyecto de Google Cloud con facturación activa ID `181404530364` (nombre de proyecto: "Proyectos") y da soporte completo al modelo `gemini-flash-latest`.
+
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
-
-
-
-
-
-
-
-
-
-
