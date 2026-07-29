@@ -168,7 +168,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                   '⏳ Procesando con IA...'
                 ) : (
                   <>
-                    <span style={{ fontSize: '1.5rem' }}>📸</span> Escanear Nuevo Ticket
+                    <span style={{ fontSize: '1.5rem' }}>📸</span> Subir o hacer foto a un ticket
                   </>
                 )}
               </button>
