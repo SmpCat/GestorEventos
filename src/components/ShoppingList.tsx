@@ -233,48 +233,54 @@ export default function ShoppingList({ items, evidences, eventId, users, current
       <div className="glass-panel">
         <div className={styles.innerBlackBox}>
           <div className={styles.addFormWrapper}>
-            <form onSubmit={handleAdd} className={styles.addForm}>
-              <input 
-                type="text" 
-                className={`input-field ${styles.addInput}`} 
-                placeholder="Escribe un producto..."
-                value={newItemName}
-                onChange={e => setNewItemName(e.target.value)}
-                disabled={loading === 'add'}
-              />
-              <button type="submit" className={`btn ${styles.addBtn}`} disabled={loading === 'add' || !newItemName.trim()}>
-                +
-              </button>
-            </form>
+            <div className={styles.inputRow}>
+              <span className={styles.rowLabel}>Manualmente</span>
+              <form onSubmit={handleAdd} className={styles.addForm}>
+                <input 
+                  type="text" 
+                  className={`input-field ${styles.addInput}`} 
+                  placeholder="Escribe un producto..."
+                  value={newItemName}
+                  onChange={e => setNewItemName(e.target.value)}
+                  disabled={loading === 'add'}
+                />
+                <button type="submit" className={`btn ${styles.addBtn}`} disabled={loading === 'add' || !newItemName.trim()}>
+                  +
+                </button>
+              </form>
+            </div>
             
             <div className={styles.orDivider}>
               <span className={styles.orText}>o alternativamente...</span>
             </div>
 
-            <input 
-              type="file" 
-              accept="image/*" 
-              id="ai-scanner-input" 
-              className="hidden" 
-              onChange={handleImageUpload} 
-              disabled={loading === 'scanning'}
-              style={{ display: 'none' }}
-            />
-            <button 
-              type="button"
-              className={`btn ${styles.uploadBtn}`}
-              onClick={() => document.getElementById('ai-scanner-input')?.click()}
-              disabled={loading === 'scanning'}
-              style={{ opacity: loading === 'scanning' ? 0.7 : 1 }}
-            >
-              {loading === 'scanning' ? (
-                '⏳ Procesando con IA...'
-              ) : (
-                <>
-                  <span style={{ fontSize: '1.5rem' }}>📸</span> Subir o hacer foto a una lista
-                </>
-              )}
-            </button>
+            <div className={styles.inputRow}>
+              <span className={styles.rowLabel}>Fotográficamente</span>
+              <input 
+                type="file" 
+                accept="image/*" 
+                id="ai-scanner-input" 
+                className="hidden" 
+                onChange={handleImageUpload} 
+                disabled={loading === 'scanning'}
+                style={{ display: 'none' }}
+              />
+              <button 
+                type="button"
+                className={`btn ${styles.uploadBtn}`}
+                onClick={() => document.getElementById('ai-scanner-input')?.click()}
+                disabled={loading === 'scanning'}
+                style={{ opacity: loading === 'scanning' ? 0.7 : 1 }}
+              >
+                {loading === 'scanning' ? (
+                  '⏳ Procesando con IA...'
+                ) : (
+                  <>
+                    <span style={{ fontSize: '1.5rem' }}>📸</span> Subir o hacer foto a una lista
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
