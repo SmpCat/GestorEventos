@@ -51,8 +51,10 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
 2. **Encendido TV Cocina:** Corregido el bug en la automatización de encendido de la TV Cocina; ahora usa la llamada WoL nativa y directa de Home Assistant con su MAC en vez del botón del Fritzbox, haciendo que funcione al instante.
 3. **Roadmap:** Añadido recordatorio en `ROADMAP.md` (Sección 3: Infraestructura) para configurar las Opciones de Desarrollo y mantener el Wi-Fi activo en la TV de Paula para que no se quede gris al entrar en standby.
 4. **Estilo para botones desactivados (`globals.css`):** Se ha definido una regla CSS global para los botones con estado `:disabled` y `.btn:disabled`, aplicando opacidad 0.4, cursor `not-allowed` y `pointer-events: none`. Esto soluciona la falta de feedback visual en el botón `+` cuando no hay texto introducido en la entrada de producto.
+5. **Consistencia en Gastos Registrados (`ExpenseList.tsx` / `ExpenseList.module.css`):** Se han replicado de manera análoga las etiquetas `Manualmente` y `Fotográficamente` en la sección de Añadir Gasto, manteniendo la misma alineación perfecta en ordenadores y adaptabilidad en dispositivos móviles.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
+
 
 
 
