@@ -137,6 +137,34 @@ export async function deleteItem(itemId: string) {
 // ==============================================================
 
 export async function scanShoppingListAI(eventId: string, base64Image: string, mimeType: string) {
+  let savedEvidenceUrl = null;
+  
+  // 1. Guardar la evidencia física y en base de datos INMEDIATAMENTE
+  try {
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
+    const filename = `lista-${crypto.randomBytes(6).toString('hex')}.jpg`;
+    const filepath = path.join(uploadDir, filename);
+    
+    // Guardar archivo
+    fs.writeFileSync(filepath, Buffer.from(base64Image, 'base64'));
+    
+    // Registrar en base de datos
+    const evidence = await prisma.shoppingListEvidence.create({
+      data: {
+        url: `/uploads/shopping-lists/${filename}`,
+        eventId
+      }
+    });
+    savedEvidenceUrl = evidence.url;
+  } catch (err: any) {
+    console.error("Error guardando la evidencia inicial:", err);
+  }
+
+  // 2. Procesar con la IA
   try {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('No hay clave de API de Gemini configurada en el servidor.');
@@ -173,11 +201,21 @@ Ejemplo de salida exacta que espero de ti:
     try {
       parsedItems = JSON.parse(cleanedText);
     } catch (e) {
-      return { success: false, error: 'La IA no devolvió un formato válido. Intentó responder: ' + cleanedText };
+      revalidatePath('/shopping');
+      return { 
+        success: false, 
+        error: 'La IA no devolvió un formato válido, pero la foto se guardó en la galería. Intentó responder: ' + cleanedText,
+        savedEvidenceUrl 
+      };
     }
 
     if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
-       return { success: false, error: 'La IA no pudo detectar artículos en la imagen.' };
+      revalidatePath('/shopping');
+      return { 
+        success: false, 
+        error: 'La IA no pudo detectar artículos en la imagen, pero la foto se guardó en la galería.', 
+        savedEvidenceUrl 
+      };
     }
 
     // Preparamos los datos para la BBDD
@@ -191,35 +229,16 @@ Ejemplo de salida exacta que espero de ti:
       data: dataToInsert
     });
 
-    // Guardado físico de la evidencia
-    try {
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists');
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      
-      const filename = `lista-${crypto.randomBytes(6).toString('hex')}.jpg`;
-      const filepath = path.join(uploadDir, filename);
-      
-      // Guardar archivo
-      fs.writeFileSync(filepath, Buffer.from(base64Image, 'base64'));
-      
-      // Registrar en base de datos
-      await prisma.shoppingListEvidence.create({
-        data: {
-          url: `/uploads/shopping-lists/${filename}`,
-          eventId
-        }
-      });
-    } catch (err: any) {
-      console.error("Error guardando la evidencia:", err);
-      // No hacemos throw aquí para no cancelar el success de la IA si la imagen falla al guardar
-    }
-
     revalidatePath('/shopping');
-    return { success: true, count: parsedItems.length };
+    return { success: true, count: parsedItems.length, savedEvidenceUrl };
+
   } catch (error: any) {
-    return { success: false, error: 'Error procesando la imagen con IA: ' + error.message };
+    revalidatePath('/shopping'); // Para asegurarnos de que la galería muestre la foto guardada
+    return { 
+      success: false, 
+      error: 'La IA no pudo procesar la lista: ' + error.message + '. Pero la foto se guardó correctamente en la galería inferior.',
+      savedEvidenceUrl 
+    };
   }
 }
 

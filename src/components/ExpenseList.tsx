@@ -13,6 +13,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
   
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [scanWarning, setScanWarning] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -67,6 +68,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
     setIsUploading(true);
     setError(null);
+    setScanWarning(null);
     setReceiptData(null);
 
     const formData = new FormData();
@@ -76,6 +78,9 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       const res = await processReceiptAction(formData);
       if (res.success && res.data) {
         setReceiptData(res.data);
+        if (res.scanError) {
+          setScanWarning(res.scanError);
+        }
       } else {
         setError(res.error || "Error al leer el ticket.");
       }
@@ -96,6 +101,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       setIsUploading(false);
     } else {
       setReceiptData(null);
+      setScanWarning(null);
       setIsUploading(false);
     }
   };
@@ -192,12 +198,26 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
         <div className={`glass-panel ${styles.previewContainer}`} style={{ marginBottom: '4rem' }}>
           <div className={styles.previewHeader}>
             <h3 className={styles.previewTitle}>
-              <span>✨</span> Datos Extraídos con Éxito
+              {scanWarning ? (
+                <><span>⚠️</span> Introducción Manual (IA no disponible)</>
+              ) : (
+                <><span>✨</span> Datos Extraídos con Éxito</>
+              )}
             </h3>
-            <p className={styles.previewSubtitle}>Revisa y confirma los detalles antes de guardar el gasto.</p>
+            <p className={styles.previewSubtitle}>
+              {scanWarning 
+                ? "La IA no pudo procesar la imagen, pero se ha guardado. Introduce los detalles a continuación:" 
+                : "Revisa y confirma los detalles antes de guardar el gasto."}
+            </p>
           </div>
           
           <div className={styles.previewBody}>
+            {scanWarning && (
+              <div className={styles.warningBox}>
+                ⚠️ {scanWarning}
+              </div>
+            )}
+
             <div className={styles.previewFlexRow}>
               {/* Imagen */}
               <div className={styles.previewImageCol}>
@@ -217,6 +237,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                       value={receiptData.store}
                       onChange={(e) => setReceiptData({...receiptData, store: e.target.value})}
                       className={`input-field ${styles.previewInput}`} 
+                      placeholder="Ej. Mercadona, Consum..."
                     />
                   </div>
                   <div className={styles.previewInputGroup}>
@@ -235,9 +256,10 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                   <input 
                     type="number" 
                     step="0.01" 
-                    value={receiptData.amount} 
+                    value={receiptData.amount || ''} 
                     onChange={(e) => setReceiptData({...receiptData, amount: parseFloat(e.target.value) || 0})}
                     className={`input-field ${styles.previewInput} ${styles.previewInputAmount}`} 
+                    placeholder="0.00"
                   />
                 </div>
 
@@ -246,15 +268,19 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                     Artículos Detectados ({receiptData.items?.length || 0})
                   </label>
                   <div className={`custom-scrollbar ${styles.previewItemsList}`}>
-                    {receiptData.items?.map((item, idx) => (
-                      <div key={idx} className={styles.previewItemRow}>
-                        <div className={styles.previewItemLeft}>
-                          <span className={styles.previewItemQty}>{item.quantity}x</span>
-                          <span className={styles.previewItemName} title={item.name}>{item.name}</span>
+                    {receiptData.items?.length === 0 ? (
+                      <p style={{ fontStyle: 'italic', opacity: 0.5, fontSize: '0.9rem', padding: '0.5rem 0' }}>Ningún artículo detectado automáticamente.</p>
+                    ) : (
+                      receiptData.items?.map((item, idx) => (
+                        <div key={idx} className={styles.previewItemRow}>
+                          <div className={styles.previewItemLeft}>
+                            <span className={styles.previewItemQty}>{item.quantity}x</span>
+                            <span className={styles.previewItemName} title={item.name}>{item.name}</span>
+                          </div>
+                          <span className={styles.previewItemPrice}>{item.price.toFixed(2)} €</span>
                         </div>
-                        <span className={styles.previewItemPrice}>{item.price.toFixed(2)} €</span>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -262,7 +288,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
             <div className={styles.previewActions}>
               <button 
-                onClick={() => setReceiptData(null)} 
+                onClick={() => { setReceiptData(null); setScanWarning(null); }} 
                 className={`btn ${styles.cancelBtn}`}
               >
                 Cancelar y Descartar

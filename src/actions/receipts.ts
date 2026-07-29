@@ -42,11 +42,25 @@ export async function processReceiptAction(formData: FormData) {
 
     // 2. Analizar con Gemini AI
     // Escaneamos la imagen guardada. La función ya la convierte a base64
-    const aiData = await scanReceiptWithAI(imageUrl, file.type);
+    let aiData;
+    let scanError = null;
+    try {
+      aiData = await scanReceiptWithAI(imageUrl, file.type);
+    } catch (err: any) {
+      console.error("Error al escanear con IA (fallback manual activo):", err);
+      scanError = "La IA no ha podido digitalizar el ticket automáticamente, pero la imagen se ha guardado correctamente. Introduce los detalles a continuación:";
+      aiData = {
+        store: "",
+        amount: 0,
+        date: new Date().toISOString().split('T')[0],
+        items: []
+      };
+    }
 
     // Devolvemos los datos a la interfaz de usuario para que pueda revisarlos
     return {
       success: true,
+      scanError,
       data: {
         ...aiData,
         imageUrl,
