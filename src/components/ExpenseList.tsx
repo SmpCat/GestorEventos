@@ -81,6 +81,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       if (res.success) {
         if (res.isScanned && res.data) {
           setReceiptData(res.data);
+          alert("¡Magia! La IA ha leído el ticket. Revisa los datos y pulsa en 'Confirmar Gasto' abajo.");
         } else {
           alert(res.message || "La IA no pudo leer el ticket, pero se ha guardado correctamente en la galería inferior de Tickets Originales.");
           router.refresh();
