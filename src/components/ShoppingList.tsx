@@ -237,7 +237,10 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
   return (
     <div className={styles.container}>
-      <AiLoadingOverlay isVisible={loading === 'scanning'} message="Vinculando productos del ticket con la lista..." />
+      <AiLoadingOverlay 
+        isVisible={loading === 'scanning' || (typeof loading === 'string' && loading.startsWith('rescan-ev-'))} 
+        message={typeof loading === 'string' && loading.startsWith('rescan-ev-') ? "Re-escaneando lista con IA..." : "Vinculando productos del ticket con la lista..."} 
+      />
       
       <div className={styles.headerRow}>
         <div>
