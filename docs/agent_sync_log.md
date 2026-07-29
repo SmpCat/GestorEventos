@@ -56,8 +56,13 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
 7. **Resiliencia en Carga de Fotos (Evidencias):**
    - *Lista de Compra:* Modificado `scanShoppingListAI` para guardar físicamente y registrar la imagen en la BBDD al inicio. Si la IA falla, la imagen no se pierde y aparece en la galería.
    - *Gastos Registrados:* Modificado `processReceiptAction` para capturar fallos de Gemini y retornar un fallback con la imagen guardada. El componente `ExpenseList.tsx` muestra un panel amarillo de advertencia, permitiendo rellenar los datos a mano sobre la previsualización del ticket guardado.
+8. **Re-escaneo de tickets y listas con IA:**
+   - *Base de Datos:* Añadido campo `isScanned Boolean @default(true)` en `ShoppingListEvidence` y `Expense`. Sincronizado mediante `npx prisma db push`.
+   - *Acciones:* Creadas `reScanShoppingListAI` y `reScanExpenseAI` para re-procesar los archivos locales y rellenar productos/datos financieros de forma automática si falló en el primer intento.
+   - *UI:* Añadidas marcas visuales (`✅` para éxito, `⚠️` para no digitalizados), botones `🔄` dedicados a re-escaneo, e interacción al hacer clic en las imágenes no procesadas que pregunta al usuario si desea volver a intentarlo.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
+
 
 
 
