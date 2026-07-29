@@ -50,8 +50,11 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
 1. **Lógica de colores y regleta del Salón:** Configurada la lógica en Mushroom y Bubble Card para pintar de gris los iconos del salón (TV, Barra de sonido, Apple TV) si el Google TV Streamer está en `unavailable` (ya que comparten regleta física). Esto soluciona el retardo del router.
 2. **Encendido TV Cocina:** Corregido el bug en la automatización de encendido de la TV Cocina; ahora usa la llamada WoL nativa y directa de Home Assistant con su MAC en vez del botón del Fritzbox, haciendo que funcione al instante.
 3. **Roadmap:** Añadido recordatorio en `ROADMAP.md` (Sección 3: Infraestructura) para configurar las Opciones de Desarrollo y mantener el Wi-Fi activo en la TV de Paula para que no se quede gris al entrar en standby.
+4. **Estilo para botones desactivados (`globals.css`):** Se ha definido una regla CSS global para los botones con estado `:disabled` y `.btn:disabled`, aplicando opacidad 0.4, cursor `not-allowed` y `pointer-events: none`. Esto soluciona la falta de feedback visual en el botón `+` cuando no hay texto introducido en la entrada de producto.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
+
+
 
 
 
