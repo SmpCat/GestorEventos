@@ -53,8 +53,12 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
 4. **Estilo para botones desactivados (`globals.css`):** Se ha definido una regla CSS global para los botones con estado `:disabled` y `.btn:disabled`, aplicando opacidad 0.4, cursor `not-allowed` y `pointer-events: none`. Esto soluciona la falta de feedback visual en el botón `+` cuando no hay texto introducido en la entrada de producto.
 5. **Consistencia en Gastos Registrados (`ExpenseList.tsx` / `ExpenseList.module.css`):** Se han replicado de manera análoga las etiquetas `Manualmente` y `Fotográficamente` en la sección de Añadir Gasto, manteniendo la misma alineación perfecta en ordenadores y adaptabilidad en dispositivos móviles.
 6. **Texto del botón de escaneo (`ExpenseList.tsx`):** Se ha cambiado el texto del botón en Gastos de `Escanear Nuevo Ticket` a `Subir o hacer foto a un ticket`, homogeneizándolo con la lista de la compra.
+7. **Resiliencia en Carga de Fotos (Evidencias):**
+   - *Lista de Compra:* Modificado `scanShoppingListAI` para guardar físicamente y registrar la imagen en la BBDD al inicio. Si la IA falla, la imagen no se pierde y aparece en la galería.
+   - *Gastos Registrados:* Modificado `processReceiptAction` para capturar fallos de Gemini y retornar un fallback con la imagen guardada. El componente `ExpenseList.tsx` muestra un panel amarillo de advertencia, permitiendo rellenar los datos a mano sobre la previsualización del ticket guardado.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
+
 
 
 
