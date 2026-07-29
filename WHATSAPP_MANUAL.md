@@ -3,7 +3,7 @@
 Para que podáis ver los días, los pagos y organizaros fácilmente, os podéis instalar la aplicación en el móvil en 1 minuto. No hace falta buscarla en ninguna tienda, es mucho más fácil:
 
 1️⃣ Entrad en este enlace desde el móvil:
-👉 https://eventos-smp.duckdns.org
+👉 https://eventos-pro.duckdns.org
 
 2️⃣ **Poneos el icono en el móvil:**
 
