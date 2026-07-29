@@ -482,15 +482,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                           </div>
                         </div>
                         <div 
-                          onClick={() => {
-                            if (!ev.isScanned) {
-                              if (window.confirm("Este ticket no se pudo escanear automáticamente por la IA. ¿Quieres intentar volver a escanearlo ahora?")) {
-                                handleReScan(ev.expenseId);
-                                return;
-                              }
-                            }
-                            setLightboxImage(apiImageUrl);
-                          }}
+                          onClick={() => setLightboxImage(apiImageUrl)}
                           className={styles.galleryLink}
                           style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1, cursor: 'pointer' }}
                         >

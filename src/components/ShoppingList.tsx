@@ -412,15 +412,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                           </div>
                         </div>
                         <div 
-                          onClick={() => {
-                            if (!ev.isScanned) {
-                              if (window.confirm("Esta lista no se pudo escanear automáticamente por la IA. ¿Quieres intentar volver a escanearla ahora?")) {
-                                handleReScan(ev.id);
-                                return;
-                              }
-                            }
-                            setLightboxImage(apiImageUrl);
-                          }}
+                          onClick={() => setLightboxImage(apiImageUrl)}
                           className={styles.galleryLink}
                           style={{ opacity: (loading === `delete-ev-${ev.id}` || loading === `rescan-ev-${ev.id}`) ? 0.5 : 1, cursor: 'pointer' }}
                         >
