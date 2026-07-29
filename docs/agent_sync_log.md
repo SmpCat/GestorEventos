@@ -59,7 +59,9 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
 8. **Re-escaneo de tickets y listas con IA:**
    - *Base de Datos:* Añadido campo `isScanned Boolean @default(true)` en `ShoppingListEvidence` y `Expense`. Sincronizado mediante `npx prisma db push`.
    - *Acciones:* Creadas `reScanShoppingListAI` y `reScanExpenseAI` para re-procesar los archivos locales y rellenar productos/datos financieros de forma automática si falló en el primer intento.
-   - *UI:* Añadidas marcas visuales (`✅` para éxito, `⚠️` para no digitalizados), botones `🔄` dedicados a re-escaneo, e interacción al hacer clic en las imágenes no procesadas que pregunta al usuario si desea volver a intentarlo.
+   - *UI:* Añadidas marcas visuales (`✅` para éxito, `⚠️` para no digitalizados) y botones `🔄` dedicados a re-escaneo.
+   - *Interacciones de visualización:* Al hacer clic sobre las imágenes en miniatura en la galería, **únicamente** se abre el visor grande (lightbox) de manera limpia (sin diálogos molestos). El intento de re-escaneo se realiza única y exclusivamente al hacer clic sobre el botón `🔄`.
+   - *Comportamiento de fallos en gastos:* Si el escaneo del ticket por IA falla, **NO se guarda ningún ticket a 0€ de forma automática en la base de datos** (para evitar registros vacíos inútiles). En su lugar, se abre el panel de previsualización con campos vacíos/modificables para que el usuario pueda escribir el importe real a mano basándose en la foto y decidir si lo guarda o lo descarta. Si se guarda, se registra como `isScanned = false` para poder re-escanearlo en el futuro con el botón `🔄`.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
 
