@@ -76,5 +76,7 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
     - Se unificaron las instrucciones de instalación y el manual de uso rápido en el mismo archivo `WHATSAPP_MANUAL.md`.
 13. **Mecanismo de Reintento Automático de IA (Resiliencia 503 / 429):**
     - Se implementó la función `generateContentWithRetry` con backoff exponencial en `src/lib/ai-scanner.ts` y se aplicó a todas las consultas de Gemini en el proyecto. Si la API responde con error 503 (alta demanda) o 429 (límite de velocidad), se reintenta automáticamente hasta 3 veces en segundo plano antes de arrojar un error en pantalla.
+14. **Desplazamiento Automático al Panel de Previsualización (UX):**
+    - Se añadió un efecto (`useEffect` y ref) en `ExpenseList.tsx` que detecta cuando los datos del ticket se han extraído con éxito y desplaza la pantalla automáticamente mediante scroll suave (`scrollIntoView({ behavior: 'smooth' })`) hasta el panel de previsualización. Esto soluciona la confusión en dispositivos móviles donde el formulario de confirmación quedaba oculto debajo del viewport.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀

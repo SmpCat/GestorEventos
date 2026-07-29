@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
@@ -18,6 +18,15 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
   const [scanWarning, setScanWarning] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (receiptData) {
+      setTimeout(() => {
+        previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [receiptData]);
 
   // Estados para entrada manual
   const [manualStore, setManualStore] = useState('');
@@ -220,7 +229,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
 
       {/* Previsualización y Revisión del JSON devuelto */}
       {receiptData && (
-        <div className={`glass-panel ${styles.previewContainer}`} style={{ marginBottom: '4rem' }}>
+        <div ref={previewRef} className={`glass-panel ${styles.previewContainer}`} style={{ marginBottom: '4rem' }}>
           <div className={styles.previewHeader}>
             <h3 className={styles.previewTitle}>
               {scanWarning ? (
