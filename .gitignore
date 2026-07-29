@@ -51,3 +51,7 @@ prisma/dev.db*
 *.zip
 *.tar.gz
 
+# local credentials
+/docs/GEMINI_API_KEY.md
+
+
