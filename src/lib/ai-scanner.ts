@@ -58,6 +58,27 @@ function fileToGenerativePart(filePath: string, mimeType: string) {
   };
 }
 
+export async function generateContentWithRetry(model: any, parts: any[], maxRetries = 3, delayMs = 1500) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await model.generateContent(parts);
+      return result;
+    } catch (error: any) {
+      const errorStr = String(error.message || error);
+      const is503 = errorStr.includes("503") || errorStr.toLowerCase().includes("service unavailable");
+      const is429 = errorStr.includes("429") || errorStr.toLowerCase().includes("too many requests");
+      
+      if ((is503 || is429) && attempt < maxRetries) {
+        console.warn(`[Gemini API] Error ${is503 ? '503' : '429'} (Intento ${attempt}/${maxRetries}). Reintentando en ${delayMs}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        delayMs *= 2; // Backoff exponencial
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+
 export async function scanReceiptWithAI(imagePath: string, mimeType: string = "image/jpeg") {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error("La clave de API de Gemini no está configurada.");
@@ -74,7 +95,7 @@ export async function scanReceiptWithAI(imagePath: string, mimeType: string = "i
       Presta especial atención al importe total pagado y asegúrate de identificar correctamente cada producto individual de la lista.
     `;
 
-    const result = await model.generateContent([prompt, imagePart]);
+    const result = await generateContentWithRetry(model, [prompt, imagePart]);
     const responseText = result.response.text();
     
     // Parsear el JSON devuelto

@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { generateContentWithRetry } from '@/lib/ai-scanner';
 
 // Obtener la lista de la compra de un evento
 export async function getShoppingList(eventId: string) {
@@ -194,7 +195,7 @@ Ejemplo de salida exacta que espero de ti:
       }
     };
 
-    const result = await model.generateContent([prompt, imagePart]);
+    const result = await generateContentWithRetry(model, [prompt, imagePart]);
     const text = result.response.text();
     
     // Limpiamos el texto por si la IA devuelve bloques markdown
@@ -297,7 +298,7 @@ Ejemplo de salida exacta que espero de ti:
       }
     };
 
-    const result = await model.generateContent([prompt, imagePart]);
+    const result = await generateContentWithRetry(model, [prompt, imagePart]);
     const text = result.response.text();
     const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
     

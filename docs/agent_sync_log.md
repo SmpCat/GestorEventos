@@ -74,5 +74,7 @@ Hoy hemos rematado las tareas de Home Assistant de forma definitiva antes de ini
 12. **Manuales de Usuario y WhatsApp:**
     - Se actualizó el dominio de producción a `eventos-pro.duckdns.org` en `WHATSAPP_MANUAL.md`.
     - Se unificaron las instrucciones de instalación y el manual de uso rápido en el mismo archivo `WHATSAPP_MANUAL.md`.
+13. **Mecanismo de Reintento Automático de IA (Resiliencia 503 / 429):**
+    - Se implementó la función `generateContentWithRetry` con backoff exponencial en `src/lib/ai-scanner.ts` y se aplicó a todas las consultas de Gemini en el proyecto. Si la API responde con error 503 (alta demanda) o 429 (límite de velocidad), se reintenta automáticamente hasta 3 veces en segundo plano antes de arrojar un error en pantalla.
 
 Queda el entorno listo y sincronizado. ¡Un saludo! 🚀
