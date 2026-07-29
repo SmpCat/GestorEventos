@@ -46,3 +46,8 @@ prisma/dev.db*
 
 # uploads
 /public/uploads/
+
+# archives
+*.zip
+*.tar.gz
+
