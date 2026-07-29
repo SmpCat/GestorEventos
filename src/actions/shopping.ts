@@ -138,8 +138,9 @@ export async function deleteItem(itemId: string) {
 
 export async function scanShoppingListAI(eventId: string, base64Image: string, mimeType: string) {
   let savedEvidenceUrl = null;
+  let evidenceId = null;
   
-  // 1. Guardar la evidencia física y en base de datos INMEDIATAMENTE
+  // 1. Guardar la evidencia física y en base de datos INMEDIATAMENTE (sin escanear de momento)
   try {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists');
     if (!fs.existsSync(uploadDir)) {
@@ -152,14 +153,16 @@ export async function scanShoppingListAI(eventId: string, base64Image: string, m
     // Guardar archivo
     fs.writeFileSync(filepath, Buffer.from(base64Image, 'base64'));
     
-    // Registrar en base de datos
+    // Registrar en base de datos como NO escaneada inicialmente (isScanned: false)
     const evidence = await prisma.shoppingListEvidence.create({
       data: {
         url: `/uploads/shopping-lists/${filename}`,
-        eventId
+        eventId,
+        isScanned: false
       }
     });
     savedEvidenceUrl = evidence.url;
+    evidenceId = evidence.id;
   } catch (err: any) {
     console.error("Error guardando la evidencia inicial:", err);
   }
@@ -229,6 +232,14 @@ Ejemplo de salida exacta que espero de ti:
       data: dataToInsert
     });
 
+    // Como ha ido bien, marcamos la evidencia como escaneada con éxito
+    if (evidenceId) {
+      await prisma.shoppingListEvidence.update({
+        where: { id: evidenceId },
+        data: { isScanned: true }
+      });
+    }
+
     revalidatePath('/shopping');
     return { success: true, count: parsedItems.length, savedEvidenceUrl };
 
@@ -239,6 +250,88 @@ Ejemplo de salida exacta que espero de ti:
       error: 'La IA no pudo procesar la lista: ' + error.message + '. Pero la foto se guardó correctamente en la galería inferior.',
       savedEvidenceUrl 
     };
+  }
+}
+
+// Re-escanear una lista ya existente en la base de datos
+export async function reScanShoppingListAI(evidenceId: string) {
+  try {
+    const evidence = await prisma.shoppingListEvidence.findUnique({
+      where: { id: evidenceId }
+    });
+    if (!evidence) {
+      return { success: false, error: 'Evidencia no encontrada.' };
+    }
+
+    // Convertir la ruta física a absoluta
+    const filename = evidence.url.replace('/uploads/shopping-lists/', '');
+    const filepath = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists', filename);
+    
+    if (!fs.existsSync(filepath)) {
+      return { success: false, error: 'El archivo físico de la imagen no existe en el servidor.' };
+    }
+
+    // Leer el archivo local
+    const base64Image = fs.readFileSync(filepath).toString('base64');
+    
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('No hay clave de API de Gemini configurada en el servidor.');
+    }
+
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+    
+    const prompt = `Eres un asistente experto en transcripción. 
+Extrae todos los artículos de la lista de la compra de esta imagen. 
+Ignora firmas, títulos u otros textos irrelevantes. 
+Si hay cantidades, inclúyelas junto al nombre (ej. "2 tomates").
+DEVUELVE ÚNICAMENTE UN ARRAY EN FORMATO JSON, sin bloques de código Markdown (\`\`\`), sin la palabra "json".
+Ejemplo de salida exacta que espero de ti:
+["Manzanas", "2 Litros de leche", "Pan de molde", "Patatas"]`;
+
+    const imagePart = {
+      inlineData: {
+        data: base64Image,
+        mimeType: 'image/jpeg'
+      }
+    };
+
+    const result = await model.generateContent([prompt, imagePart]);
+    const text = result.response.text();
+    const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    
+    let parsedItems: string[] = [];
+    try {
+      parsedItems = JSON.parse(cleanedText);
+    } catch (e) {
+      return { success: false, error: 'La IA no devolvió un formato válido. Intentó responder: ' + cleanedText };
+    }
+
+    if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
+      return { success: false, error: 'La IA no pudo detectar artículos en la imagen.' };
+    }
+
+    // Inserción de productos
+    const dataToInsert = parsedItems.map(name => ({
+      name: String(name).trim(),
+      eventId: evidence.eventId
+    }));
+
+    await prisma.shoppingListItem.createMany({
+      data: dataToInsert
+    });
+
+    // Marcar como escaneada con éxito
+    await prisma.shoppingListEvidence.update({
+      where: { id: evidenceId },
+      data: { isScanned: true }
+    });
+
+    revalidatePath('/shopping');
+    return { success: true, count: parsedItems.length };
+  } catch (error: any) {
+    return { success: false, error: 'Error procesando la imagen con IA: ' + error.message };
   }
 }
 

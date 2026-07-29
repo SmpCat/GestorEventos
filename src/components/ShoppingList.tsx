@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, scanShoppingListAI, deleteShoppingListEvidence } from '@/actions/shopping';
+import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, scanShoppingListAI, deleteShoppingListEvidence, reScanShoppingListAI } from '@/actions/shopping';
 import TrashIcon from './TrashIcon';
 import AiLoadingOverlay from './AiLoadingOverlay';
 import ImageLightbox from './ImageLightbox';
@@ -76,6 +76,23 @@ export default function ShoppingList({ items, evidences, eventId, users, current
       setLoading(`delete-ev-${evidenceId}`);
       await deleteShoppingListEvidence(evidenceId);
       router.refresh();
+      setLoading(null);
+    }
+  };
+
+  const handleReScan = async (evidenceId: string) => {
+    setLoading(`rescan-ev-${evidenceId}`);
+    try {
+      const res = await reScanShoppingListAI(evidenceId);
+      if (res.success) {
+        alert(`¡Éxito! La IA ha procesado la lista y ha añadido ${res.count} artículos.`);
+        router.refresh();
+      } else {
+        alert(`No se pudo escanear: ${res.error}`);
+      }
+    } catch (err: any) {
+      alert(`Error al procesar: ${err.message}`);
+    } finally {
       setLoading(null);
     }
   };
@@ -369,22 +386,43 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                   return (
                     <div key={ev.id} className={styles.galleryItem}>
                         <div className={styles.galleryHeader}>
-                          <span className={styles.galleryDate}>
-                            🗓️ {dateStr}
+                          <span className={styles.galleryDate} title={ev.isScanned ? "Escaneado por IA con éxito" : "No escaneado / Error IA"}>
+                            {ev.isScanned ? '✅' : '⚠️'} {dateStr}
                           </span>
-                          <button
-                            onClick={() => handleDeleteEvidence(ev.id)}
-                            disabled={loading === `delete-ev-${ev.id}`}
-                            className={styles.galleryDeleteBtn}
-                            title="Borrar foto"
-                          >
-                            {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
-                          </button>
+                          <div style={{ display: 'flex', gap: '0.25rem' }}>
+                            {!ev.isScanned && (
+                              <button
+                                onClick={() => handleReScan(ev.id)}
+                                disabled={loading === `rescan-ev-${ev.id}` || loading === `delete-ev-${ev.id}`}
+                                className={styles.galleryReScanBtn}
+                                title="Volver a escanear con IA"
+                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff' }}
+                              >
+                                {loading === `rescan-ev-${ev.id}` ? '⏳' : '🔄'}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteEvidence(ev.id)}
+                              disabled={loading === `delete-ev-${ev.id}` || loading === `rescan-ev-${ev.id}`}
+                              className={styles.galleryDeleteBtn}
+                              title="Borrar foto"
+                            >
+                              {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
+                            </button>
+                          </div>
                         </div>
                         <div 
-                          onClick={() => setLightboxImage(apiImageUrl)}
+                          onClick={() => {
+                            if (!ev.isScanned) {
+                              if (window.confirm("Esta lista no se pudo escanear automáticamente por la IA. ¿Quieres intentar volver a escanearla ahora?")) {
+                                handleReScan(ev.id);
+                                return;
+                              }
+                            }
+                            setLightboxImage(apiImageUrl);
+                          }}
                           className={styles.galleryLink}
-                          style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1, cursor: 'pointer' }}
+                          style={{ opacity: (loading === `delete-ev-${ev.id}` || loading === `rescan-ev-${ev.id}`) ? 0.5 : 1, cursor: 'pointer' }}
                         >
                           <img src={apiImageUrl} alt="Ticket" className={styles.galleryImg} />
                         </div>

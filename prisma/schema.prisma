@@ -153,6 +153,7 @@ model ShoppingListItem {
 model ShoppingListEvidence {
   id        String   @id @default(uuid())
   url       String   // Ruta física o URL de la imagen
+  isScanned Boolean  @default(true)
   createdAt DateTime @default(now())
   
   // Relaciones
@@ -168,6 +169,7 @@ model Expense {
   store        String
   amount       Float
   date         DateTime @default(now())
+  isScanned    Boolean  @default(true)
   
   // Relaciones
   purchaserId  String

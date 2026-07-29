@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData } from '@/actions/receipts';
+import { useRouter } from 'next/navigation';
+import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
 import AiLoadingOverlay from './AiLoadingOverlay';
 import ImageLightbox from './ImageLightbox';
 
 export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expenses: any[], isAdmin: boolean, currentUserId: string }) {
+  const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   
@@ -103,6 +105,23 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
       setReceiptData(null);
       setScanWarning(null);
       setIsUploading(false);
+    }
+  };
+
+  const handleReScan = async (expenseId: string) => {
+    setLoading(`rescan-exp-${expenseId}`);
+    try {
+      const res = await reScanExpenseAI(expenseId);
+      if (res.success) {
+        alert("¡Éxito! El ticket ha sido escaneado correctamente y el gasto ha sido actualizado.");
+        router.refresh();
+      } else {
+        alert(`No se pudo escanear: ${res.error}`);
+      }
+    } catch (err: any) {
+      alert(`Error al procesar: ${err.message}`);
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -332,12 +351,17 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                 return (
                   <div key={expense.id} className={styles.expenseCard}>
                     
-                    {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete Button */}
+                    {/* Top Row: Icon, Store (if known) + Date + Purchaser, Delete/ReScan Buttons */}
                     <div className={styles.expenseTopRow}>
                       <div className={styles.expenseMeta}>
                         <div className={styles.expenseMetaInfo}>
                           <div className={styles.expenseDateUser}>
                             {dateStr} <span style={{ margin: '0 0.25rem' }}>•</span> <strong className={styles.expenseUser}>{expense.purchaser.name}</strong>
+                            {!expense.isScanned && (
+                              <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', backgroundColor: 'rgba(234, 179, 8, 0.15)', color: '#fef08a', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                ⚠️ No digitalizado
+                              </span>
+                            )}
                           </div>
                           {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && (
                             <div className={styles.expenseStore}>{expense.store}</div>
@@ -345,8 +369,19 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                         </div>
                       </div>
                       
-                      {/* Delete Button */}
-                      <div>
+                      {/* Action Buttons */}
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        {!expense.isScanned && expense.images.length > 0 && (
+                          <button
+                            onClick={() => handleReScan(expense.id)}
+                            disabled={loading === `rescan-exp-${expense.id}`}
+                            className={styles.expenseReScanBtn}
+                            title="Intentar volver a escanear ticket con IA"
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '0.95rem' }}
+                          >
+                            {loading === `rescan-exp-${expense.id}` ? '⏳' : '🔄'}
+                          </button>
+                        )}
                         {canDelete && (
                           <button 
                             onClick={() => handleDelete(expense.id)}
@@ -398,6 +433,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
           exp.images.map((img: any) => ({
             ...img,
             expenseId: exp.id,
+            isScanned: exp.isScanned,
             date: exp.date,
             createdAt: exp.createdAt
           }))
@@ -420,20 +456,41 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
                     return (
                       <div key={ev.id} className={styles.galleryItem}>
                         <div className={styles.galleryHeader}>
-                          <span className={styles.galleryDate}>
-                            🗓️ {dateStr}
+                          <span className={styles.galleryDate} title={ev.isScanned ? "Escaneado por IA con éxito" : "No escaneado / Error IA"}>
+                            {ev.isScanned ? '✅' : '⚠️'} {dateStr}
                           </span>
-                          <button
-                            onClick={() => handleDeleteEvidence(ev.id)}
-                            disabled={loading === `delete-ev-${ev.id}`}
-                            className={styles.galleryDeleteBtn}
-                            title="Borrar foto"
-                          >
-                            {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
-                          </button>
+                          <div style={{ display: 'flex', gap: '0.25rem' }}>
+                            {!ev.isScanned && (
+                              <button
+                                onClick={() => handleReScan(ev.expenseId)}
+                                disabled={loading === `rescan-exp-${ev.expenseId}` || loading === `delete-ev-${ev.id}`}
+                                className={styles.galleryReScanBtn}
+                                title="Volver a escanear con IA"
+                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff' }}
+                              >
+                                {loading === `rescan-exp-${ev.expenseId}` ? '⏳' : '🔄'}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteEvidence(ev.id)}
+                              disabled={loading === `delete-ev-${ev.id}`}
+                              className={styles.galleryDeleteBtn}
+                              title="Borrar foto"
+                            >
+                              {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
+                            </button>
+                          </div>
                         </div>
                         <div 
-                          onClick={() => setLightboxImage(apiImageUrl)}
+                          onClick={() => {
+                            if (!ev.isScanned) {
+                              if (window.confirm("Este ticket no se pudo escanear automáticamente por la IA. ¿Quieres intentar volver a escanearlo ahora?")) {
+                                handleReScan(ev.expenseId);
+                                return;
+                              }
+                            }
+                            setLightboxImage(apiImageUrl);
+                          }}
                           className={styles.galleryLink}
                           style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1, cursor: 'pointer' }}
                         >
