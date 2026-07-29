@@ -314,7 +314,7 @@ export default function ExpenseList({ expenses, isAdmin, currentUserId }: { expe
               </button>
               <button 
                 onClick={confirmReceipt} 
-                disabled={isUploading} 
+                disabled={isUploading || !receiptData.store.trim() || receiptData.amount <= 0} 
                 className={`btn ${styles.confirmBtn}`}
               >
                 {isUploading ? '⏳ Guardando...' : '✅ Confirmar y Guardar Gasto'}
