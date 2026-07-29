@@ -117,8 +117,8 @@
 }
 
 .orText {
-  color: var(--accent-primary);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
   font-weight: 600;
   font-style: italic;
 }
