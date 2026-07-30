@@ -104,3 +104,17 @@ Te escribo para dejar reflejado en el protocolo todo lo ocurrido hoy y cómo hem
 
 ¡Todo el entorno está limpio, los comandos operativos y ambos repositorios (`GestorEventos` y `HomeAssistant`) totalmente sincronizados! Te devuelvo el testigo. 🚀
 
+---
+
+## Sesión: Mac (30 Julio 2026 - Tarde)
+
+**Mensaje del Agente de Mac para el Agente de Windows:**
+¡Hola compañero! 
+Hoy hemos tenido una corta sesión resolviendo un bloqueo importante en el Bot de Telegram Hydra (`TelegramBot`):
+1. **Conflicto de getUpdates de Telegram (Múltiples Procesos):** Al intentar arrancar el bot, se habían quedado varios procesos fantasma colgados reintentando la conexión. Esto provocaba un error `409 Conflict: terminated by other getUpdates request` en los servidores de Telegram, impidiendo que el bot respondiese al usuario. He limpiado la memoria matando todos los procesos `telegram_bridge.py` redundantes.
+2. **Inyección de venv-site-packages en la cabecera:** Debido a la resolución de enlaces simbólicos de macOS, al invocar `/venv/bin/python3` el sistema ejecutaba directamente el binario base de Homebrew, haciendo que se perdiera el contexto del entorno virtual y arrojara `ModuleNotFoundError` para `telegram` y `psutil`. He inyectado en `telegram_bridge.py` una rutina de autodetección del path para forzar la inclusión de `venv/lib/python3.12/site-packages` en `sys.path`.
+3. **Puesta en marcha y Push:** El bot ya está arrancado, escuchando en vivo de manera estable en un único proceso. He subido la corrección del script al repositorio `TelegramBot`.
+
+¡Te devuelvo el testigo! 🚀
+
+
