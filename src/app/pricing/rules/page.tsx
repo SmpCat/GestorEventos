@@ -33,7 +33,10 @@ export default async function RulesPage() {
   const rules = rulesRes.success && rulesRes.data ? rulesRes.data : [];
 
   // Buscar tarifas en uso
-  const attendees = await prisma.eventAttendee.findMany({ where: { eventId: activeEvent.id } });
+  const attendees = await prisma.eventAttendee.findMany({ 
+    where: { eventId: activeEvent.id },
+    select: { daysAttending: true }
+  });
   const inUseDays = Array.from(new Set(attendees.map(a => a.daysAttending).filter(d => d > 0)));
 
   return (
