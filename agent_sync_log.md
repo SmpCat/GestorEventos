@@ -55,3 +55,7 @@
 - **Reordenación de Campos:** Campos obligatorios (Nombre, Nick, Password, Socio, Edad) arriba del todo; campos opcionales (Email, Teléfono) desplazados al final.
 - **Selector de Socio:** Implementado mediante `SelectField` premium con valor por defecto `No (No Socio/a)`.
 - **Desglose en Asistentes (`/pricing/attendees`):** Añadido panel informativo transparente de tarifa por asistente y controles de edición por parte del administrador.
+
+### 7. Despliegue en Producción & Tolerancia a Fallos
+- **Migración de Producción:** Preservados todos los usuarios existentes en producción e iniciados como Socios (18+) de forma transparente.
+- **Fallback de Días:** Si las tarifas en producción aún no han sido precargadas, el selector de Asistencia ofrece por defecto `1 día`, `2 días`, `3 días` evitando estados bloqueados o vacíos.
