@@ -54,23 +54,41 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                     ))}
                   </SelectField>
 
-                  {/* Selector de consumo de alcohol para este evento */}
-                  <div className="flex items-center gap-2 mt-1">
-                    <label className="text-secondary text-xs uppercase font-bold tracking-wider">Consumo de Alcohol:</label>
-                    <button
-                      type="button"
-                      onClick={() => handleChangeDays(attendee.daysAttending, !attendee.drinksAlcohol)}
-                      disabled={loadingDays}
-                      className="btn text-xs py-1 px-3"
-                      style={{
-                        backgroundColor: attendee.drinksAlcohol ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                        border: attendee.drinksAlcohol ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.2)',
-                        color: '#fff',
-                        borderRadius: '20px'
-                      }}
-                    >
-                      {attendee.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}
-                    </button>
+                  {/* Selector de consumo de alcohol segmentado */}
+                  <div className="w-full max-w-[240px] mt-1">
+                    <label className="text-secondary text-xs uppercase font-bold tracking-wider block text-center mb-1.5">
+                      Consumo de Alcohol
+                    </label>
+                    <div className="grid grid-cols-2 gap-1 p-1 rounded-xl" style={{ background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeDays(attendee.daysAttending, true)}
+                        disabled={loadingDays}
+                        className="py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center"
+                        style={{
+                          backgroundColor: attendee.drinksAlcohol ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
+                          border: attendee.drinksAlcohol ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid transparent',
+                          color: attendee.drinksAlcohol ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
+                          boxShadow: attendee.drinksAlcohol ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                        }}
+                      >
+                        🍺 Con Alcohol
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeDays(attendee.daysAttending, false)}
+                        disabled={loadingDays}
+                        className="py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center"
+                        style={{
+                          backgroundColor: !attendee.drinksAlcohol ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
+                          border: !attendee.drinksAlcohol ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid transparent',
+                          color: !attendee.drinksAlcohol ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
+                          boxShadow: !attendee.drinksAlcohol ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                        }}
+                      >
+                        🥤 Sin Alcohol
+                      </button>
+                    </div>
                   </div>
                 </div>
 
