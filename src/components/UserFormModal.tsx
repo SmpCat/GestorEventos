@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createUser, updateUser } from '@/actions/users';
+import SelectField from './SelectField';
 
 export default function UserFormModal({ isOpen, onClose, user, onSaved, session }: { isOpen: boolean, onClose: () => void, user?: any, onSaved: () => void, session?: any }) {
   const [formData, setFormData] = useState({
@@ -132,38 +133,15 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
             </div>
           </div>
 
-          {/* Selector binario prominente para Socio/a */}
-          <div className="input-group">
-            <label className="input-label mb-1.5 block">¿Es Socio/a de la Peña?</label>
-            <div className="grid grid-cols-2 gap-2 p-1.5 rounded-xl" style={{ background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, isMember: true })}
-                className="py-2 px-3 rounded-lg text-sm font-bold transition-all text-center"
-                style={{
-                  backgroundColor: formData.isMember ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  border: formData.isMember ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid transparent',
-                  color: formData.isMember ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
-                  boxShadow: formData.isMember ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
-                }}
-              >
-                Sí (Socio)
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, isMember: false })}
-                className="py-2 px-3 rounded-lg text-sm font-bold transition-all text-center"
-                style={{
-                  backgroundColor: !formData.isMember ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  border: !formData.isMember ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid transparent',
-                  color: !formData.isMember ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
-                  boxShadow: !formData.isMember ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
-                }}
-              >
-                No (No Socio)
-              </button>
-            </div>
-          </div>
+          {/* Selector desplegable premium para Socio/a */}
+          <SelectField
+            label="¿Es Socio/a de la Peña?"
+            value={formData.isMember ? 'true' : 'false'}
+            onChange={e => setFormData({ ...formData, isMember: e.target.value === 'true' })}
+          >
+            <option value="true">Sí (Socio/a)</option>
+            <option value="false">No (No Socio/a)</option>
+          </SelectField>
 
           <div className="input-group">
             <label className="input-label">Edad (para cálculo de cuota)</label>
