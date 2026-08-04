@@ -28,6 +28,8 @@ export async function createUser(data: any) {
         email: data.email || null,
         phone: data.phone || null,
         isAdmin: data.isAdmin || false,
+        isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
+        age: data.age ? parseInt(data.age, 10) : null,
       },
     });
     revalidatePath('/admin/users');
@@ -49,6 +51,8 @@ export async function updateUser(id: string, data: any) {
       email: data.email || null,
       phone: data.phone || null,
       isAdmin: data.isAdmin,
+      isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
+      age: data.age ? parseInt(data.age, 10) : null,
     };
 
     // Si envía password, lo actualizamos también
@@ -117,10 +121,6 @@ export async function deleteAllNonAdminUsers() {
       const hasShoppingItems = user.shoppingTasks && user.shoppingTasks.length > 0;
 
       if (!hasExpenses && !hasPayments && !hasShoppingItems) {
-        // Safe to delete
-        // Note: EventAttendances and History will cascade or we can delete manually if needed, 
-        // but Prisma schema should have cascade on user delete for Attendee. 
-        // Let's delete attendees explicitly to be safe:
         await prisma.eventAttendee.deleteMany({ where: { userId: user.id } });
         await prisma.user.delete({ where: { id: user.id } });
         deletedCount++;
@@ -148,9 +148,10 @@ export async function registerPublicUser(data: any) {
         email: data.email || null,
         phone: data.phone || null,
         isAdmin: false, // <-- RESTRICCIÓN DE SEGURIDAD BLINDADA
+        isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
+        age: data.age ? parseInt(data.age, 10) : null,
       },
     });
-    // Podríamos redirigir aquí, pero lo manejamos desde el cliente
     return { success: true, data: user };
   } catch (error: any) {
     if (error.code === 'P2002') {

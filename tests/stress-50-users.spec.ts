@@ -134,7 +134,7 @@ test.describe('Macro-Simulación: 50 Asistentes', () => {
     if (isLogin) {
       await page.fill('input[type="text"]', `${prefix}_admin`);
       await page.fill('input[type="password"]', '123456');
-      await page.click('button', { hasText: 'Acceder' });
+      await Promise.all([page.waitForNavigation(), page.click('button:has-text("Acceder")')]);
       // Esperar a que el server action responda y nos redirija a la raíz, para que no pise la siguiente navegación
       await page.waitForURL('**/');
       await page.waitForLoadState('domcontentloaded');

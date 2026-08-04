@@ -10,7 +10,9 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
     password: '',
     email: '',
     phone: '',
-    isAdmin: false
+    isAdmin: false,
+    isMember: false,
+    age: ''
   });
   
   const [loading, setLoading] = useState(false);
@@ -23,7 +25,9 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
         password: '', // No cargamos el password por seguridad, si lo deja vacío no lo actualizamos
         email: user.email || '',
         phone: user.phone || '',
-        isAdmin: user.isAdmin || false
+        isAdmin: user.isAdmin || false,
+        isMember: user.isMember || false,
+        age: user.age !== null && user.age !== undefined ? String(user.age) : ''
       });
     } else {
       setFormData({
@@ -32,7 +36,9 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
         password: '',
         email: '',
         phone: '',
-        isAdmin: false
+        isAdmin: false,
+        isMember: false,
+        age: ''
       });
     }
   }, [user, isOpen]);
@@ -149,7 +155,33 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
             </div>
           </div>
 
-          <div className="input-group mt-4">
+          <div className="flex mobile-col gap-4">
+            <div className="input-group" style={{ flex: 1 }}>
+              <label className="input-label">Edad (para cálculo de cuota)</label>
+              <input 
+                type="number" 
+                className="input-field" 
+                placeholder="Ej. 25"
+                min="0"
+                max="120"
+                value={formData.age}
+                onChange={e => setFormData({...formData, age: e.target.value})}
+              />
+            </div>
+            <div className="input-group flex items-end pb-2" style={{ flex: 1 }}>
+              <label className="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isMember}
+                  onChange={e => setFormData({...formData, isMember: e.target.checked})}
+                  style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--accent-primary)' }}
+                />
+                Es Socio/a de la Peña
+              </label>
+            </div>
+          </div>
+
+          <div className="input-group mt-2">
             <label className="checkbox-label">
               <input 
                 type="checkbox" 

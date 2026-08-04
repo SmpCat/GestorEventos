@@ -60,7 +60,7 @@ test.describe('Ciclo E2E: Administración y Gastos', () => {
       // para evitar que aborte nuestro siguiente page.goto
       await Promise.all([
         page.waitForNavigation(),
-        page.click('button', { hasText: 'Acceder' })
+        page.click('button:has-text("Acceder")')
       ]);
     }
 

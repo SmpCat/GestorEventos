@@ -18,27 +18,21 @@ export async function getPricingRules(eventId: string) {
   }
 }
 
-export async function savePricingRules(eventId: string, rules: { days: number, price: number }[]) {
-  // Validate uniqueness of days and > 0
-  const daysSet = new Set<number>();
+export interface PricingRuleInput {
+  id?: string;
+  name?: string | null;
+  days: number;
+  price: number;
+  isMember?: boolean | null;
+  minAge?: number | null;
+  maxAge?: number | null;
+  drinksAlcohol?: boolean | null;
+}
+
+export async function savePricingRules(eventId: string, rules: PricingRuleInput[]) {
   for (const rule of rules) {
     if (rule.days <= 0) {
       return { success: false, error: 'No se pueden crear tarifas de 0 días.' };
-    }
-    if (daysSet.has(rule.days)) {
-      return { success: false, error: `No puedes tener varias reglas para el mismo número de días (tiene repetido: ${rule.days} días).` };
-    }
-    daysSet.add(rule.days);
-  }
-
-  // CASO 4: Bloqueo Estricto si se intentan borrar tarifas en uso
-  const attendees = await prisma.eventAttendee.findMany({ where: { eventId } });
-  for (const att of attendees) {
-    if (att.daysAttending > 0 && !daysSet.has(att.daysAttending)) {
-      return { 
-        success: false, 
-        error: `No puedes borrar la tarifa de ${att.daysAttending} días porque hay asistentes apuntados con esos días. Por favor, cambia a esas personas primero.` 
-      };
     }
   }
 
@@ -49,7 +43,16 @@ export async function savePricingRules(eventId: string, rules: { days: number, p
       // Crear nuevas
       if (rules.length > 0) {
         await tx.pricingRule.createMany({
-          data: rules.map(r => ({ ...r, eventId })),
+          data: rules.map(r => ({
+            name: r.name || null,
+            days: r.days,
+            price: r.price,
+            isMember: r.isMember !== undefined ? r.isMember : null,
+            minAge: r.minAge !== undefined ? r.minAge : null,
+            maxAge: r.maxAge !== undefined ? r.maxAge : null,
+            drinksAlcohol: r.drinksAlcohol !== undefined ? r.drinksAlcohol : null,
+            eventId
+          })),
         });
       }
     });
@@ -95,6 +98,8 @@ export async function getAttendees(eventId: string) {
             id: true, 
             name: true, 
             username: true,
+            isMember: true,
+            age: true,
             expenses: { where: { eventId } }
           } 
         },
@@ -126,21 +131,77 @@ export async function checkAttendance(eventId: string, userId: string) {
   }
 }
 
+// Helper para calcular la tarifa esperada basada en Socio, Edad, Alcohol y Días
+export async function calculateExpectedPayment(
+  eventId: string,
+  userId: string,
+  daysAttending: number,
+  overrideDrinksAlcohol: boolean = true
+): Promise<{ price: number | null, error?: string }> {
+  if (daysAttending <= 0) return { price: 0 };
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { price: null, error: 'Usuario no encontrado' };
+
+  const isMember = user.isMember ?? false;
+  const age = user.age ?? 18;
+  const drinksAlcohol = overrideDrinksAlcohol;
+
+  const rules = await prisma.pricingRule.findMany({
+    where: { eventId },
+  });
+
+  if (rules.length === 0) {
+    return { price: null, error: 'No hay tarifas configuradas para este evento.' };
+  }
+
+  // Filtrar reglas compatibles
+  const matchingRules = rules.filter(rule => {
+    // Días: coincide exactamente o si tiene 3+ días y la regla es >= 3
+    const daysMatch = rule.days === daysAttending || (daysAttending >= 3 && rule.days === 3);
+    if (!daysMatch) return false;
+
+    // Filtro Socio
+    if (rule.isMember !== null && rule.isMember !== isMember) return false;
+
+    // Filtro Edad
+    if (rule.minAge !== null && age < rule.minAge) return false;
+    if (rule.maxAge !== null && age > rule.maxAge) return false;
+
+    // Filtro Alcohol
+    if (rule.drinksAlcohol !== null && rule.drinksAlcohol !== drinksAlcohol) return false;
+
+    return true;
+  });
+
+  if (matchingRules.length > 0) {
+    // Ordenar por especificidad (la regla con más criterios definidos gana)
+    matchingRules.sort((a, b) => {
+      const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinksAlcohol !== null ? 1 : 0);
+      const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinksAlcohol !== null ? 1 : 0);
+      return scoreB - scoreA;
+    });
+    return { price: matchingRules[0].price };
+  }
+
+  // Fallback: coincidencia por días si existe alguna regla general
+  const fallbackDaysRule = rules.find(r => r.days === daysAttending || (daysAttending >= 3 && r.days === 3));
+  if (fallbackDaysRule) return { price: fallbackDaysRule.price };
+
+  return { price: null, error: `No hay una tarifa configurada para ${daysAttending} días con las características del usuario.` };
+}
+
 // Cuando un usuario se une al evento
 export async function joinEvent(eventId: string, userId: string, daysAttending: number) {
   try {
     let expectedPayment = 0;
 
     if (daysAttending > 0) {
-      // Buscar la tarifa aplicable
-      const rule = await prisma.pricingRule.findUnique({
-        where: { eventId_days: { eventId, days: daysAttending } }
-      });
-
-      if (!rule) {
-        return { success: false, error: `No hay una tarifa configurada para ${daysAttending} días. Por favor, revisa los días o contacta al administrador.` };
+      const calc = await calculateExpectedPayment(eventId, userId, daysAttending);
+      if (calc.price === null) {
+        return { success: false, error: calc.error || `No hay una tarifa aplicable.` };
       }
-      expectedPayment = rule.price;
+      expectedPayment = calc.price;
     }
 
     const attendee = await prisma.eventAttendee.create({
@@ -186,14 +247,11 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number) {
 
     let expectedPayment = 0;
     if (newDays > 0) {
-      const rule = await prisma.pricingRule.findUnique({
-        where: { eventId_days: { eventId: attendee.eventId, days: newDays } }
-      });
-
-      if (!rule) {
-        return { success: false, error: `No hay una tarifa configurada para ${newDays} días.` };
+      const calc = await calculateExpectedPayment(attendee.eventId, attendee.userId, newDays, attendee.drinksAlcohol);
+      if (calc.price === null) {
+        return { success: false, error: calc.error || `No hay una tarifa aplicable.` };
       }
-      expectedPayment = rule.price;
+      expectedPayment = calc.price;
     }
 
     await prisma.eventAttendee.update({

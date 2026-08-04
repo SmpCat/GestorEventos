@@ -51,7 +51,7 @@ test.describe('Lógica Financiera de Tickets', () => {
     if (isLogin) {
       await page.fill('input[type="text"]', `${prefix}_admin`);
       await page.fill('input[type="password"]', '123456');
-      await Promise.all([page.waitForNavigation(), page.click('button', { hasText: 'Acceder' })]);
+      await Promise.all([page.waitForNavigation(), page.click('button:has-text("Acceder")')]);
     }
 
     // Creamos el gasto por API simulando lo que haría el Scanner IA

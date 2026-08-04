@@ -93,13 +93,47 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
     }
   };
 
+  const handleLoadPenaPreset = () => {
+    if (window.confirm('¿Quieres cargar la tabla estándar de tarifas de la Peña? Reemplazará las reglas actuales.')) {
+      const penaRules: any[] = [
+        { name: 'Socio 1 día', days: 1, price: 25, isMember: true, minAge: 18, drinksAlcohol: null },
+        { name: 'Socio 2 días', days: 2, price: 45, isMember: true, minAge: 18, drinksAlcohol: null },
+        { name: 'Socio 3+ días', days: 3, price: 60, isMember: true, minAge: 18, drinksAlcohol: null },
+        { name: 'Socio 14-17 Sin Alcohol', days: 1, price: 15, isMember: true, minAge: 14, maxAge: 17, drinksAlcohol: false },
+        { name: 'No Socio 1 día', days: 1, price: 30, isMember: false, minAge: 18, drinksAlcohol: null },
+        { name: 'No Socio 2 días', days: 2, price: 50, isMember: false, minAge: 18, drinksAlcohol: null },
+        { name: 'No Socio 3+ días', days: 3, price: 70, isMember: false, minAge: 18, drinksAlcohol: null },
+        { name: 'No Socio 14-17 Sin Alcohol', days: 1, price: 20, isMember: false, minAge: 14, maxAge: 17, drinksAlcohol: false },
+      ];
+      setRules(penaRules);
+    }
+  };
+
   return (
     <div className={`glass-panel ${styles.adminPanel}`}>
       <div className={styles.innerBlackBox}>
+        {isAdmin && (
+          <div className="flex justify-end mb-4">
+            <button
+              type="button"
+              onClick={handleLoadPenaPreset}
+              className="btn text-sm"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.5rem 1rem' }}
+            >
+              📋 Cargar Tarifas Peña (Valdeganga)
+            </button>
+          </div>
+        )}
+
         <div className={styles.rulesList}>
           {rules.length === 0 && <p className={styles.emptyState}>No hay tarifas configuradas.</p>}
-          {rules.map((rule, idx) => (
-            <div key={idx} className={styles.ruleRow}>
+          {rules.map((rule: any, idx) => (
+            <div key={idx} className={styles.ruleRow} style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
+              {rule.name && (
+                <span className="font-bold text-accent" style={{ color: 'var(--accent-primary)', marginRight: '0.5rem' }}>
+                  [{rule.name}]
+                </span>
+              )}
               <span>Si vienes</span>
               {isAdmin ? (
                 <input 
@@ -113,7 +147,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
               ) : (
                 <strong className={styles.daysValue}>{rule.days}</strong>
               )}
-              <span>días, pagas</span>
+              <span>días ({rule.isMember === true ? 'Socio' : rule.isMember === false ? 'No Socio' : 'Todos'}), pagas</span>
               {isAdmin ? (
                 <input 
                   type="number" 

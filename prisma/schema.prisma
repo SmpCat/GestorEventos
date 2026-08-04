@@ -23,6 +23,8 @@ model User {
   email          String?
   phone          String?
   isAdmin        Boolean         @default(false)
+  isMember       Boolean         @default(false) // ¿Es socio/a de la peña?
+  age            Int?                            // Edad del usuario
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   
@@ -64,6 +66,11 @@ model EventAttendee {
   daysAttending Int      @default(0)
   balance       Float    @default(0.0) // Saldo a favor en ESTE evento
   
+  // Atributos para cálculo de tarifa
+  isMember      Boolean  @default(false) // ¿Es socio/a de la peña?
+  age           Int?                     // Edad del asistente
+  drinksAlcohol Boolean  @default(true)  // ¿Consume alcohol?
+
   // Custom Pricing (Nuevos campos)
   expectedPayment Float?   // Lo que tiene que pagar. Nulo = automático según tabla.
   adminComment    String?  // Comentario del admin si sobrescribe el precio.
@@ -111,15 +118,21 @@ model Payment {
 }
 
 model PricingRule {
-  id        String   @id @default(uuid())
-  days      Int
-  price     Float
+  id            String   @id @default(uuid())
+  name          String?  // ej. "Socio Adulto (1 día)"
+  days          Int      // 1, 2, 3 (o más)
+  price         Float
+  
+  // Filtros condicionales (opcionales: null = aplica a todos)
+  isMember      Boolean? // true = solo socios, false = solo no socios, null = todos
+  minAge        Int?     // edad mínima (inclusive)
+  maxAge        Int?     // edad máxima (inclusive)
+  drinksAlcohol Boolean? // true = solo con alcohol, false = solo sin alcohol, null = todos
   
   // Relaciones
-  eventId   String
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId       String
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@unique([eventId, days])
   @@index([eventId])
 }
 

@@ -12,6 +12,8 @@ export default function RegisterPage() {
     password: '',
     email: '',
     phone: '',
+    isMember: false,
+    age: '',
   });
   
   const [loading, setLoading] = useState(false);
@@ -105,6 +107,32 @@ export default function RegisterPage() {
               value={formData.phone}
               onChange={e => setFormData({...formData, phone: e.target.value})}
             />
+          </div>
+
+          <div className="flex mobile-col gap-4">
+            <div className="input-group" style={{ flex: 1 }}>
+              <label className="input-label">Edad (para cuota)</label>
+              <input 
+                type="number" 
+                className="input-field" 
+                placeholder="Ej. 25"
+                min="0"
+                max="120"
+                value={formData.age}
+                onChange={e => setFormData({...formData, age: e.target.value})}
+              />
+            </div>
+            <div className="input-group flex items-end pb-2" style={{ flex: 1 }}>
+              <label className="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isMember}
+                  onChange={e => setFormData({...formData, isMember: e.target.checked})}
+                  style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--accent-primary)' }}
+                />
+                Es Socio/a de la Peña
+              </label>
+            </div>
           </div>
 
           <button type="submit" className="btn mt-4 w-full" disabled={loading} style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '1rem' }}>

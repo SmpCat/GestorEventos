@@ -40,13 +40,13 @@ test.describe('Concurrencia Pura', () => {
     await page1.goto('/');
     await page1.fill('input[type="text"]', `${prefix}_admin`);
     await page1.fill('input[type="password"]', '123456');
-    await Promise.all([page1.waitForNavigation(), page1.click('button', { hasText: 'Acceder' })]);
+    await Promise.all([page1.waitForNavigation(), page1.click('button:has-text("Acceder")')]);
 
     // Login Admin 2
     await page2.goto('/');
     await page2.fill('input[type="text"]', `${prefix}_admin`);
     await page2.fill('input[type="password"]', '123456');
-    await Promise.all([page2.waitForNavigation(), page2.click('button', { hasText: 'Acceder' })]);
+    await Promise.all([page2.waitForNavigation(), page2.click('button:has-text("Acceder")')]);
 
     await page1.goto('/admin/events');
     await page2.goto('/admin/events');
