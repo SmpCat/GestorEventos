@@ -33,3 +33,8 @@
 - **UI:** 
   - Formulario de Registro Público y Modal de Usuario actualizados con Edad y casilla "Es Socio/a".
   - Añadido botón "📋 Cargar Tarifas Peña (Valdeganga)" en el panel de administración de reglas (`RulesAdmin.tsx`).
+
+- **Selector de Alcohol en Pantalla Principal:**
+  - Campo `drinksAlcohol` guardado en la tabla de asistentes (`EventAttendee`).
+  - Botón selector "🍺 Con Alcohol / 🥤 Sin Alcohol" integrado directamente en la tarjeta de ASISTENCIA del Dashboard junto al menú desplegable de días.
+  - Al cambiar de días o preferencia de alcohol, la cuota esperada se recalcula en tiempo real.

@@ -66,6 +66,8 @@ model EventAttendee {
   daysAttending Int      @default(0)
   balance       Float    @default(0.0) // Saldo a favor en ESTE evento
   
+  drinksAlcohol Boolean  @default(true) // ¿Beberá alcohol en ESTE evento?
+
   // Custom Pricing (Nuevos campos)
   expectedPayment Float?   // Lo que tiene que pagar. Nulo = automático según tabla.
   adminComment    String?  // Comentario del admin si sobrescribe el precio.

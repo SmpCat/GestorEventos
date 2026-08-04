@@ -192,12 +192,12 @@ export async function calculateExpectedPayment(
 }
 
 // Cuando un usuario se une al evento
-export async function joinEvent(eventId: string, userId: string, daysAttending: number) {
+export async function joinEvent(eventId: string, userId: string, daysAttending: number, drinksAlcohol: boolean = true) {
   try {
     let expectedPayment = 0;
 
     if (daysAttending > 0) {
-      const calc = await calculateExpectedPayment(eventId, userId, daysAttending);
+      const calc = await calculateExpectedPayment(eventId, userId, daysAttending, drinksAlcohol);
       if (calc.price === null) {
         return { success: false, error: calc.error || `No hay una tarifa aplicable.` };
       }
@@ -209,6 +209,7 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
         userId,
         eventId,
         daysAttending,
+        drinksAlcohol,
         expectedPayment,
         history: {
           create: {
@@ -228,7 +229,7 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
 }
 
 
-export async function updateAttendeeDays(attendeeId: string, newDays: number) {
+export async function updateAttendeeDays(attendeeId: string, newDays: number, drinksAlcohol?: boolean) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: 'No autorizado' };
@@ -241,13 +242,15 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number) {
       return { success: false, error: 'No tienes permiso para modificar a este asistente' };
     }
 
-    if (attendee.daysAttending === newDays) {
+    const updatedDrinks = drinksAlcohol !== undefined ? drinksAlcohol : attendee.drinksAlcohol;
+
+    if (attendee.daysAttending === newDays && attendee.drinksAlcohol === updatedDrinks) {
       return { success: true }; // Nada que cambiar
     }
 
     let expectedPayment = 0;
     if (newDays > 0) {
-      const calc = await calculateExpectedPayment(attendee.eventId, attendee.userId, newDays);
+      const calc = await calculateExpectedPayment(attendee.eventId, attendee.userId, newDays, updatedDrinks);
       if (calc.price === null) {
         return { success: false, error: calc.error || `No hay una tarifa aplicable.` };
       }
@@ -258,6 +261,7 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number) {
       where: { id: attendeeId },
       data: {
         daysAttending: newDays,
+        drinksAlcohol: updatedDrinks,
         expectedPayment,
         history: {
           create: {

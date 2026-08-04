@@ -10,14 +10,14 @@ import styles from './Dashboard.module.css';
 export default function Dashboard({ session, activeEvent, attendee, pricingRules }: { session: any, activeEvent: any, attendee?: any, pricingRules?: any[] }) {
   const [loadingDays, setLoadingDays] = useState(false);
 
-  const handleChangeDays = async (newVal: number) => {
-    if (!attendee || newVal === attendee.daysAttending) return;
-    const label = newVal === 0 ? 'No lo sé aún' : `${newVal} ${newVal === 1 ? 'día' : 'días'}`;
-    const confirmed = window.confirm(`¿Realmente quieres cambiar tu asistencia a "${label}"?`);
-    if (!confirmed) return;
+  const handleChangeDays = async (newVal: number, newDrinks?: boolean) => {
+    if (!attendee) return;
+    const drinks = newDrinks !== undefined ? newDrinks : (attendee.drinksAlcohol ?? true);
+    if (newVal === attendee.daysAttending && drinks === attendee.drinksAlcohol) return;
+
     setLoadingDays(true);
-    const res = await updateAttendeeDays(attendee.id, newVal);
-    if (!res.success) alert(res.error || 'Error al actualizar días');
+    const res = await updateAttendeeDays(attendee.id, newVal, drinks);
+    if (!res.success) alert(res.error || 'Error al actualizar asistencia');
     setLoadingDays(false);
   };
 
@@ -38,20 +38,41 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
             <div className="glass-panel" style={{ width: '100%' }}>
               <div className={styles.innerBlackBox}>
 
-                {/* Selector de días inline con confirmación */}
-                <SelectField
-                  label="Asistencia"
-                  value={attendee.daysAttending}
-                  onChange={e => handleChangeDays(Number(e.target.value))}
-                  disabled={loadingDays}
-                  containerStyle={{ width: 'fit-content', minWidth: '210px', marginBottom: '1.25rem', marginLeft: 'auto', marginRight: 'auto' }}
-                  style={{ opacity: loadingDays ? 0.6 : 1 }}
-                >
-                  <option value={0}>No lo sé aún</option>
-                  {pricingRules?.map(r => (
-                    <option key={r.id} value={r.days}>{r.days} {r.days === 1 ? 'día' : 'días'} ({r.price}€)</option>
-                  ))}
-                </SelectField>
+                {/* Selector de días e información de alcohol inline */}
+                <div className="flex flex-col items-center gap-3 mb-4">
+                  <SelectField
+                    label="Asistencia"
+                    value={attendee.daysAttending}
+                    onChange={e => handleChangeDays(Number(e.target.value))}
+                    disabled={loadingDays}
+                    containerStyle={{ width: 'fit-content', minWidth: '210px', margin: 0 }}
+                    style={{ opacity: loadingDays ? 0.6 : 1 }}
+                  >
+                    <option value={0}>No lo sé aún</option>
+                    {pricingRules?.map(r => (
+                      <option key={r.id} value={r.days}>{r.days} {r.days === 1 ? 'día' : 'días'}</option>
+                    ))}
+                  </SelectField>
+
+                  {/* Selector de consumo de alcohol para este evento */}
+                  <div className="flex items-center gap-2 mt-1">
+                    <label className="text-secondary text-xs uppercase font-bold tracking-wider">Consumo de Alcohol:</label>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeDays(attendee.daysAttending, !attendee.drinksAlcohol)}
+                      disabled={loadingDays}
+                      className="btn text-xs py-1 px-3"
+                      style={{
+                        backgroundColor: attendee.drinksAlcohol ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        border: attendee.drinksAlcohol ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.2)',
+                        color: '#fff',
+                        borderRadius: '20px'
+                      }}
+                    >
+                      {attendee.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}
+                    </button>
+                  </div>
+                </div>
 
                 <p className={styles.quotaStatusText} style={{ fontSize: '1.1rem', margin: 0 }}>
                   Tu cuota es: <strong style={{ fontSize: '1.3rem', textShadow: '0 2px 15px rgba(0,0,0,0.9), 0 0 5px rgba(255,255,255,0.3)' }}>{attendee.expectedPayment !== null ? `${attendee.expectedPayment}€` : 'Calculando...'}</strong>
