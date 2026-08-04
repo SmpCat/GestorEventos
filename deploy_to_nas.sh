@@ -14,9 +14,9 @@ echo "🚀 Iniciando despliegue de GestorEventos a Producción..."
 echo "🔧 Ajustando permisos en el NAS para permitir la copia..."
 ssh -p ${NAS_PORT} -t ${NAS_USER}@${NAS_IP} "sudo mkdir -p ${NAS_DIR} && sudo chown -R ${NAS_USER} ${NAS_DIR}"
 
-# 1. Sincronizar archivos (ignorar dependencias y archivos ocultos pesados)
+# 1. Sincronizar archivos (ignorar dependencias, base de datos local y temporales)
 echo "📦 Transfiriendo archivos nuevos al NAS..."
-rsync -rlv -e "ssh -p ${NAS_PORT}" --delete --update --exclude 'node_modules' --exclude '.next' --exclude '.git' ./ ${NAS_USER}@${NAS_IP}:${NAS_DIR}/
+rsync -rlv -e "ssh -p ${NAS_PORT}" --delete --update --exclude 'node_modules' --exclude '.next' --exclude '.git' --exclude 'dev.db' --exclude 'data' --exclude '*.db' --exclude '*.sqlite' ./ ${NAS_USER}@${NAS_IP}:${NAS_DIR}/
 
 if [ $? -ne 0 ]; then
     echo "❌ Error al copiar los archivos. Revisa la conexión."
