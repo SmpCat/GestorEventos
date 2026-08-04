@@ -36,5 +36,12 @@
 
 - **Selector de Alcohol en Pantalla Principal:**
   - Campo `drinksAlcohol` guardado en la tabla de asistentes (`EventAttendee`).
-  - Botón selector "🍺 Con Alcohol / 🥤 Sin Alcohol" integrado directamente en la tarjeta de ASISTENCIA del Dashboard junto al menú desplegable de días.
+  - Rediseñado el selector de alcohol en el Dashboard utilizando dos componentes `SelectField` gemelos con simetría 100% idéntica entre Asistencia y Consumo de Alcohol.
   - Al cambiar de días o preferencia de alcohol, la cuota esperada se recalcula en tiempo real.
+
+### 4. Perfeccionamiento del Configurador de Tarifas (`/pricing/rules`)
+- **Estética Monocromática:** Paleta estricta basada exclusivamente en tonos blanco, gris y negro. Icono de papelera blanca sin etiquetas de texto sobrantes.
+- **Formato Responsivo:** Tarjetas de tarifas delimitadas individualmente con borde sutil y sombras. En dispositivos móviles los campos no desbordan a la derecha.
+- **Campos Estructurados:** Tramo de Edad y Días de Asistencia configurables mediante pares `[ Min ] a [ Max ]`.
+- **Filtro Socio Binario:** Campo `¿Socio/a?` configurado como binario estricto (`Sí (Socio)` / `No (No Socio)`), eliminando la opción redundante.
+- **Preset de Tarifas Peña Valdeganga:** 8 reglas precargadas optimizadas a 1 solo clic que traducen de forma 1:1 la libreta de precios manuscrita del evento.
