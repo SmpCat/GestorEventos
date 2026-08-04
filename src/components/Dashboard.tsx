@@ -38,7 +38,7 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
             <div className="glass-panel" style={{ width: '100%' }}>
               <div className={styles.innerBlackBox}>
 
-                {/* Selector de días e información de alcohol alineados en paralelo */}
+                {/* Selector de días e información de alcohol con SIMETRÍA 100% PERFECTA */}
                 <div className="flex flex-col items-center gap-4 mb-6">
                   <SelectField
                     label="Asistencia"
@@ -54,25 +54,17 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                     ))}
                   </SelectField>
 
-                  {/* Consumo de Alcohol alineado en paralelo (mismo ancho de 240px) */}
-                  <div className="flex items-center justify-between gap-2 w-full max-w-[240px]">
-                    <span className="text-secondary text-xs uppercase font-bold tracking-wider">¿Alcohol?:</span>
-                    <button
-                      type="button"
-                      onClick={() => handleChangeDays(attendee.daysAttending, !attendee.drinksAlcohol)}
-                      disabled={loadingDays}
-                      className="btn text-sm font-semibold transition-all"
-                      style={{
-                        padding: '0.6rem 0.85rem',
-                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        color: '#ffffff',
-                        borderRadius: '12px'
-                      }}
-                    >
-                      {attendee.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}
-                    </button>
-                  </div>
+                  <SelectField
+                    label="Consumo de Alcohol"
+                    value={attendee.drinksAlcohol ? 'true' : 'false'}
+                    onChange={e => handleChangeDays(attendee.daysAttending, e.target.value === 'true')}
+                    disabled={loadingDays}
+                    containerStyle={{ width: '100%', maxWidth: '240px', margin: 0 }}
+                    style={{ opacity: loadingDays ? 0.6 : 1 }}
+                  >
+                    <option value="true">🍺 Con Alcohol</option>
+                    <option value="false">🥤 Sin Alcohol</option>
+                  </SelectField>
                 </div>
 
                 {/* Tu cuota es... desplazado más abajo */}
