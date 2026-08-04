@@ -110,14 +110,14 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
     <div className={`glass-panel ${styles.adminPanel}`}>
       <div className={styles.innerBlackBox}>
         {isAdmin && (
-          <div className="flex flex-col gap-3 mb-8 pb-2">
+          <div className="flex flex-col items-start justify-center" style={{ marginTop: '0.25rem', marginBottom: '1.75rem', gap: '1.25rem' }}>
             {/* Fila 1: Título */}
             <div>
               <h3 className="text-xl font-bold tracking-tight text-white">Configurador de Tarifas</h3>
             </div>
 
-            {/* Fila 2: Botón de Cargar Tarifas Peña (Separado con margen inferior amplio) */}
-            <div>
+            {/* Fila 2: Botón de Cargar Tarifas Peña (Centrado verticalmente en el medio) */}
+            <div className="w-full">
               <button
                 type="button"
                 onClick={handleLoadPenaPreset}
@@ -135,16 +135,17 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
           </div>
         )}
 
-        <div className={styles.rulesList}>
+        <div className={styles.rulesList} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
           {rules.length === 0 && <p className={styles.emptyState}>No hay tarifas configuradas.</p>}
           {rules.map((rule: any, idx) => (
             <div 
               key={idx} 
-              className="flex flex-col gap-3 p-4 rounded-xl mb-5 shadow-lg transition-all" 
+              className="flex flex-col gap-3 p-4 rounded-xl shadow-lg transition-all" 
               style={{ 
                 background: 'rgba(15, 23, 42, 0.95)', 
                 border: '1px solid rgba(255, 255, 255, 0.15)', 
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)' 
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+                marginBottom: '0.5rem'
               }}
             >
               {/* Cabecera del Card: Identificador de la Tarifa y Botón Papelera Sin Texto */}
