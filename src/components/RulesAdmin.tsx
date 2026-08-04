@@ -110,14 +110,14 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
     <div className={`glass-panel ${styles.adminPanel}`}>
       <div className={styles.innerBlackBox}>
         {isAdmin && (
-          <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col gap-2 mb-5">
             {/* Fila 1: Título */}
             <div>
               <h3 className="text-xl font-bold tracking-tight text-white">Configurador de Tarifas</h3>
             </div>
 
-            {/* Fila 2: Botón de Cargar Tarifas Peña (Separado con margen inferior) */}
-            <div className="mb-2">
+            {/* Fila 2: Botón de Cargar Tarifas Peña */}
+            <div>
               <button
                 type="button"
                 onClick={handleLoadPenaPreset}
@@ -126,7 +126,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                   backgroundColor: 'rgba(255, 255, 255, 0.08)', 
                   border: '1px solid rgba(255, 255, 255, 0.25)', 
                   color: '#ffffff', 
-                  padding: '0.65rem 1.25rem' 
+                  padding: '0.5rem 1.1rem' 
                 }}
               >
                 Cargar Tarifas Peña (Valdeganga)
