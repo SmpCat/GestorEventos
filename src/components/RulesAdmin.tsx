@@ -93,14 +93,14 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
   const handleLoadPenaPreset = () => {
     if (window.confirm('¿Quieres cargar la tabla estándar de tarifas de la Peña? Reemplazará las reglas actuales.')) {
       const penaRules: any[] = [
-        { name: 'Socio 1 día', days: 1, price: 25, isMember: true, minAge: 18, drinksAlcohol: null },
-        { name: 'Socio 2 días', days: 2, price: 45, isMember: true, minAge: 18, drinksAlcohol: null },
-        { name: 'Socio 3+ días', days: 3, price: 60, isMember: true, minAge: 18, drinksAlcohol: null },
-        { name: 'Socio 14-17 Sin Alcohol', days: 1, price: 15, isMember: true, minAge: 14, maxAge: 17, drinksAlcohol: false },
-        { name: 'No Socio 1 día', days: 1, price: 30, isMember: false, minAge: 18, drinksAlcohol: null },
-        { name: 'No Socio 2 días', days: 2, price: 50, isMember: false, minAge: 18, drinksAlcohol: null },
-        { name: 'No Socio 3+ días', days: 3, price: 70, isMember: false, minAge: 18, drinksAlcohol: null },
-        { name: 'No Socio 14-17 Sin Alcohol', days: 1, price: 20, isMember: false, minAge: 14, maxAge: 17, drinksAlcohol: false },
+        { name: 'Socio 1 día', days: 1, maxDays: 1, price: 25, isMember: true, minAge: 14, maxAge: null, drinksAlcohol: null },
+        { name: 'Socio 2 días', days: 2, maxDays: 2, price: 45, isMember: true, minAge: 14, maxAge: null, drinksAlcohol: null },
+        { name: 'Socio 3+ días', days: 3, maxDays: null, price: 60, isMember: true, minAge: 14, maxAge: null, drinksAlcohol: null },
+        { name: 'Socio 14-17 Sin Alcohol', days: 1, maxDays: null, price: 15, isMember: true, minAge: 14, maxAge: 17, drinksAlcohol: false },
+        { name: 'No Socio 1 día', days: 1, maxDays: 1, price: 30, isMember: false, minAge: 14, maxAge: null, drinksAlcohol: null },
+        { name: 'No Socio 2 días', days: 2, maxDays: 2, price: 50, isMember: false, minAge: 14, maxAge: null, drinksAlcohol: null },
+        { name: 'No Socio 3+ días', days: 3, maxDays: null, price: 70, isMember: false, minAge: 14, maxAge: null, drinksAlcohol: null },
+        { name: 'No Socio 14-17 Sin Alcohol', days: 1, maxDays: null, price: 20, isMember: false, minAge: 14, maxAge: 17, drinksAlcohol: false },
       ];
       setRules(penaRules);
     }
