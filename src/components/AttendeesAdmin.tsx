@@ -221,9 +221,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-bold uppercase tracking-wider text-white">Desglose de Tarifa</span>
                             {att.user.isMember ? (
-                              <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.4)' }}>Socio</span>
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.18)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.3)' }}>Socio</span>
                             ) : (
-                              <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>No Socio</span>
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.06)', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>No Socio</span>
                             )}
                             {att.user.age !== null && att.user.age !== undefined && (
                               <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}>{att.user.age}a</span>
@@ -439,9 +439,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-bold uppercase tracking-wider text-white">Desglose de Tarifa</span>
                                   {att.user.isMember ? (
-                                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.4)' }}>Socio</span>
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.18)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.3)' }}>Socio</span>
                                   ) : (
-                                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>No Socio</span>
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.06)', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>No Socio</span>
                                   )}
                                   {att.user.age !== null && att.user.age !== undefined && (
                                     <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}>{att.user.age}a</span>

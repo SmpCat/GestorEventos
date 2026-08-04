@@ -120,9 +120,9 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {user.isMember ? (
-                      <span className="badge" style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)', color: '#4ade80', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>Socio</span>
+                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.18)', border: '1px solid rgba(255, 255, 255, 0.3)', color: '#ffffff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 600 }}>Socio</span>
                     ) : (
-                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.15)', color: 'var(--text-secondary)', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>No Socio</span>
+                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>No Socio</span>
                     )}
                     {user.age !== null && user.age !== undefined && (
                       <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>{user.age} años</span>
