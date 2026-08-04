@@ -23,7 +23,7 @@ model User {
   email          String?
   phone          String?
   isAdmin        Boolean         @default(false)
-  isMember       Boolean         @default(false) // ¿Es socio/a de la peña?
+  isMember       Boolean         @default(true)  // ¿Es socio/a de la peña? (Por defecto Sí)
   age            Int?                            // Edad del usuario
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
