@@ -244,13 +244,6 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                             <strong className="text-white">{att.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}</strong>
                           </div>
                         </div>
-
-                        <div className="pt-2 text-xs" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                          <span className="text-secondary">Cálculo: </span>
-                          <span className="text-white font-medium">
-                            {att.user.isMember ? 'Socio' : 'No Socio'} · {att.user.age ? `${att.user.age}a · ` : ''}{att.drinksAlcohol ? 'Con Alcohol' : 'Sin Alcohol'} · {att.daysAttending}d ➔ <strong className="text-white">{att.expectedPayment !== null ? `${att.expectedPayment}€` : '0€'}</strong>
-                          </span>
-                        </div>
                       </div>
 
                       {isAdmin && (
@@ -468,13 +461,6 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                   <span className="text-secondary block mb-0.5">Consumo Alcohol:</span>
                                   <strong className="text-white">{att.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}</strong>
                                 </div>
-                              </div>
-
-                              <div className="pt-2 text-xs" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                                <span className="text-secondary">Cálculo: </span>
-                                <span className="text-white font-medium">
-                                  {att.user.isMember ? 'Socio' : 'No Socio'} · {att.user.age ? `${att.user.age}a · ` : ''}{att.drinksAlcohol ? 'Con Alcohol' : 'Sin Alcohol'} · {att.daysAttending}d ➔ <strong className="text-white">{att.expectedPayment !== null ? `${att.expectedPayment}€` : '0€'}</strong>
-                                </span>
                               </div>
                             </div>
 
