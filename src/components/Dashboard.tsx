@@ -49,8 +49,8 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                     style={{ opacity: loadingDays ? 0.6 : 1 }}
                   >
                     <option value={0}>No lo sé aún</option>
-                    {pricingRules?.map(r => (
-                      <option key={r.id} value={r.days}>{r.days} {r.days === 1 ? 'día' : 'días'}</option>
+                    {Array.from(new Set(pricingRules?.map(r => r.days) || [])).sort((a, b) => a - b).map(days => (
+                      <option key={days} value={days}>{days} {days === 1 ? 'día' : 'días'}</option>
                     ))}
                   </SelectField>
 
