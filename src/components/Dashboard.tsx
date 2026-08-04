@@ -38,14 +38,14 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
             <div className="glass-panel" style={{ width: '100%' }}>
               <div className={styles.innerBlackBox}>
 
-                {/* Selector de días e información de alcohol inline */}
-                <div className="flex flex-col items-center gap-3 mb-4">
+                {/* Selector de días e información de alcohol con proporciones idénticas */}
+                <div className="flex flex-col items-center gap-4 mb-5">
                   <SelectField
                     label="Asistencia"
                     value={attendee.daysAttending}
                     onChange={e => handleChangeDays(Number(e.target.value))}
                     disabled={loadingDays}
-                    containerStyle={{ width: 'fit-content', minWidth: '210px', margin: 0 }}
+                    containerStyle={{ width: '100%', maxWidth: '230px', margin: 0 }}
                     style={{ opacity: loadingDays ? 0.6 : 1 }}
                   >
                     <option value={0}>No lo sé aún</option>
@@ -54,21 +54,20 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                     ))}
                   </SelectField>
 
-                  {/* Consumo de Alcohol inline super compacto */}
-                  <div className="flex items-center justify-center gap-2 mt-1 whitespace-nowrap">
-                    <span className="text-secondary text-xs font-bold">¿Alcohol?:</span>
+                  {/* Consumo de Alcohol alineado con proporciones iguales a Asistencia */}
+                  <div className="flex items-center justify-between gap-2 w-full max-w-[230px]">
+                    <span className="text-secondary text-xs uppercase font-bold tracking-wider">¿Alcohol?:</span>
                     <button
                       type="button"
                       onClick={() => handleChangeDays(attendee.daysAttending, !attendee.drinksAlcohol)}
                       disabled={loadingDays}
-                      className="btn text-xs font-semibold transition-all"
+                      className="btn text-sm font-semibold transition-all"
                       style={{
-                        padding: '0.25rem 0.65rem',
-                        fontSize: '0.75rem',
+                        padding: '0.6rem 1rem',
                         backgroundColor: 'rgba(255, 255, 255, 0.08)',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         color: '#ffffff',
-                        borderRadius: '6px'
+                        borderRadius: '12px'
                       }}
                     >
                       {attendee.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}
