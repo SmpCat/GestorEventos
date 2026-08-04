@@ -151,16 +151,16 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                 )}
               </div>
 
-              {/* Fila 2 del item: Resto de campos ordenados con visibilidad perfecta */}
-              <div className="flex flex-wrap items-end gap-3 w-full pt-1">
+              {/* Fila 2 del item: Criterios de filtrado (Socio, Edad, Alcohol) */}
+              <div className="grid grid-cols-3 gap-2 w-full pt-1">
                 
                 {/* Socio */}
-                <div style={{ flex: '1 1 130px', minWidth: '130px' }}>
+                <div>
                   <label className="text-secondary text-xs font-bold block mb-1">¿Socio/a?</label>
                   {isAdmin ? (
                     <select
-                      className="input-field w-full text-sm"
-                      style={{ padding: '0.4rem 0.5rem' }}
+                      className="input-field w-full text-xs"
+                      style={{ padding: '0.4rem 0.25rem' }}
                       value={rule.isMember === true ? 'true' : rule.isMember === false ? 'false' : 'null'}
                       onChange={e => handleRuleChange(idx, 'isMember', e.target.value)}
                     >
@@ -169,20 +169,20 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                       <option value="false">No Socio</option>
                     </select>
                   ) : (
-                    <span className="text-sm font-medium">{rule.isMember === true ? 'Sí (Socio)' : rule.isMember === false ? 'No Socio' : 'Todos'}</span>
+                    <span className="text-xs font-medium">{rule.isMember === true ? 'Sí' : rule.isMember === false ? 'No' : 'Todos'}</span>
                   )}
                 </div>
 
                 {/* Tramo Edad */}
-                <div style={{ flex: '1 1 140px', minWidth: '140px' }}>
-                  <label className="text-secondary text-xs font-bold block mb-1">Tramo Edad</label>
+                <div>
+                  <label className="text-secondary text-xs font-bold block mb-1">Edad</label>
                   {isAdmin ? (
                     <div className="flex items-center gap-1">
                       <input
                         type="number"
                         placeholder="Min"
-                        className="input-field text-sm text-center"
-                        style={{ width: '48%', padding: '0.4rem 0.2rem' }}
+                        className="input-field text-xs text-center"
+                        style={{ width: '50%', padding: '0.4rem 0.1rem' }}
                         value={rule.minAge !== null && rule.minAge !== undefined ? rule.minAge : ''}
                         onChange={e => handleRuleChange(idx, 'minAge', e.target.value)}
                       />
@@ -190,70 +190,77 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                       <input
                         type="number"
                         placeholder="Max"
-                        className="input-field text-sm text-center"
-                        style={{ width: '48%', padding: '0.4rem 0.2rem' }}
+                        className="input-field text-xs text-center"
+                        style={{ width: '50%', padding: '0.4rem 0.1rem' }}
                         value={rule.maxAge !== null && rule.maxAge !== undefined ? rule.maxAge : ''}
                         onChange={e => handleRuleChange(idx, 'maxAge', e.target.value)}
                       />
                     </div>
                   ) : (
-                    <span className="text-sm font-medium">
-                      {rule.minAge ? `De ${rule.minAge}a` : ''} {rule.maxAge ? `a ${rule.maxAge}a` : ''} {!rule.minAge && !rule.maxAge ? 'Cualquiera' : ''}
+                    <span className="text-xs font-medium">
+                      {rule.minAge ? `${rule.minAge}` : '0'}-{rule.maxAge ? `${rule.maxAge}` : '∞'}a
                     </span>
                   )}
                 </div>
 
                 {/* Alcohol */}
-                <div style={{ flex: '1 1 140px', minWidth: '140px' }}>
+                <div>
                   <label className="text-secondary text-xs font-bold block mb-1">Alcohol</label>
                   {isAdmin ? (
                     <select
-                      className="input-field w-full text-sm"
-                      style={{ padding: '0.4rem 0.5rem' }}
+                      className="input-field w-full text-xs"
+                      style={{ padding: '0.4rem 0.25rem' }}
                       value={rule.drinksAlcohol === true ? 'true' : rule.drinksAlcohol === false ? 'false' : 'null'}
                       onChange={e => handleRuleChange(idx, 'drinksAlcohol', e.target.value)}
                     >
                       <option value="null">Todos</option>
-                      <option value="true">Con Alcohol</option>
-                      <option value="false">Sin Alcohol</option>
+                      <option value="true">Con Alc.</option>
+                      <option value="false">Sin Alc.</option>
                     </select>
                   ) : (
-                    <span className="text-sm font-medium">{rule.drinksAlcohol === true ? 'Con Alcohol' : rule.drinksAlcohol === false ? 'Sin Alcohol' : 'Todos'}</span>
+                    <span className="text-xs font-medium">{rule.drinksAlcohol === true ? 'Con Alc.' : rule.drinksAlcohol === false ? 'Sin Alc.' : 'Todos'}</span>
                   )}
                 </div>
+              </div>
 
+              {/* Fila 3 del item: Días, Precio y Botón Borrar */}
+              <div className="flex items-center justify-between gap-3 w-full pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                
                 {/* Días */}
-                <div style={{ flex: '0 1 80px', minWidth: '70px' }}>
-                  <label className="text-secondary text-xs font-bold block mb-1">Días</label>
+                <div className="flex items-center gap-2">
+                  <label className="text-secondary text-xs font-bold">Días:</label>
                   {isAdmin ? (
                     <input 
                       type="number" 
                       min="1" 
                       placeholder="1"
-                      className="input-field w-full text-sm text-center"
-                      style={{ padding: '0.4rem 0.2rem' }}
+                      className="input-field text-sm text-center font-bold"
+                      style={{ width: '60px', padding: '0.3rem 0.2rem' }}
                       value={rule.days}
                       onChange={e => handleRuleChange(idx, 'days', e.target.value)}
                     />
                   ) : (
-                    <strong className={styles.daysValue}>{rule.days} d</strong>
+                    <strong className={styles.daysValue}>{rule.days} días</strong>
                   )}
                 </div>
 
                 {/* Precio (€) */}
-                <div style={{ flex: '0 1 90px', minWidth: '80px' }}>
-                  <label className="text-secondary text-xs font-bold block mb-1">Precio (€)</label>
+                <div className="flex items-center gap-2">
+                  <label className="text-secondary text-xs font-bold">Cuota:</label>
                   {isAdmin ? (
-                    <input 
-                      type="number" 
-                      min="0" 
-                      step="0.5"
-                      placeholder="0"
-                      className="input-field w-full text-sm text-center font-bold"
-                      style={{ padding: '0.4rem 0.2rem' }}
-                      value={rule.price}
-                      onChange={e => handleRuleChange(idx, 'price', e.target.value)}
-                    />
+                    <div className="flex items-center gap-1">
+                      <input 
+                        type="number" 
+                        min="0" 
+                        step="0.5"
+                        placeholder="0"
+                        className="input-field text-sm text-center font-bold"
+                        style={{ width: '70px', padding: '0.3rem 0.2rem' }}
+                        value={rule.price}
+                        onChange={e => handleRuleChange(idx, 'price', e.target.value)}
+                      />
+                      <span className="font-bold text-sm">€</span>
+                    </div>
                   ) : (
                     <strong className={styles.priceValue}>{rule.price}€</strong>
                   )}
@@ -261,11 +268,13 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
 
                 {/* Botón Borrar */}
                 {isAdmin && (
-                  <div className="flex items-center justify-end pb-1 ml-auto">
+                  <div>
                     <button 
+                      type="button"
                       onClick={() => handleRemoveRule(idx)} 
                       className={styles.deleteBtn}
                       title="Borrar Regla"
+                      style={{ padding: '0.4rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
                     >
                       <TrashIcon />
                     </button>
