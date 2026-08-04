@@ -84,9 +84,9 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
         return;
       }
       setSavedRulesJSON(JSON.stringify(validRules));
-      setRules([...validRules, { name: '', days: 1, price: 0, isMember: null, minAge: null, maxAge: null, drinksAlcohol: null }]);
+      setRules([...validRules, { name: '', days: 1, price: 0, isMember: true, minAge: null, maxAge: null, drinksAlcohol: null }]);
     } else {
-      setRules(prev => [...prev, { name: '', days: 1, price: 0, isMember: null, minAge: null, maxAge: null, drinksAlcohol: null }]);
+      setRules(prev => [...prev, { name: '', days: 1, price: 0, isMember: true, minAge: null, maxAge: null, drinksAlcohol: null }]);
     }
   };
 
@@ -196,17 +196,16 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                   <label className="text-secondary text-xs font-bold block mb-1">¿Socio/a?</label>
                   {isAdmin ? (
                     <select
-                      className="input-field w-full text-sm text-white"
+                      className="input-field w-full text-sm text-white font-medium"
                       style={{ padding: '0.45rem 0.5rem', boxSizing: 'border-box' }}
-                      value={rule.isMember === true ? 'true' : rule.isMember === false ? 'false' : 'null'}
+                      value={rule.isMember === false ? 'false' : 'true'}
                       onChange={e => handleRuleChange(idx, 'isMember', e.target.value)}
                     >
-                      <option value="null">Todos (Socios y No Socios)</option>
-                      <option value="true">Sí (Solo Socios)</option>
-                      <option value="false">No (Solo No Socios)</option>
+                      <option value="true">Sí (Socio)</option>
+                      <option value="false">No (No Socio)</option>
                     </select>
                   ) : (
-                    <span className="text-sm font-medium text-white">{rule.isMember === true ? 'Sí (Socio)' : rule.isMember === false ? 'No Socio' : 'Todos'}</span>
+                    <span className="text-sm font-medium text-white">{rule.isMember === false ? 'No Socio' : 'Sí (Socio)'}</span>
                   )}
                 </div>
 
