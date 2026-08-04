@@ -133,109 +133,140 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
         <div className={styles.rulesList}>
           {rules.length === 0 && <p className={styles.emptyState}>No hay tarifas configuradas.</p>}
           {rules.map((rule: any, idx) => (
-            <div key={idx} className="flex flex-col gap-3 p-4 rounded-xl mb-3" style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div 
+              key={idx} 
+              className="flex flex-col gap-3 p-4 rounded-xl mb-4 shadow-lg transition-all" 
+              style={{ 
+                background: 'rgba(15, 23, 42, 0.9)', 
+                border: '1px solid rgba(255, 255, 255, 0.15)', 
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)' 
+              }}
+            >
+              {/* Cabecera del Card: Identificador de la Tarifa y Botón Borrar */}
+              <div className="flex items-center justify-between pb-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'var(--accent-primary)' }}>
+                    Tarifa #{idx + 1}
+                  </span>
+                  <span className="text-xs text-secondary font-medium">
+                    {rule.name ? rule.name : `Regla de ${rule.days} días`}
+                  </span>
+                </div>
+                {isAdmin && (
+                  <button 
+                    type="button"
+                    onClick={() => handleRemoveRule(idx)} 
+                    className={styles.deleteBtn}
+                    title="Borrar Regla"
+                    style={{ padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171' }}
+                  >
+                    <TrashIcon /> <span className="text-xs ml-1 hidden sm:inline">Eliminar</span>
+                  </button>
+                )}
+              </div>
               
-              {/* Fila 1 del item: Nombre Tarifa que ocupe una sola fila completa */}
+              {/* Fila 1: Nombre de la Tarifa (Ancho completo 100%) */}
               <div className="w-full">
-                <label className="text-secondary text-xs uppercase font-bold tracking-wider block mb-1">Nombre Tarifa</label>
+                <label className="text-secondary text-xs uppercase font-bold tracking-wider block mb-1">Nombre de la Tarifa</label>
                 {isAdmin ? (
                   <input
                     type="text"
                     placeholder="Ej. Socio Adulto 1 día"
                     className="input-field w-full text-sm font-semibold"
+                    style={{ boxSizing: 'border-box' }}
                     value={rule.name || ''}
                     onChange={e => handleRuleChange(idx, 'name', e.target.value)}
                   />
                 ) : (
-                  <span className="font-bold text-accent text-base">{rule.name || 'Tarifa general'}</span>
+                  <span className="font-bold text-accent text-base block">{rule.name || 'Tarifa general'}</span>
                 )}
               </div>
 
-              {/* Fila 2 del item: Criterios de filtrado (Socio, Edad, Alcohol) */}
-              <div className="grid grid-cols-3 gap-2 w-full pt-1">
+              {/* Fila 2: Criterios principales (Socio, Edad, Alcohol) - Adaptables en Móvil */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
                 
                 {/* Socio */}
-                <div>
+                <div className="w-full">
                   <label className="text-secondary text-xs font-bold block mb-1">¿Socio/a?</label>
                   {isAdmin ? (
                     <select
-                      className="input-field w-full text-xs"
-                      style={{ padding: '0.4rem 0.25rem' }}
+                      className="input-field w-full text-sm"
+                      style={{ padding: '0.45rem 0.5rem', boxSizing: 'border-box' }}
                       value={rule.isMember === true ? 'true' : rule.isMember === false ? 'false' : 'null'}
                       onChange={e => handleRuleChange(idx, 'isMember', e.target.value)}
                     >
-                      <option value="null">Todos</option>
-                      <option value="true">Sí (Socio)</option>
-                      <option value="false">No Socio</option>
+                      <option value="null">Todos (Socios y No Socios)</option>
+                      <option value="true">Sí (Solo Socios)</option>
+                      <option value="false">No (Solo No Socios)</option>
                     </select>
                   ) : (
-                    <span className="text-xs font-medium">{rule.isMember === true ? 'Sí' : rule.isMember === false ? 'No' : 'Todos'}</span>
+                    <span className="text-sm font-medium">{rule.isMember === true ? 'Sí (Socio)' : rule.isMember === false ? 'No Socio' : 'Todos'}</span>
                   )}
                 </div>
 
                 {/* Tramo Edad */}
-                <div>
-                  <label className="text-secondary text-xs font-bold block mb-1">Edad</label>
+                <div className="w-full">
+                  <label className="text-secondary text-xs font-bold block mb-1">Tramo de Edad (Años)</label>
                   {isAdmin ? (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <input
                         type="number"
                         placeholder="Min"
-                        className="input-field text-xs text-center"
-                        style={{ width: '50%', padding: '0.4rem 0.1rem' }}
+                        className="input-field text-sm text-center"
+                        style={{ width: '50%', padding: '0.45rem 0.2rem', boxSizing: 'border-box' }}
                         value={rule.minAge !== null && rule.minAge !== undefined ? rule.minAge : ''}
                         onChange={e => handleRuleChange(idx, 'minAge', e.target.value)}
                       />
-                      <span className="text-xs text-secondary">-</span>
+                      <span className="text-xs text-secondary">a</span>
                       <input
                         type="number"
                         placeholder="Max"
-                        className="input-field text-xs text-center"
-                        style={{ width: '50%', padding: '0.4rem 0.1rem' }}
+                        className="input-field text-sm text-center"
+                        style={{ width: '50%', padding: '0.45rem 0.2rem', boxSizing: 'border-box' }}
                         value={rule.maxAge !== null && rule.maxAge !== undefined ? rule.maxAge : ''}
                         onChange={e => handleRuleChange(idx, 'maxAge', e.target.value)}
                       />
                     </div>
                   ) : (
-                    <span className="text-xs font-medium">
-                      {rule.minAge ? `${rule.minAge}` : '0'}-{rule.maxAge ? `${rule.maxAge}` : '∞'}a
+                    <span className="text-sm font-medium">
+                      {rule.minAge ? `De ${rule.minAge}a` : 'Desde 0'} {rule.maxAge ? `a ${rule.maxAge}a` : 'en adelante'}
                     </span>
                   )}
                 </div>
 
                 {/* Alcohol */}
-                <div>
-                  <label className="text-secondary text-xs font-bold block mb-1">Alcohol</label>
+                <div className="w-full">
+                  <label className="text-secondary text-xs font-bold block mb-1">Consumo Alcohol</label>
                   {isAdmin ? (
                     <select
-                      className="input-field w-full text-xs"
-                      style={{ padding: '0.4rem 0.25rem' }}
+                      className="input-field w-full text-sm"
+                      style={{ padding: '0.45rem 0.5rem', boxSizing: 'border-box' }}
                       value={rule.drinksAlcohol === true ? 'true' : rule.drinksAlcohol === false ? 'false' : 'null'}
                       onChange={e => handleRuleChange(idx, 'drinksAlcohol', e.target.value)}
                     >
                       <option value="null">Todos</option>
-                      <option value="true">Con Alc.</option>
-                      <option value="false">Sin Alc.</option>
+                      <option value="true">Con Alcohol 🍺</option>
+                      <option value="false">Sin Alcohol 🥤</option>
                     </select>
                   ) : (
-                    <span className="text-xs font-medium">{rule.drinksAlcohol === true ? 'Con Alc.' : rule.drinksAlcohol === false ? 'Sin Alc.' : 'Todos'}</span>
+                    <span className="text-sm font-medium">{rule.drinksAlcohol === true ? 'Con Alcohol' : rule.drinksAlcohol === false ? 'Sin Alcohol' : 'Todos'}</span>
                   )}
                 </div>
               </div>
 
-              {/* Fila 3 del item: Días, Precio y Botón Borrar */}
-              <div className="flex items-center justify-between gap-3 w-full pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              {/* Fila 3: Días de Asistencia y Cuota (€) en una franja destacada */}
+              <div className="flex flex-wrap items-center justify-between gap-3 w-full pt-3 mt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '8px' }}>
                 
                 {/* Días */}
                 <div className="flex items-center gap-2">
-                  <label className="text-secondary text-xs font-bold">Días:</label>
+                  <label className="text-secondary text-xs font-bold">Días de Asistencia:</label>
                   {isAdmin ? (
                     <input 
                       type="number" 
                       min="1" 
                       placeholder="1"
                       className="input-field text-sm text-center font-bold"
-                      style={{ width: '60px', padding: '0.3rem 0.2rem' }}
+                      style={{ width: '70px', padding: '0.35rem 0.2rem' }}
                       value={rule.days}
                       onChange={e => handleRuleChange(idx, 'days', e.target.value)}
                     />
@@ -246,7 +277,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
 
                 {/* Precio (€) */}
                 <div className="flex items-center gap-2">
-                  <label className="text-secondary text-xs font-bold">Cuota:</label>
+                  <label className="text-secondary text-xs font-bold">Cuota a Cobrar:</label>
                   {isAdmin ? (
                     <div className="flex items-center gap-1">
                       <input 
@@ -255,31 +286,17 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
                         step="0.5"
                         placeholder="0"
                         className="input-field text-sm text-center font-bold"
-                        style={{ width: '70px', padding: '0.3rem 0.2rem' }}
+                        style={{ width: '85px', padding: '0.35rem 0.2rem', color: 'var(--accent-success)' }}
                         value={rule.price}
                         onChange={e => handleRuleChange(idx, 'price', e.target.value)}
                       />
-                      <span className="font-bold text-sm">€</span>
+                      <span className="font-bold text-sm" style={{ color: 'var(--accent-success)' }}>€</span>
                     </div>
                   ) : (
                     <strong className={styles.priceValue}>{rule.price}€</strong>
                   )}
                 </div>
 
-                {/* Botón Borrar */}
-                {isAdmin && (
-                  <div>
-                    <button 
-                      type="button"
-                      onClick={() => handleRemoveRule(idx)} 
-                      className={styles.deleteBtn}
-                      title="Borrar Regla"
-                      style={{ padding: '0.4rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
-                    >
-                      <TrashIcon />
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           ))}
