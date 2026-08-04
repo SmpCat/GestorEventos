@@ -263,33 +263,21 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
               {/* Fila 3: Días de Asistencia (Estilo Tramo de Edad) y Cuota a Cobrar (€) sin desbordamiento */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full pt-3 mt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                 
-                {/* Días de Asistencia (Estilo tramos de edad) */}
+                {/* Días de Asistencia (Un solo campo) */}
                 <div className="w-full">
                   <label className="text-secondary text-xs font-bold block mb-1">Días de Asistencia</label>
                   {isAdmin ? (
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="number" 
-                        min="1" 
-                        placeholder="Min"
-                        className="input-field text-sm text-center font-semibold text-white"
-                        style={{ width: '50%', padding: '0.45rem 0.2rem', boxSizing: 'border-box' }}
-                        value={rule.days}
-                        onChange={e => handleRuleChange(idx, 'days', e.target.value)}
-                      />
-                      <span className="text-xs text-secondary">a</span>
-                      <input 
-                        type="number" 
-                        min="1" 
-                        placeholder="Max"
-                        className="input-field text-sm text-center font-semibold text-white"
-                        style={{ width: '50%', padding: '0.45rem 0.2rem', boxSizing: 'border-box' }}
-                        value={rule.maxDays !== null && rule.maxDays !== undefined ? rule.maxDays : ''}
-                        onChange={e => handleRuleChange(idx, 'maxDays', e.target.value)}
-                      />
-                    </div>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      placeholder="Ej. 1"
+                      className="input-field w-full text-sm font-semibold text-white px-3"
+                      style={{ padding: '0.45rem 0.75rem', boxSizing: 'border-box' }}
+                      value={rule.days}
+                      onChange={e => handleRuleChange(idx, 'days', e.target.value)}
+                    />
                   ) : (
-                    <strong className="text-white text-sm">{rule.days} {rule.maxDays ? `a ${rule.maxDays}` : '+'} días</strong>
+                    <strong className="text-white text-base block">{rule.days} días</strong>
                   )}
                 </div>
 
