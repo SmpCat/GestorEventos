@@ -118,11 +118,17 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                     <h3 className={styles.userName}>{user.name}</h3>
                     <span className={styles.userHandle}>@{user.username}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    {user.isAdmin ? (
-                      <span className={`badge ${styles.adminBadge}`}>Admin</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    {user.isMember ? (
+                      <span className="badge" style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)', color: '#4ade80', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>Socio</span>
                     ) : (
-                      <span className={`badge ${styles.userBadge}`}>Usuario</span>
+                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.15)', color: 'var(--text-secondary)', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>No Socio</span>
+                    )}
+                    {user.age !== null && user.age !== undefined && (
+                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>{user.age} años</span>
+                    )}
+                    {user.isAdmin && (
+                      <span className={`badge ${styles.adminBadge}`}>Admin</span>
                     )}
                     <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>{isExpanded ? '▲' : '▼'}</span>
                   </div>

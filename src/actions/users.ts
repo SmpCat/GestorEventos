@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
+import { calculateExpectedPayment } from './attendance';
 
 // Obtener todos los usuarios
 export async function getUsers() {
@@ -64,7 +65,24 @@ export async function updateUser(id: string, data: any) {
       where: { id },
       data: updateData,
     });
+
+    // Recalcular cuota esperada en asistentes si ha cambiado su perfil de socio/edad
+    const attendees = await prisma.eventAttendee.findMany({
+      where: { userId: id, daysAttending: { gt: 0 } }
+    });
+    for (const att of attendees) {
+      const calc = await calculateExpectedPayment(att.eventId, id, att.daysAttending, att.drinksAlcohol);
+      if (calc.price !== null) {
+        await prisma.eventAttendee.update({
+          where: { id: att.id },
+          data: { expectedPayment: calc.price }
+        });
+      }
+    }
+
     revalidatePath('/admin/users');
+    revalidatePath('/pricing/attendees');
+    revalidatePath('/');
     return { success: true, data: user };
   } catch (error: any) {
     if (error.code === 'P2002') {
