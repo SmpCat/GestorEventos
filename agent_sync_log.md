@@ -45,3 +45,8 @@
 - **Campos Estructurados:** Tramo de Edad y Días de Asistencia configurables mediante pares `[ Min ] a [ Max ]`.
 - **Filtro Socio Binario:** Campo `¿Socio/a?` configurado como binario estricto (`Sí (Socio)` / `No (No Socio)`), eliminando la opción redundante.
 - **Preset de Tarifas Peña Valdeganga:** 8 reglas precargadas optimizadas a 1 solo clic que traducen de forma 1:1 la libreta de precios manuscrita del evento.
+
+### 5. Correcciones y Administración de Usuarios (`/admin/users`)
+- **Deduplicación de Opciones de Asistencia:** Corregido el selector de días en el Dashboard para mostrar únicamente días únicos (`1 día`, `2 días`, `3 días`), evitando repeticiones.
+- **Gestión de Perfil en Administración:** Añadida la visualización clara de `Socio`/`No Socio` y `Edad` en la lista de usuarios.
+- **Recálculo Dinámico de Cuotas:** Al modificar la edad o condición de socio de un usuario desde la administración, el sistema recalcula automáticamente sus cuotas esperadas en los eventos activos.

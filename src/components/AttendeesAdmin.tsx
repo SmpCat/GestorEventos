@@ -39,21 +39,31 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     setNewDays(att.daysAttending);
   };
 
-  const handleUpdateDays = async (attId: string, newVal: number) => {
+  const handleUpdateDays = async (attId: string, newVal: number, currentDrinks?: boolean) => {
     const label = newVal === 0 ? 'No lo sé aún' : `${newVal} días`;
     const confirmed = window.confirm(`¿Seguro que quieres cambiar la asistencia a "${label}"?`);
     if (!confirmed) {
-      // Revert select back to current by forcing a re-render
       setNewDays((prev) => prev === newVal ? '' : prev);
       return;
     }
 
     setLoading(`att-${attId}`);
-    const res = await updateAttendeeDays(attId, newVal);
+    const attendee = attendees.find(a => a.id === attId);
+    const drinks = currentDrinks !== undefined ? currentDrinks : (attendee?.drinksAlcohol ?? true);
+    const res = await updateAttendeeDays(attId, newVal, drinks);
     if (res.success) {
       setNewDays(newVal);
     } else {
       alert(res.error || 'Error al actualizar días.');
+    }
+    setLoading(null);
+  };
+
+  const handleUpdateAlcohol = async (attId: string, currentDays: number, drinks: boolean) => {
+    setLoading(`att-${attId}`);
+    const res = await updateAttendeeDays(attId, currentDays, drinks);
+    if (!res.success) {
+      alert(res.error || 'Error al actualizar preferencia de alcohol.');
     }
     setLoading(null);
   };
@@ -197,24 +207,88 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                     </div>
                   ) : (
                     <div className={styles.editSection}>
+                      
+                      {/* Ficha de Desglose de Tarifa y Perfil */}
+                      <div 
+                        className="p-3.5 rounded-xl mb-4 flex flex-col gap-2.5" 
+                        style={{ 
+                          background: 'rgba(15, 23, 42, 0.85)', 
+                          border: '1px solid rgba(255, 255, 255, 0.12)', 
+                          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)' 
+                        }}
+                      >
+                        <div className="flex items-center justify-between pb-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-white">Desglose de Tarifa</span>
+                            {att.user.isMember ? (
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.4)' }}>Socio</span>
+                            ) : (
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>No Socio</span>
+                            )}
+                            {att.user.age !== null && att.user.age !== undefined && (
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}>{att.user.age}a</span>
+                            )}
+                          </div>
+                          <span className="text-sm font-bold text-white">
+                            {att.expectedPayment !== null ? `${att.expectedPayment}€` : '0€'}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-xs pt-0.5">
+                          <div>
+                            <span className="text-secondary block mb-0.5">Asistencia:</span>
+                            <strong className="text-white">{att.daysAttending > 0 ? `${att.daysAttending} ${att.daysAttending === 1 ? 'día' : 'días'}` : 'Sin confirmar'}</strong>
+                          </div>
+                          <div>
+                            <span className="text-secondary block mb-0.5">Consumo Alcohol:</span>
+                            <strong className="text-white">{att.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}</strong>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 text-xs" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                          <span className="text-secondary">Cálculo: </span>
+                          <span className="text-white font-medium">
+                            {att.user.isMember ? 'Socio' : 'No Socio'} · {att.user.age ? `${att.user.age}a · ` : ''}{att.drinksAlcohol ? 'Con Alcohol' : 'Sin Alcohol'} · {att.daysAttending}d ➔ <strong className="text-white">{att.expectedPayment !== null ? `${att.expectedPayment}€` : '0€'}</strong>
+                          </span>
+                        </div>
+                      </div>
+
                       {isAdmin && (
                         <div className={styles.actionBox} style={{ marginBottom: '1rem' }}>
-                          <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
-                          <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem', alignItems: 'center' }}>
-                            <span className={styles.infoLabel} style={{ minWidth: '40px' }}>Días:</span>
-                            <div style={{ flex: 1, maxWidth: '250px' }}>
-                              <SelectField
-                                value={newDays}
-                                onChange={e => handleUpdateDays(att.id, Number(e.target.value))}
-                                disabled={isProcessing}
-                                containerStyle={{ width: '100%', marginBottom: 0 }}
-                                style={{ opacity: isProcessing ? 0.6 : 1 }}
-                              >
-                                <option value={0}>No lo sé aún</option>
-                                {pricingRules.map(r => (
-                                  <option key={r.id} value={r.days}>{r.days} días ({r.price}€)</option>
-                                ))}
-                              </SelectField>
+                          <div className={styles.actionBoxTitleAlt}>Opciones de Asistencia (Admin)</div>
+                          <div className="flex flex-col gap-3 mt-2">
+                            <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
+                              <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Días:</span>
+                              <div style={{ flex: 1, maxWidth: '250px' }}>
+                                <SelectField
+                                  value={newDays}
+                                  onChange={e => handleUpdateDays(att.id, Number(e.target.value))}
+                                  disabled={isProcessing}
+                                  containerStyle={{ width: '100%', marginBottom: 0 }}
+                                  style={{ opacity: isProcessing ? 0.6 : 1 }}
+                                >
+                                  <option value={0}>No lo sé aún</option>
+                                  {Array.from(new Set(pricingRules.map(r => r.days))).sort((a,b)=>a-b).map(days => (
+                                    <option key={days} value={days}>{days} {days === 1 ? 'día' : 'días'}</option>
+                                  ))}
+                                </SelectField>
+                              </div>
+                            </div>
+
+                            <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
+                              <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Alcohol:</span>
+                              <div style={{ flex: 1, maxWidth: '250px' }}>
+                                <SelectField
+                                  value={att.drinksAlcohol ? 'true' : 'false'}
+                                  onChange={e => handleUpdateAlcohol(att.id, att.daysAttending, e.target.value === 'true')}
+                                  disabled={isProcessing}
+                                  containerStyle={{ width: '100%', marginBottom: 0 }}
+                                  style={{ opacity: isProcessing ? 0.6 : 1 }}
+                                >
+                                  <option value="true">🍺 Con Alcohol</option>
+                                  <option value="false">🥤 Sin Alcohol</option>
+                                </SelectField>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -359,23 +433,86 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                             >
                               ▲ Cerrar Panel
                             </button>
+                            {/* Ficha de Desglose de Tarifa y Perfil (Desktop) */}
+                            <div 
+                              className="p-3.5 rounded-xl mb-4 flex flex-col gap-2.5" 
+                              style={{ 
+                                background: 'rgba(15, 23, 42, 0.85)', 
+                                border: '1px solid rgba(255, 255, 255, 0.12)', 
+                                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)' 
+                              }}
+                            >
+                              <div className="flex items-center justify-between pb-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold uppercase tracking-wider text-white">Desglose de Tarifa</span>
+                                  {att.user.isMember ? (
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.4)' }}>Socio</span>
+                                  ) : (
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>No Socio</span>
+                                  )}
+                                  {att.user.age !== null && att.user.age !== undefined && (
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}>{att.user.age}a</span>
+                                  )}
+                                </div>
+                                <span className="text-sm font-bold text-white">
+                                  {att.expectedPayment !== null ? `${att.expectedPayment}€` : '0€'}
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2 text-xs pt-0.5">
+                                <div>
+                                  <span className="text-secondary block mb-0.5">Asistencia:</span>
+                                  <strong className="text-white">{att.daysAttending > 0 ? `${att.daysAttending} ${att.daysAttending === 1 ? 'día' : 'días'}` : 'Sin confirmar'}</strong>
+                                </div>
+                                <div>
+                                  <span className="text-secondary block mb-0.5">Consumo Alcohol:</span>
+                                  <strong className="text-white">{att.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}</strong>
+                                </div>
+                              </div>
+
+                              <div className="pt-2 text-xs" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                                <span className="text-secondary">Cálculo: </span>
+                                <span className="text-white font-medium">
+                                  {att.user.isMember ? 'Socio' : 'No Socio'} · {att.user.age ? `${att.user.age}a · ` : ''}{att.drinksAlcohol ? 'Con Alcohol' : 'Sin Alcohol'} · {att.daysAttending}d ➔ <strong className="text-white">{att.expectedPayment !== null ? `${att.expectedPayment}€` : '0€'}</strong>
+                                </span>
+                              </div>
+                            </div>
+
                             <div className={styles.actionBox}>
                               {isAdmin && (
                                 <>
-                                  <div className={styles.actionBoxTitleAlt}>Días de Asistencia</div>
-                                  <div className={styles.addPaymentRow} style={{ marginTop: '0.25rem', alignItems: 'center' }}>
-                                    <div style={{ flex: 1 }}>
-                                      <SelectField
-                                        value={newDays}
-                                        onChange={e => setNewDays(Number(e.target.value))}
-                                        disabled={isProcessing}
-                                        containerStyle={{ width: '100%', marginBottom: 0 }}
-                                      >
-                                        <option value={0}>No lo sé aún</option>
-                                        {pricingRules.map(r => (
-                                          <option key={r.id} value={r.days}>{r.days} días ({r.price}€)</option>
-                                        ))}
-                                      </SelectField>
+                                  <div className={styles.actionBoxTitleAlt}>Opciones de Asistencia (Admin)</div>
+                                  <div className="flex flex-col gap-3 mt-2">
+                                    <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
+                                      <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Días:</span>
+                                      <div style={{ flex: 1 }}>
+                                        <SelectField
+                                          value={newDays}
+                                          onChange={e => handleUpdateDays(att.id, Number(e.target.value))}
+                                          disabled={isProcessing}
+                                          containerStyle={{ width: '100%', marginBottom: 0 }}
+                                        >
+                                          <option value={0}>No lo sé aún</option>
+                                          {Array.from(new Set(pricingRules.map(r => r.days))).sort((a,b)=>a-b).map(days => (
+                                            <option key={days} value={days}>{days} {days === 1 ? 'día' : 'días'}</option>
+                                          ))}
+                                        </SelectField>
+                                      </div>
+                                    </div>
+
+                                    <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
+                                      <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Alcohol:</span>
+                                      <div style={{ flex: 1 }}>
+                                        <SelectField
+                                          value={att.drinksAlcohol ? 'true' : 'false'}
+                                          onChange={e => handleUpdateAlcohol(att.id, att.daysAttending, e.target.value === 'true')}
+                                          disabled={isProcessing}
+                                          containerStyle={{ width: '100%', marginBottom: 0 }}
+                                        >
+                                          <option value="true">🍺 Con Alcohol</option>
+                                          <option value="false">🥤 Sin Alcohol</option>
+                                        </SelectField>
+                                      </div>
                                     </div>
                                   </div>
                                 </>
