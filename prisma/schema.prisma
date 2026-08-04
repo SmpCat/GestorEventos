@@ -66,11 +66,6 @@ model EventAttendee {
   daysAttending Int      @default(0)
   balance       Float    @default(0.0) // Saldo a favor en ESTE evento
   
-  // Atributos para cálculo de tarifa
-  isMember      Boolean  @default(false) // ¿Es socio/a de la peña?
-  age           Int?                     // Edad del asistente
-  drinksAlcohol Boolean  @default(true)  // ¿Consume alcohol?
-
   // Custom Pricing (Nuevos campos)
   expectedPayment Float?   // Lo que tiene que pagar. Nulo = automático según tabla.
   adminComment    String?  // Comentario del admin si sobrescribe el precio.

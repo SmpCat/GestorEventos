@@ -247,7 +247,7 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number) {
 
     let expectedPayment = 0;
     if (newDays > 0) {
-      const calc = await calculateExpectedPayment(attendee.eventId, attendee.userId, newDays, attendee.drinksAlcohol);
+      const calc = await calculateExpectedPayment(attendee.eventId, attendee.userId, newDays);
       if (calc.price === null) {
         return { success: false, error: calc.error || `No hay una tarifa aplicable.` };
       }
