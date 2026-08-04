@@ -133,14 +133,14 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
             </div>
           </div>
 
-          {/* Selector desplegable premium para Socio/a */}
+          {/* Selector desplegable premium para Socio/a (por defecto No Socio) */}
           <SelectField
             label="¿Es Socio/a de la Peña?"
             value={formData.isMember ? 'true' : 'false'}
             onChange={e => setFormData({ ...formData, isMember: e.target.value === 'true' })}
           >
-            <option value="true">Sí (Socio/a)</option>
             <option value="false">No (No Socio/a)</option>
+            <option value="true">Sí (Socio/a)</option>
           </SelectField>
 
           <div className="input-group">
