@@ -48,5 +48,10 @@
 
 ### 5. Correcciones y Administración de Usuarios (`/admin/users`)
 - **Deduplicación de Opciones de Asistencia:** Corregido el selector de días en el Dashboard para mostrar únicamente días únicos (`1 día`, `2 días`, `3 días`), evitando repeticiones.
-- **Gestión de Perfil en Administración:** Añadida la visualización clara de `Socio`/`No Socio` y `Edad` en la lista de usuarios.
+- **Gestión de Perfil en Administración:** Añadida la visualización clara de `Socio`/`No Socio` (monocromático) y `Edad` en la lista de usuarios.
 - **Recálculo Dinámico de Cuotas:** Al modificar la edad o condición de socio de un usuario desde la administración, el sistema recalcula automáticamente sus cuotas esperadas en los eventos activos.
+
+### 6. Formularios de Registro de Usuarios (`/register` y Modal Admin)
+- **Reordenación de Campos:** Campos obligatorios (Nombre, Nick, Password, Socio, Edad) arriba del todo; campos opcionales (Email, Teléfono) desplazados al final.
+- **Selector de Socio:** Implementado mediante `SelectField` premium con valor por defecto `No (No Socio/a)`.
+- **Desglose en Asistentes (`/pricing/attendees`):** Añadido panel informativo transparente de tarifa por asistente y controles de edición por parte del administrador.
