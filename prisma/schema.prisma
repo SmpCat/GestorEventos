@@ -117,7 +117,8 @@ model Payment {
 model PricingRule {
   id            String   @id @default(uuid())
   name          String?  // ej. "Socio Adulto (1 día)"
-  days          Int      // 1, 2, 3 (o más)
+  days          Int      // 1, 2, 3 (o más) (Días mínimos)
+  maxDays       Int?     // Días máximos (inclusive, null = sin límite)
   price         Float
   
   // Filtros condicionales (opcionales: null = aplica a todos)

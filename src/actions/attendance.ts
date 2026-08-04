@@ -22,6 +22,7 @@ export interface PricingRuleInput {
   id?: string;
   name?: string | null;
   days: number;
+  maxDays?: number | null;
   price: number;
   isMember?: boolean | null;
   minAge?: number | null;
@@ -46,6 +47,7 @@ export async function savePricingRules(eventId: string, rules: PricingRuleInput[
           data: rules.map(r => ({
             name: r.name || null,
             days: r.days,
+            maxDays: r.maxDays !== undefined ? r.maxDays : null,
             price: r.price,
             isMember: r.isMember !== undefined ? r.isMember : null,
             minAge: r.minAge !== undefined ? r.minAge : null,
@@ -157,8 +159,8 @@ export async function calculateExpectedPayment(
 
   // Filtrar reglas compatibles
   const matchingRules = rules.filter(rule => {
-    // Días: coincide exactamente o si tiene 3+ días y la regla es >= 3
-    const daysMatch = rule.days === daysAttending || (daysAttending >= 3 && rule.days === 3);
+    // Días: coincide dentro del rango [rule.days, rule.maxDays]
+    const daysMatch = daysAttending >= rule.days && (rule.maxDays === null || rule.maxDays === undefined || daysAttending <= rule.maxDays) || (daysAttending === rule.days);
     if (!daysMatch) return false;
 
     // Filtro Socio
