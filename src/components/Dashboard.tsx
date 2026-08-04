@@ -49,9 +49,13 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                     style={{ opacity: loadingDays ? 0.6 : 1 }}
                   >
                     <option value={0}>No lo sé aún</option>
-                    {Array.from(new Set(pricingRules?.map(r => r.days) || [])).sort((a, b) => a - b).map(days => (
-                      <option key={days} value={days}>{days} {days === 1 ? 'día' : 'días'}</option>
-                    ))}
+                    {(() => {
+                      const availableDays = Array.from(new Set(pricingRules?.map(r => r.days) || [])).sort((a, b) => a - b);
+                      const daysList = availableDays.length > 0 ? availableDays : [1, 2, 3];
+                      return daysList.map(days => (
+                        <option key={days} value={days}>{days} {days === 1 ? 'día' : 'días'}</option>
+                      ));
+                    })()}
                   </SelectField>
 
                   <SelectField
