@@ -87,51 +87,78 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="input-group mt-2">
-            <label className="input-label">Email (Opcional, para recuperar cuenta)</label>
-            <input 
-              type="email" 
-              className="input-field" 
-              placeholder="pepe@email.com"
-              value={formData.email}
-              onChange={e => setFormData({...formData, email: e.target.value})}
-            />
+          {/* Selector binario prominente para Socio/a */}
+          <div className="input-group">
+            <label className="input-label mb-1.5 block">¿Es Socio/a de la Peña? *</label>
+            <div className="grid grid-cols-2 gap-2 p-1.5 rounded-xl" style={{ background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, isMember: true })}
+                className="py-2.5 px-3 rounded-lg text-sm font-bold transition-all text-center"
+                style={{
+                  backgroundColor: formData.isMember ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  border: formData.isMember ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid transparent',
+                  color: formData.isMember ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
+                  boxShadow: formData.isMember ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                }}
+              >
+                Sí (Socio)
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, isMember: false })}
+                className="py-2.5 px-3 rounded-lg text-sm font-bold transition-all text-center"
+                style={{
+                  backgroundColor: !formData.isMember ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  border: !formData.isMember ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid transparent',
+                  color: !formData.isMember ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
+                  boxShadow: !formData.isMember ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                }}
+              >
+                No (No Socio)
+              </button>
+            </div>
           </div>
 
           <div className="input-group">
-            <label className="input-label">Teléfono (Opcional, para pagos de Bizum)</label>
+            <label className="input-label">Edad (años)</label>
             <input 
-              type="text" 
+              type="number" 
               className="input-field" 
-              placeholder="600123456"
-              value={formData.phone}
-              onChange={e => setFormData({...formData, phone: e.target.value})}
+              placeholder="Ej. 25"
+              min="0"
+              max="120"
+              value={formData.age}
+              onChange={e => setFormData({...formData, age: e.target.value})}
             />
           </div>
 
-          <div className="flex mobile-col gap-4">
-            <div className="input-group" style={{ flex: 1 }}>
-              <label className="input-label">Edad (para cuota)</label>
-              <input 
-                type="number" 
-                className="input-field" 
-                placeholder="Ej. 25"
-                min="0"
-                max="120"
-                value={formData.age}
-                onChange={e => setFormData({...formData, age: e.target.value})}
-              />
-            </div>
-            <div className="input-group flex items-end pb-2" style={{ flex: 1 }}>
-              <label className="checkbox-label">
+          {/* Sección de Campos Opcionales al final */}
+          <div className="pt-2 mt-2" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <p className="text-secondary text-xs uppercase font-bold tracking-wider mb-3">Campos Opcionales</p>
+
+            <div className="flex flex-col gap-4">
+              <div className="input-group">
+                <label className="input-label">Email (Opcional, para recuperar cuenta)</label>
                 <input 
-                  type="checkbox" 
-                  checked={formData.isMember}
-                  onChange={e => setFormData({...formData, isMember: e.target.checked})}
-                  style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--accent-primary)' }}
+                  type="email" 
+                  className="input-field" 
+                  placeholder="pepe@email.com"
+                  value={formData.email}
+                  onChange={e => setFormData({...formData, email: e.target.value})}
                 />
-                Es Socio/a de la Peña
-              </label>
+              </div>
+
+              <div className="input-group">
+                <label className="input-label">Teléfono (Opcional, para pagos de Bizum)</label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="600123456"
+                  value={formData.phone}
+                  onChange={e => setFormData({...formData, phone: e.target.value})}
+                />
+              </div>
             </div>
           </div>
 
