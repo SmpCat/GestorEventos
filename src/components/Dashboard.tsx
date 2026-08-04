@@ -38,14 +38,14 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
             <div className="glass-panel" style={{ width: '100%' }}>
               <div className={styles.innerBlackBox}>
 
-                {/* Selector de días e información de alcohol con proporciones idénticas */}
-                <div className="flex flex-col items-center gap-4 mb-5">
+                {/* Selector de días e información de alcohol alineados en paralelo */}
+                <div className="flex flex-col items-center gap-4 mb-6">
                   <SelectField
                     label="Asistencia"
                     value={attendee.daysAttending}
                     onChange={e => handleChangeDays(Number(e.target.value))}
                     disabled={loadingDays}
-                    containerStyle={{ width: '100%', maxWidth: '230px', margin: 0 }}
+                    containerStyle={{ width: '100%', maxWidth: '240px', margin: 0 }}
                     style={{ opacity: loadingDays ? 0.6 : 1 }}
                   >
                     <option value={0}>No lo sé aún</option>
@@ -54,8 +54,8 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                     ))}
                   </SelectField>
 
-                  {/* Consumo de Alcohol alineado con proporciones iguales a Asistencia */}
-                  <div className="flex items-center justify-between gap-2 w-full max-w-[230px]">
+                  {/* Consumo de Alcohol alineado en paralelo (mismo ancho de 240px) */}
+                  <div className="flex items-center justify-between gap-2 w-full max-w-[240px]">
                     <span className="text-secondary text-xs uppercase font-bold tracking-wider">¿Alcohol?:</span>
                     <button
                       type="button"
@@ -63,7 +63,7 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                       disabled={loadingDays}
                       className="btn text-sm font-semibold transition-all"
                       style={{
-                        padding: '0.6rem 1rem',
+                        padding: '0.6rem 0.85rem',
                         backgroundColor: 'rgba(255, 255, 255, 0.08)',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         color: '#ffffff',
@@ -75,7 +75,8 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                   </div>
                 </div>
 
-                <p className={styles.quotaStatusText} style={{ fontSize: '1.1rem', margin: 0 }}>
+                {/* Tu cuota es... desplazado más abajo */}
+                <p className={styles.quotaStatusText} style={{ fontSize: '1.1rem', marginTop: '1.5rem', marginBottom: '0.5rem' }}>
                   Tu cuota es: <strong style={{ fontSize: '1.3rem', textShadow: '0 2px 15px rgba(0,0,0,0.9), 0 0 5px rgba(255,255,255,0.3)' }}>{attendee.expectedPayment !== null ? `${attendee.expectedPayment}€` : 'Calculando...'}</strong>
                 </p>
                 {(() => {
