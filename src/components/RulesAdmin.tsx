@@ -121,8 +121,13 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
               <button
                 type="button"
                 onClick={handleLoadPenaPreset}
-                className="btn text-sm w-full md:w-auto"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.6rem 1.2rem' }}
+                className="btn text-sm w-full md:w-auto font-semibold"
+                style={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)', 
+                  border: '1px solid rgba(255, 255, 255, 0.25)', 
+                  color: '#ffffff', 
+                  padding: '0.6rem 1.2rem' 
+                }}
               >
                 📋 Cargar Tarifas Peña (Valdeganga)
               </button>
@@ -137,7 +142,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
               key={idx} 
               className="flex flex-col gap-3 p-4 rounded-xl mb-4 shadow-lg transition-all" 
               style={{ 
-                background: 'rgba(15, 23, 42, 0.9)', 
+                background: 'rgba(20, 20, 25, 0.95)', 
                 border: '1px solid rgba(255, 255, 255, 0.15)', 
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)' 
               }}
@@ -145,7 +150,7 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
               {/* Cabecera del Card: Identificador de la Tarifa y Botón Borrar */}
               <div className="flex items-center justify-between pb-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'var(--accent-primary)' }}>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(255, 255, 255, 0.12)', color: '#facc15' }}>
                     Tarifa #{idx + 1}
                   </span>
                   <span className="text-xs text-secondary font-medium">
