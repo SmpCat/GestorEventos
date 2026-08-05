@@ -13,6 +13,12 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [isSelectAll, setIsSelectAll] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredUsers = users.filter((user: any) =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const toggleExpand = (id: string) => {
     setExpandedUserId(prev => prev === id ? null : id);
@@ -69,6 +75,27 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
           + Añadir Usuario
         </button>
 
+        <div style={{ position: 'relative', width: '100%' }}>
+          <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+          <input 
+            type="text" 
+            className="input-field" 
+            placeholder="Buscar usuario por nombre o nick..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: '100%', paddingLeft: '2.5rem', paddingRight: '2.5rem', borderRadius: '12px' }}
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', padding: '0.5rem' }}
+              title="Borrar búsqueda"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
         <div className={styles.userCard} style={{ padding: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <input 
@@ -100,12 +127,12 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
 
       <div className="glass-panel">
         <div className={styles.usersGrid}>
-          {users.length === 0 ? (
+          {filteredUsers.length === 0 ? (
             <div className={`glass-panel ${styles.emptyState}`}>
-              <p>No hay usuarios registrados en el sistema.</p>
+              <p>{searchQuery ? 'No se encontraron usuarios coincidentes.' : 'No hay usuarios registrados en el sistema.'}</p>
             </div>
           ) : (
-            users.map(user => {
+            filteredUsers.map(user => {
               const isExpanded = expandedUserId === user.id;
               return (
               <div key={user.id} className={styles.userCard}>

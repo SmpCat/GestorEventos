@@ -12,15 +12,32 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
   const [txAmount, setTxAmount] = useState('');
   const [txDescription, setTxDescription] = useState('');
   const [txAttendeeId, setTxAttendeeId] = useState<string>(''); // Vacio = Ninguno
+  const [attendeeSearch, setAttendeeSearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingPaymentId, setEditingPaymentId] = useState<string | null>(null);
+
+  const filteredAttendees = attendees.filter(a =>
+    a.user.name.toLowerCase().includes(attendeeSearch.toLowerCase()) ||
+    a.user.username.toLowerCase().includes(attendeeSearch.toLowerCase())
+  );
+
+  const filteredPayments = payments.filter((p: any) => {
+    const query = searchQuery.toLowerCase();
+    const descMatch = (p.description || '').toLowerCase().includes(query);
+    const userMatch = (p.attendee?.user?.name || '').toLowerCase().includes(query) || (p.attendee?.user?.username || '').toLowerCase().includes(query);
+    const regMatch = (p.registeredBy?.username || '').toLowerCase().includes(query) || (p.registeredBy?.name || '').toLowerCase().includes(query);
+    const amountMatch = (p.amount || '').toString().includes(query);
+    return descMatch || userMatch || regMatch || amountMatch;
+  });
 
   const resetForm = () => {
     setTxType('INCOME');
     setTxAmount('');
     setTxDescription('');
     setTxAttendeeId('');
+    setAttendeeSearch('');
     setEditingPaymentId(null);
   };
 
@@ -102,7 +119,16 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
 
           <div className={styles.addPaymentRow} style={{ marginTop: '1rem', alignItems: 'center' }}>
             <span className={styles.infoLabel} style={{ minWidth: '80px' }}>Asistente:</span>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <input 
+                type="text" 
+                className="input-field" 
+                placeholder="🔍 Filtrar lista de asistentes..." 
+                value={attendeeSearch}
+                onChange={e => setAttendeeSearch(e.target.value)}
+                disabled={isProcessing}
+                style={{ width: '100%', fontSize: '0.85rem', padding: '0.5rem 0.75rem', borderRadius: '8px' }}
+              />
               <SelectField
                 value={txAttendeeId}
                 onChange={(e) => setTxAttendeeId(e.target.value)}
@@ -111,7 +137,7 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
                 style={{ opacity: isProcessing ? 0.6 : 1 }}
               >
                 <option value="">--- Ninguno (Movimiento Externo) ---</option>
-                {attendees.map(a => (
+                {filteredAttendees.map(a => (
                   <option key={a.id} value={a.id}>{a.user.name} (@{a.user.username})</option>
                 ))}
               </SelectField>
@@ -179,14 +205,33 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
         </div>
       </div>
 
-      <div className={styles.headerRow} style={{ marginTop: '3rem' }}>
+      <div className={styles.headerRow} style={{ marginTop: '3rem', flexWrap: 'wrap', gap: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 className={styles.title} style={{ fontSize: '1.2rem' }}>Historial Global</h3>
+        <div style={{ position: 'relative', width: '100%', maxWidth: '350px' }}>
+          <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+          <input 
+            type="text" 
+            className="input-field" 
+            placeholder="Buscar concepto, nick o importe..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: '100%', paddingLeft: '2.25rem', paddingRight: '2rem', fontSize: '0.85rem', borderRadius: '10px' }}
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              style={{ position: 'absolute', right: '0.4rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1rem', padding: '0.25rem' }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
       
       <div className={styles.editSection}>
-        {payments && payments.length > 0 ? (
+        {filteredPayments && filteredPayments.length > 0 ? (
           <div className={styles.paymentsList}>
-            {payments.map((p: any) => (
+            {filteredPayments.map((p: any) => (
               <div key={p.id} className={styles.paymentRow} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', marginBottom: '0.5rem', border: '1px solid rgba(255,255,255,0.05)' }}>
                 
                 <div style={{ flex: '1 1 100%', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
