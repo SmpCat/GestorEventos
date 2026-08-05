@@ -172,8 +172,11 @@ export async function deleteAllNonAdminUsers() {
   }
 }
 
-// Modificaciones masivas de usuarios (Exclusivo Superadmin)
-export async function bulkUpdateUsers(actionType: 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_MEMBER' | 'SET_NON_MEMBER') {
+// Modificaciones masivas de usuarios con filtro personalizado (Exclusivo Superadmin)
+export type FilterType = 'ALL' | 'UNDER_18' | 'OVER_18' | 'MEMBERS' | 'NON_MEMBERS' | 'ADMINS' | 'NON_ADMINS';
+export type BulkActionType = 'SET_MEMBER' | 'SET_NON_MEMBER' | 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_AGE_18' | 'DELETE_CLEAN';
+
+export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType: BulkActionType) {
   try {
     const { getSession } = require('./auth');
     const session = await getSession();
@@ -181,19 +184,70 @@ export async function bulkUpdateUsers(actionType: 'GRANT_ADMIN' | 'REVOKE_ADMIN'
       return { success: false, error: 'Solo el Superadministrador (admin) puede realizar modificaciones masivas.' };
     }
 
+    // Construir la condición de filtrado (siempre excluyendo al usuario técnico admin)
+    const baseWhere: any = { username: { not: 'admin' } };
+
+    if (filterType === 'UNDER_18') {
+      baseWhere.OR = [{ age: { lt: 18 } }, { age: null }];
+    } else if (filterType === 'OVER_18') {
+      baseWhere.age = { gte: 18 };
+    } else if (filterType === 'MEMBERS') {
+      baseWhere.isMember = true;
+    } else if (filterType === 'NON_MEMBERS') {
+      baseWhere.isMember = false;
+    } else if (filterType === 'ADMINS') {
+      baseWhere.isAdmin = true;
+    } else if (filterType === 'NON_ADMINS') {
+      baseWhere.isAdmin = false;
+    }
+
+    // Si la acción es borrado masivo de limpios
+    if (actionType === 'DELETE_CLEAN') {
+      const targetUsers = await prisma.user.findMany({
+        where: baseWhere,
+        include: {
+          expenses: true,
+          eventAttendances: { include: { payments: true } },
+          shoppingTasks: true
+        }
+      });
+
+      let deletedCount = 0;
+      let skippedCount = 0;
+
+      for (const user of targetUsers) {
+        const hasExpenses = user.expenses.length > 0;
+        const hasPayments = user.eventAttendances.some((att: any) => att.payments.length > 0);
+        const hasShoppingItems = user.shoppingTasks && user.shoppingTasks.length > 0;
+
+        if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+          await prisma.eventAttendee.deleteMany({ where: { userId: user.id } });
+          await prisma.user.delete({ where: { id: user.id } });
+          deletedCount++;
+        } else {
+          skippedCount++;
+        }
+      }
+
+      revalidatePath('/admin/users');
+      return { success: true, isDelete: true, deletedCount, skippedCount };
+    }
+
+    // Acciones de actualización masiva
     let updateData: any = {};
-    if (actionType === 'GRANT_ADMIN') updateData = { isAdmin: true };
-    if (actionType === 'REVOKE_ADMIN') updateData = { isAdmin: false };
     if (actionType === 'SET_MEMBER') updateData = { isMember: true };
     if (actionType === 'SET_NON_MEMBER') updateData = { isMember: false };
+    if (actionType === 'GRANT_ADMIN') updateData = { isAdmin: true };
+    if (actionType === 'REVOKE_ADMIN') updateData = { isAdmin: false };
+    if (actionType === 'SET_AGE_18') updateData = { age: 18 };
 
     const res = await prisma.user.updateMany({
-      where: { username: { not: 'admin' } },
+      where: baseWhere,
       data: updateData
     });
 
     revalidatePath('/admin/users');
-    return { success: true, count: res.count };
+    return { success: true, isDelete: false, count: res.count };
   } catch (error: any) {
     return { success: false, error: 'Error en la actualización masiva: ' + error.message };
   }

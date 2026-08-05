@@ -4,8 +4,28 @@ import { useState } from 'react';
 import Link from 'next/link';
 import UserFormModal from './UserFormModal';
 import TrashIcon from './TrashIcon';
-import { deleteUser, deleteAllNonAdminUsers, bulkUpdateUsers } from '@/actions/users';
+import SelectField from './SelectField';
+import { deleteUser, bulkUpdateUsersFiltered, FilterType, BulkActionType } from '@/actions/users';
 import styles from './UserMaintenance.module.css';
+
+const FILTER_LABELS: Record<FilterType, string> = {
+  ALL: 'Todos los usuarios',
+  UNDER_18: 'Menores de 18 años (< 18)',
+  OVER_18: 'Mayores de 18 años (18+)',
+  MEMBERS: 'Solo Socios',
+  NON_MEMBERS: 'Solo No Socios',
+  ADMINS: 'Solo Administradores',
+  NON_ADMINS: 'Solo Usuarios Normales'
+};
+
+const ACTION_LABELS: Record<BulkActionType, string> = {
+  SET_MEMBER: 'Marcar como Socio/a (isMember: Sí)',
+  SET_NON_MEMBER: 'Marcar como No Socio/a (isMember: No)',
+  GRANT_ADMIN: 'Otorgar rol de Administrador',
+  REVOKE_ADMIN: 'Quitar rol de Administrador',
+  SET_AGE_18: 'Establecer Edad en 18 años',
+  DELETE_CLEAN: 'Borrar usuarios limpios (sin pagos/tickets)'
+};
 
 export default function UserMaintenance({ users, session }: { users: any[], session: any }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,6 +34,9 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('ALL');
+  const [selectedAction, setSelectedAction] = useState<BulkActionType>('SET_NON_MEMBER');
 
   const isSuperAdmin = session?.username === 'admin';
 
@@ -49,30 +72,29 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
     }
   };
 
-  const handleBulkUpdate = async (actionType: 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_MEMBER' | 'SET_NON_MEMBER', label: string) => {
-    if (!window.confirm(`¿Estás seguro de que deseas "${label}" para TODOS los usuarios de la plataforma? La cuenta Superadmin no se verá afectada.`)) return;
+  const handleExecuteFilteredBulk = async () => {
+    const filterText = FILTER_LABELS[selectedFilter];
+    const actionText = ACTION_LABELS[selectedAction];
 
-    setActionLoading(actionType);
-    const res = await bulkUpdateUsers(actionType);
-    if (res.success) {
-      alert(`¡Operación masiva completada con éxito! Se han modificado ${res.count} usuarios.`);
-    } else {
-      alert(res.error || 'Error al ejecutar la acción masiva.');
-    }
+    const confirmMessage = selectedAction === 'DELETE_CLEAN'
+      ? `🚨 ¿SÚPER SEGURO? Se van a BORRAR permanentemente los usuarios coincidentes con "${filterText}" que no tengan pagos ni tickets asociados.`
+      : `¿Estás seguro de aplicar la acción "${actionText}" a los usuarios coincidentes con "${filterText}"?\n(La cuenta Superadmin nunca se verá afectada).`;
+
+    if (!window.confirm(confirmMessage)) return;
+
+    setActionLoading('bulk_filtered');
+    const res = await bulkUpdateUsersFiltered(selectedFilter, selectedAction);
     setActionLoading(null);
-  };
 
-  const handleBulkDelete = async () => {
-    if (window.confirm('🚨 ¿Estás SÚPER SEGURO de que quieres BORRAR a todos los usuarios que no sean Administradores? Esta acción es irreversible y solo borrará a los usuarios que NO tengan pagos ni tickets asociados.')) {
-      setActionLoading('bulk');
-      const res = await deleteAllNonAdminUsers();
-      if (res.success) {
-        alert(`¡Limpieza completada! Se borraron ${res.deletedCount} usuarios limpios. Se han conservado ${res.skippedCount} usuarios que tienen pagos o tickets registrados.`);
-        setIsSelectAll(false);
-      } else {
-        alert(res.error || 'Error al realizar el borrado masivo.');
-      }
-      setActionLoading(null);
+    if (!res.success) {
+      alert(res.error || 'Error al ejecutar la acción masiva.');
+      return;
+    }
+
+    if (res.isDelete) {
+      alert(`¡Borrado masivo completado! Se han eliminado ${res.deletedCount} usuarios limpios (${res.skippedCount} conservados por tener historial).`);
+    } else {
+      alert(`¡Actualización masiva completada! Se han modificado ${res.count} usuarios.`);
     }
   };
 
@@ -112,55 +134,92 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
         </div>
 
         {isSuperAdmin && (
-          <div className={styles.userCard} style={{ padding: '1rem', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.05)' }}>
+          <div 
+            className={styles.userCard} 
+            style={{ 
+              padding: '1.25rem', 
+              border: '1px solid rgba(255, 255, 255, 0.15)', 
+              background: 'rgba(15, 23, 42, 0.65)', 
+              backdropFilter: 'blur(10px)',
+              borderRadius: '16px' 
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <input 
                 type="checkbox"
                 checked={isSelectAll}
                 onChange={(e) => setIsSelectAll(e.target.checked)}
                 style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', flexShrink: 0 }}
-                title="Acciones Masivas del Superadministrador"
+                title="Edición Masiva Personalizada por Filtro"
               />
-              <span style={{ color: '#fef08a', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
-                👑 Acciones Masivas (Superadministrador)
+              <span style={{ color: '#ffffff', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
+                👑 Edición Masiva Personalizada (Superadmin)
               </span>
             </div>
 
             {isSelectAll && (
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem' }}>
-                <button 
-                  onClick={() => handleBulkUpdate('GRANT_ADMIN', 'Otorgar rol de Administrador a todos')}
+              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 'bold' }}>
+                      1. Filtrar Usuarios Objetivo:
+                    </label>
+                    <SelectField
+                      value={selectedFilter}
+                      onChange={(e) => setSelectedFilter(e.target.value as FilterType)}
+                      disabled={actionLoading !== null}
+                      containerStyle={{ marginBottom: 0 }}
+                    >
+                      <option value="ALL">👥 Todos los usuarios</option>
+                      <option value="UNDER_18">👶 Menores de 18 años (&lt; 18)</option>
+                      <option value="OVER_18">👴 Mayores de 18 años (18+)</option>
+                      <option value="MEMBERS">🎗️ Solo Socios</option>
+                      <option value="NON_MEMBERS">👤 Solo No Socios</option>
+                      <option value="ADMINS">🛡️ Solo Administradores</option>
+                      <option value="NON_ADMINS">👤 Solo Usuarios Normales</option>
+                    </SelectField>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 'bold' }}>
+                      2. Acción Masiva a Ejecutar:
+                    </label>
+                    <SelectField
+                      value={selectedAction}
+                      onChange={(e) => setSelectedAction(e.target.value as BulkActionType)}
+                      disabled={actionLoading !== null}
+                      containerStyle={{ marginBottom: 0 }}
+                    >
+                      <option value="SET_MEMBER">🎗️ Marcar como Socio/a (isMember: Sí)</option>
+                      <option value="SET_NON_MEMBER">👤 Marcar como No Socio/a (isMember: No)</option>
+                      <option value="GRANT_ADMIN">👑 Otorgar rol de Administrador</option>
+                      <option value="REVOKE_ADMIN">🛡️ Quitar rol de Administrador</option>
+                      <option value="SET_AGE_18">🎂 Fijar Edad en 18 años</option>
+                      <option value="DELETE_CLEAN">🗑️ Borrar usuarios limpios (sin historial)</option>
+                    </SelectField>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleExecuteFilteredBulk}
                   disabled={actionLoading !== null}
-                  className="btn btn-secondary"
-                  style={{ padding: '0.5rem', fontSize: '0.8rem', fontWeight: 'bold' }}
+                  className="btn"
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.75rem', 
+                    fontSize: '0.9rem', 
+                    fontWeight: 'bold',
+                    backgroundColor: selectedAction === 'DELETE_CLEAN' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                    border: selectedAction === 'DELETE_CLEAN' ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.2)',
+                    color: selectedAction === 'DELETE_CLEAN' ? '#fca5a5' : '#ffffff',
+                    borderRadius: '10px',
+                    cursor: 'pointer'
+                  }}
                 >
-                  👑 Otorgar Admin a todos
+                  {actionLoading === 'bulk_filtered' ? '⏳ Aplicando cambios masivos...' : '⚡ Aplicar Cambio Masivo'}
                 </button>
-                <button 
-                  onClick={() => handleBulkUpdate('REVOKE_ADMIN', 'Quitar rol de Administrador a todos')}
-                  disabled={actionLoading !== null}
-                  className="btn btn-secondary"
-                  style={{ padding: '0.5rem', fontSize: '0.8rem', fontWeight: 'bold' }}
-                >
-                  👤 Quitar Admin a todos
-                </button>
-                <button 
-                  onClick={() => handleBulkUpdate('SET_MEMBER', 'Marcar a todos como Socios')}
-                  disabled={actionLoading !== null}
-                  className="btn btn-secondary"
-                  style={{ padding: '0.5rem', fontSize: '0.8rem', fontWeight: 'bold' }}
-                >
-                  🎗️ Marcar a todos como Socios
-                </button>
-                <button 
-                  onClick={handleBulkDelete}
-                  disabled={actionLoading === 'bulk'}
-                  className={styles.deleteBtn}
-                  style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.8rem' }}
-                  title="Borrar Todos los Usuarios No Administradores Limpios"
-                >
-                  {actionLoading === 'bulk' ? '⏳' : <TrashIcon />} Borrado Masivo (Limpios)
-                </button>
+
               </div>
             )}
           </div>
