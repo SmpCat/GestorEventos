@@ -68,5 +68,11 @@
 - **Modal "Mi Perfil":** Disponible desde la barra superior (`👤 Mi Perfil`). Permite al usuario editar su Nombre, Nick, Edad, Socio (`Sí`/`No`), Email y Teléfono.
 - **Cambio de Contraseña:** Sub-sección con verificación de contraseña actual, nueva contraseña y casilla `👁️ Mostrar contraseñas`.
 - **Privilegios Exclusivos del Superadministrador (`admin`):**
-  1. **Control de Mantenimiento:** Botón `⚙️ Mantenimiento` / `🔴 Mantenimiento ON` en el Navbar para pausar o abrir la web a usuarios no admin.
+  1. **Control de Mantenimiento:** Tarjeta integrada en la Zona de Administración para pausar o abrir la web a usuarios no admin.
   2. **Carga de Tarifas Peña (Valdeganga):** Botón `👑 Cargar Tarifas Peña (Valdeganga)` en `/pricing/rules` visible de forma exclusiva para el Superadmin.
+
+### 10. Refinamiento de Interfaz (Cabecera Limpia & Corrección de Scroll)
+- **Cabecera Ultra-Limpia:** Eliminados botones sobrantes de la barra superior. La propia tarjeta del usuario (`👤 Bienvenido/a [Nombre]`) es interactiva y al clicarla abre directamente "Mi Perfil".
+- **Fijado Bug de Scroll:** Aplicado bloqueo de scroll en `document.body` y fondo oscuro transparente completo al abrir el modal de perfil para evitar el desbordamiento de pantalla en móviles.
+- **Mantenimiento en Zona Admin:** Movida la tarjeta de control de Mantenimiento a la Zona de Administración del Superadministrador.
+- **Texto Mantenimiento:** Actualizada la pantalla de bloqueo con el texto exacto `🔒 Acceso Superadministrador`.
