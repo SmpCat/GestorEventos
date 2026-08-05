@@ -83,3 +83,7 @@
 
 ### 12. Enfoque 100% Financiero en Asistentes
 - **Eliminado Historial de Días:** Retirada la tabla y relaciones de `AttendanceHistory` para centrar la vista y auditoría exclusivamente en el historial de pagos y cobros reales del bote.
+
+### 13. Buscadores en Vivo en Gestión de Usuarios y Flujo de Caja
+- **Buscador en Usuarios (`/admin/users`):** Añadido campo `🔍 Buscar usuario por nombre o nick...` para filtrar al instante la cuadrícula de 31+ miembros.
+- **Buscador en Flujo de Caja (`/finances`):** Añadido filtro rápido en el selector de asistente al crear transacciones y buscador global en el historial de movimientos de caja.
