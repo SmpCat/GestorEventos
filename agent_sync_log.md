@@ -63,3 +63,8 @@
 ### 8. Pulido Estético de Administración de Usuarios (`/admin/users`)
 - **Papelera Blanco Monocromático:** El botón/icono de eliminación de usuario es 100% blanco cristalino alineado con el diseño global.
 - **Botón Cancelar en Formulario:** Añadido un botón **"Cancelar"** claro al lado de **"Guardar Usuario"** en la edición y creación de usuarios.
+
+### 9. Auto-Gestión de Perfil & Modo Mantenimiento Superadmin
+- **Modal "Mi Perfil":** Disponible desde la barra superior (`👤 Mi Perfil`). Permite al usuario editar su Nombre, Nick, Edad, Socio (`Sí`/`No`), Email y Teléfono.
+- **Cambio de Contraseña:** Sub-sección con verificación de contraseña actual, nueva contraseña y casilla `👁️ Mostrar contraseñas`.
+- **Modo Mantenimiento Superadmin:** El usuario `admin` (Superadministrador) cuenta con el botón `⚙️ Mantenimiento` / `🔴 Mantenimiento ON` en el Navbar para pausar/activar la web a usuarios no admin. Pantalla `/maintenance` con login exclusivo para el Superadmin.
