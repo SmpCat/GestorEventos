@@ -90,5 +90,9 @@
 
 ### 14. Acciones Masivas Exclusivas del Superadministrador (`admin`)
 - **Control Restringido:** Panel `👑 Acciones Masivas (Superadministrador)` disponible exclusivamente para el rol Superadmin.
-- **Operaciones Masivas:** Botones de un solo clic para *Otorgar Admin a todos*, *Quitar Admin a todos*, *Marcar a todos como Socios* y *Borrado Masivo (Usuarios Limpios)*.
 - **Protección Root Inviolable:** Todas las operaciones filtran implícitamente `username !== 'admin'`, garantizando que la cuenta del Superadministrador nunca sufra modificaciones involuntarias.
+
+### 15. Edición Masiva Personalizada por Filtros Dinámicos
+- **Diseño Glassmorphic Oscuro Integrado:** Eliminados los tonos amarillos por un panel oscuro translúcido con desenfoque de cristal.
+- **Filtros Dinámicos Seleccionables:** Filtro objetivo configurable (*Todos los usuarios*, *Menores de 18 años*, *Mayores de 18 años*, *Solo Socios*, *Solo No Socios*, *Solo Admins*, *Solo Usuarios Normales*).
+- **Acciones Flexibles:** Ejecución masiva parametrizable (*Marcar como Socio*, *Marcar como No Socio*, *Otorgar Admin*, *Quitar Admin*, *Fijar Edad 18*, *Borrado Masivo Limpio*).
