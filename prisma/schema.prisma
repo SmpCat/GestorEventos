@@ -34,7 +34,6 @@ model User {
   shoppingTasks    ShoppingListItem[] // Tareas de compra asignadas
   
   // Auditoría
-  attendanceHistoryChanges AttendanceHistory[] @relation("HistoryChangedBy")
   registeredPayments       Payment[]           @relation("PaymentRegisteredBy")
   shoppingHistoryChanges   ShoppingListHistory[] @relation("ShoppingHistoryUser")
 }
@@ -85,9 +84,6 @@ model EventAttendee {
 
   // Pagos realizados por el asistente
   payments      Payment[]
-  
-  // Historial de cambios de días
-  history       AttendanceHistory[] @relation("AttendeeHistory")
 }
 
 model Payment {
@@ -225,24 +221,6 @@ model ExpenseItem {
 // ---------------------------------------------------------
 // MODELOS DE AUDITORÍA Y REGISTRO
 // ---------------------------------------------------------
-
-model AttendanceHistory {
-  id          String   @id @default(uuid())
-  attendeeId  String
-  attendee    EventAttendee @relation("AttendeeHistory", fields: [attendeeId], references: [id], onDelete: Cascade)
-  
-  oldDays     Int      // Días que tenía antes (0 si es nuevo)
-  newDays     Int      // Días nuevos asignados
-  
-  // Usuario que hizo el cambio
-  changedById String
-  changedBy   User     @relation("HistoryChangedBy", fields: [changedById], references: [id])
-  
-  date        DateTime @default(now())
-
-  @@index([attendeeId])
-  @@index([changedById])
-}
 
 model ShoppingListHistory {
   id                 String   @id @default(uuid())

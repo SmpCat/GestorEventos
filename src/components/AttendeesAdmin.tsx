@@ -287,20 +287,6 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                         </div>
                       )}
 
-                      {att.history && att.history.length > 0 && (
-                        <div className={styles.paymentsSection} style={{ marginTop: 0 }}>
-                          <div className={styles.paymentsTitle}>Historial de Días</div>
-                          <div className={styles.paymentsList}>
-                            {att.history.map((h: any) => (
-                              <div key={h.id} className={styles.paymentRow}>
-                                <span className={styles.paymentDate}>{new Date(h.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })} <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{h.changedBy?.username || '?'})</span></span>
-                                <span className={styles.paymentAmount} style={{ color: 'var(--text-primary)' }}>{h.newDays}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
                       {isAdmin && (
                         <div className={styles.actionBox} style={{ marginTop: '1rem' }}>
                           <div className={styles.actionBoxTitleAlt}>Añadir Pago</div>
@@ -504,19 +490,6 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                 </>
                               )}
                               
-                            {att.history && att.history.length > 0 && (
-                                <div style={{ marginTop: '0.75rem' }}>
-                                  <div className={styles.actionBoxTitleAlt}>Historial de Días</div>
-                                  <div className={styles.paymentsList}>
-                                    {att.history.map((h: any) => (
-                                      <div key={h.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
-                                        <span className={styles.paymentDate}>{new Date(h.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })} <span style={{opacity: 0.6}}>(@{h.changedBy?.username || '?'})</span></span>
-                                        <span style={{ fontWeight: 'bold' }}>{h.newDays}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
                             </div>
 
                             <div className={styles.actionBox}>

@@ -112,10 +112,6 @@ export async function getAttendees(eventId: string) {
         payments: { 
           orderBy: { date: 'desc' },
           include: { registeredBy: { select: { name: true, username: true } } }
-        },
-        history: { 
-          orderBy: { date: 'desc' },
-          include: { changedBy: { select: { name: true, username: true } } }
         }
       },
       orderBy: { user: { name: 'asc' } },
@@ -216,14 +212,7 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
         eventId,
         daysAttending,
         drinksAlcohol,
-        expectedPayment,
-        history: {
-          create: {
-            oldDays: 0,
-            newDays: daysAttending,
-            changedById: userId
-          }
-        }
+        expectedPayment
       }
     });
 
@@ -268,14 +257,7 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number, dr
       data: {
         daysAttending: newDays,
         drinksAlcohol: updatedDrinks,
-        expectedPayment,
-        history: {
-          create: {
-            oldDays: attendee.daysAttending,
-            newDays: newDays,
-            changedById: session.id
-          }
-        }
+        expectedPayment
       }
     });
 
