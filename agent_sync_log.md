@@ -67,4 +67,6 @@
 ### 9. Auto-Gestión de Perfil & Modo Mantenimiento Superadmin
 - **Modal "Mi Perfil":** Disponible desde la barra superior (`👤 Mi Perfil`). Permite al usuario editar su Nombre, Nick, Edad, Socio (`Sí`/`No`), Email y Teléfono.
 - **Cambio de Contraseña:** Sub-sección con verificación de contraseña actual, nueva contraseña y casilla `👁️ Mostrar contraseñas`.
-- **Modo Mantenimiento Superadmin:** El usuario `admin` (Superadministrador) cuenta con el botón `⚙️ Mantenimiento` / `🔴 Mantenimiento ON` en el Navbar para pausar/activar la web a usuarios no admin. Pantalla `/maintenance` con login exclusivo para el Superadmin.
+- **Privilegios Exclusivos del Superadministrador (`admin`):**
+  1. **Control de Mantenimiento:** Botón `⚙️ Mantenimiento` / `🔴 Mantenimiento ON` en el Navbar para pausar o abrir la web a usuarios no admin.
+  2. **Carga de Tarifas Peña (Valdeganga):** Botón `👑 Cargar Tarifas Peña (Valdeganga)` en `/pricing/rules` visible de forma exclusiva para el Superadmin.
