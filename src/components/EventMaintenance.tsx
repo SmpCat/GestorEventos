@@ -101,20 +101,20 @@ export default function EventMaintenance({ events, session }: { events: any[], s
                 <div 
                   className={styles.eventHeader}
                   onClick={() => toggleExpand(event.id)}
-                  style={{ cursor: 'pointer', marginBottom: isExpanded ? '1rem' : '0' }}
+                  style={{ cursor: 'pointer', marginBottom: isExpanded ? '1rem' : '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}
                 >
-                  <div className={styles.eventInfo}>
+                  <div className={styles.eventInfo} style={{ flex: '1 1 auto', minWidth: 0 }}>
                     <h3 className={`${styles.eventTitle} ${event.isActive ? styles.eventTitleActive : ''}`}>
                       {event.name}
                     </h3>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
                     {event.isActive && (
                       <span className={`badge ${styles.activeBadge}`}>
                         OPERATIVO
                       </span>
                     )}
-                    <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>{isExpanded ? '▲' : '▼'}</span>
+                    <span style={{ fontSize: '0.85rem', opacity: 0.7, fontWeight: 'bold' }}>{isExpanded ? '▲' : '▼'}</span>
                   </div>
                 </div>
                 
