@@ -59,3 +59,7 @@
 ### 7. Despliegue en Producción & Tolerancia a Fallos
 - **Migración de Producción:** Preservados todos los usuarios existentes en producción e iniciados como Socios (18+) de forma transparente.
 - **Fallback de Días:** Si las tarifas en producción aún no han sido precargadas, el selector de Asistencia ofrece por defecto `1 día`, `2 días`, `3 días` evitando estados bloqueados o vacíos.
+
+### 8. Pulido Estético de Administración de Usuarios (`/admin/users`)
+- **Papelera Blanco Monocromático:** El botón/icono de eliminación de usuario es 100% blanco cristalino alineado con el diseño global.
+- **Botón Cancelar en Formulario:** Añadido un botón **"Cancelar"** claro al lado de **"Guardar Usuario"** en la edición y creación de usuarios.
