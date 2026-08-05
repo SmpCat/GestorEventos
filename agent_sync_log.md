@@ -96,3 +96,6 @@
 - **Diseño Glassmorphic Oscuro Integrado:** Eliminados los tonos amarillos por un panel oscuro translúcido con desenfoque de cristal.
 - **Filtros Dinámicos Seleccionables:** Filtro objetivo configurable (*Todos los usuarios*, *Menores de 18 años*, *Mayores de 18 años*, *Solo Socios*, *Solo No Socios*, *Solo Admins*, *Solo Usuarios Normales*).
 - **Acciones Flexibles:** Ejecución masiva parametrizable (*Marcar como Socio*, *Marcar como No Socio*, *Otorgar Admin*, *Quitar Admin*, *Fijar Edad 18*, *Borrado Masivo Limpio*).
+
+### 16. Alineación de Flechas de Despliegue en Tarjetas de Usuario
+- **Anclaje al Margen Derecho:** Reestructurado el layout de `userHeader` con Flexbox para fijar la flecha indicador de despliegue (`▼`/`▲`) 100% anclada al extremo derecho en todas las tarjetas independientemente de la longitud del nombre o los badges.
