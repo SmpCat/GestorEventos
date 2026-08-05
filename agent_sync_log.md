@@ -76,3 +76,7 @@
 - **Fijado Bug de Scroll:** Aplicado bloqueo de scroll en `document.body` y fondo oscuro transparente completo al abrir el modal de perfil para evitar el desbordamiento de pantalla en móviles.
 - **Mantenimiento en Zona Admin:** Movida la tarjeta de control de Mantenimiento a la Zona de Administración del Superadministrador.
 - **Texto Mantenimiento:** Actualizada la pantalla de bloqueo con el texto exacto `🔒 Acceso Superadministrador`.
+
+### 11. Aislamiento de Cuenta Técnica Superadmin (`admin`)
+- **Exclusión de Asistentes:** La cuenta técnica `admin` queda 100% excluida de auto-registrarse como asistente a eventos, listas de asistentes (`/pricing/attendees`) y balances/estadísticas.
+- **Privacidad y Protección:** La cuenta `admin` solo es visible en `/admin/users` cuando el usuario logueado es el propio `admin` (Superadministrador) y cuenta con protección contra borrado accidental.
