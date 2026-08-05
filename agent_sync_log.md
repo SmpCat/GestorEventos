@@ -80,3 +80,6 @@
 ### 11. Aislamiento de Cuenta Técnica Superadmin (`admin`)
 - **Exclusión de Asistentes:** La cuenta técnica `admin` queda 100% excluida de auto-registrarse como asistente a eventos, listas de asistentes (`/pricing/attendees`) y balances/estadísticas.
 - **Privacidad y Protección:** La cuenta `admin` solo es visible en `/admin/users` cuando el usuario logueado es el propio `admin` (Superadministrador) y cuenta con protección contra borrado accidental.
+
+### 12. Enfoque 100% Financiero en Asistentes
+- **Eliminado Historial de Días:** Retirada la tabla y relaciones de `AttendanceHistory` para centrar la vista y auditoría exclusivamente en el historial de pagos y cobros reales del bote.
