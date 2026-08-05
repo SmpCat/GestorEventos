@@ -197,8 +197,22 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
             </div>
           </div>
 
-          <div className="flex mobile-col justify-end gap-3 mt-2">
-            <button type="submit" className="btn mobile-w-full py-3 text-lg" disabled={loading} style={{ backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+          <div className="flex mobile-col justify-end gap-3 mt-4">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="btn mobile-w-full py-3 text-base" 
+              disabled={loading} 
+              style={{ backgroundColor: 'transparent', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255, 0.15)' }}
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              className="btn mobile-w-full py-3 text-base font-bold" 
+              disabled={loading} 
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.3)' }}
+            >
               {loading ? 'Guardando...' : 'Guardar Usuario'}
             </button>
           </div>
