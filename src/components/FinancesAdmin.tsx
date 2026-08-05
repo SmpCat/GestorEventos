@@ -120,15 +120,26 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
           <div className={styles.addPaymentRow} style={{ marginTop: '1rem', alignItems: 'center' }}>
             <span className={styles.infoLabel} style={{ minWidth: '80px' }}>Asistente:</span>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <input 
-                type="text" 
-                className="input-field" 
-                placeholder="🔍 Filtrar lista de asistentes..." 
-                value={attendeeSearch}
-                onChange={e => setAttendeeSearch(e.target.value)}
-                disabled={isProcessing}
-                style={{ width: '100%', fontSize: '0.85rem', padding: '0.5rem 0.75rem', borderRadius: '8px' }}
-              />
+              <div style={{ position: 'relative', width: '100%' }}>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="🔍 Filtrar lista de asistentes..." 
+                  value={attendeeSearch}
+                  onChange={e => setAttendeeSearch(e.target.value)}
+                  disabled={isProcessing}
+                  style={{ width: '100%', fontSize: '0.85rem', padding: '0.5rem 2rem 0.5rem 0.75rem', borderRadius: '8px' }}
+                />
+                {attendeeSearch && (
+                  <button 
+                    onClick={() => setAttendeeSearch('')}
+                    style={{ position: 'absolute', right: '0.4rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', padding: '0.2rem' }}
+                    title="Borrar filtro de asistente"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
               <SelectField
                 value={txAttendeeId}
                 onChange={(e) => setTxAttendeeId(e.target.value)}
