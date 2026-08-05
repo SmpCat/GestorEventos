@@ -87,6 +87,14 @@ async function main() {
     }
     console.log(`✅ Cuotas de producción recalculadas para ${attendees.length} asistentes.`);
   }
+
+  // 4. Eliminar cualquier registro de asistencia del usuario técnico admin
+  const adminUser = await prisma.user.findUnique({ where: { username: adminUsername } });
+  if (adminUser) {
+    await prisma.eventAttendee.deleteMany({
+      where: { userId: adminUser.id }
+    });
+  }
 }
 
 main()

@@ -44,7 +44,9 @@ export default async function Home() {
         })
       ]);
       
-      if (attendeeRes) {
+      if (session.username === 'admin') {
+        attendee = null;
+      } else if (attendeeRes) {
         const amountPaid = attendeeRes.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
         const currentQuota = attendeeRes.expectedPayment || 0;
         attendee = {

@@ -8,7 +8,16 @@ import { calculateExpectedPayment } from './attendance';
 // Obtener todos los usuarios
 export async function getUsers() {
   try {
+    const { getSession } = require('./auth');
+    const session = await getSession();
+
+    // Solo el Superadministrador (admin) ve la cuenta técnica admin
+    const whereClause = session?.username === 'admin' 
+      ? {} 
+      : { username: { not: 'admin' } };
+
     const users = await prisma.user.findMany({
+      where: whereClause,
       orderBy: { name: 'asc' },
     });
     return { success: true, data: users };
