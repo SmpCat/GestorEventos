@@ -3,11 +3,23 @@ import { prisma } from '@/lib/prisma';
 import LoginForm from '@/components/LoginForm';
 import Dashboard from '@/components/Dashboard';
 import { getActiveEventCached } from '@/lib/cache';
+import { getSystemConfig } from '@/actions/system';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const session = await getSession();
+  const [session, configRes] = await Promise.all([
+    getSession(),
+    getSystemConfig()
+  ]);
+
+  const maintenanceMode = configRes.data?.maintenanceMode ?? false;
+
+  // Si el modo mantenimiento está activo y el usuario no es superadmin (admin)
+  if (maintenanceMode && session?.username !== 'admin') {
+    redirect('/maintenance');
+  }
 
   if (!session) {
     return <LoginForm />;

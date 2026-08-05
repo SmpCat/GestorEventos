@@ -178,3 +178,73 @@ export async function registerPublicUser(data: any) {
     return { success: false, error: 'Error al registrarse: ' + error.message };
   }
 }
+
+// Editar propio perfil (Cualquier usuario logueado)
+export async function updateMyProfile(data: {
+  name: string;
+  username: string;
+  isMember: boolean;
+  age?: number | string;
+  email?: string;
+  phone?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}) {
+  try {
+    const { getSession } = require('./auth');
+    const session = await getSession();
+    if (!session) return { success: false, error: 'No has iniciado sesión.' };
+
+    const currentUser = await prisma.user.findUnique({ where: { id: session.id } });
+    if (!currentUser) return { success: false, error: 'Usuario no encontrado.' };
+
+    const updateData: any = {
+      name: data.name,
+      username: data.username.trim().toLowerCase(),
+      isMember: Boolean(data.isMember),
+      age: data.age ? parseInt(String(data.age), 10) : null,
+      email: data.email || null,
+      phone: data.phone || null,
+    };
+
+    // Si el usuario quiere cambiar contraseña
+    if (data.newPassword) {
+      if (!data.currentPassword) {
+        return { success: false, error: 'Debes introducir tu contraseña actual para cambiarla.' };
+      }
+      const isValid = await bcrypt.compare(data.currentPassword, currentUser.password);
+      if (!isValid) {
+        return { success: false, error: 'La contraseña actual es incorrecta.' };
+      }
+      updateData.password = await bcrypt.hash(data.newPassword, 10);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: session.id },
+      data: updateData,
+    });
+
+    // Recalcular cuota si es asistente a un evento activo
+    const attendees = await prisma.eventAttendee.findMany({
+      where: { userId: session.id, daysAttending: { gt: 0 } }
+    });
+    for (const att of attendees) {
+      const calc = await calculateExpectedPayment(att.eventId, session.id, att.daysAttending, att.drinksAlcohol);
+      if (calc.price !== null) {
+        await prisma.eventAttendee.update({
+          where: { id: att.id },
+          data: { expectedPayment: calc.price }
+        });
+      }
+    }
+
+    revalidatePath('/');
+    revalidatePath('/pricing/attendees');
+    return { success: true, data: updatedUser };
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      return { success: false, error: 'El nombre de usuario ya está en uso.' };
+    }
+    return { success: false, error: 'Error al actualizar perfil: ' + error.message };
+  }
+}

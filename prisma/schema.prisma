@@ -260,3 +260,10 @@ model ShoppingListHistory {
   @@index([shoppingListItemId])
   @@index([userId])
 }
+
+model SystemConfig {
+  id                 String   @id @default("global")
+  maintenanceMode    Boolean  @default(false)
+  maintenanceMessage String?  @default("Estamos realizando labores de mantenimiento y optimización. Volveremos muy pronto.")
+  updatedAt          DateTime @updatedAt
+}
