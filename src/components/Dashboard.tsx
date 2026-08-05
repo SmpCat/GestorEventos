@@ -1,14 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SelectField from './SelectField';
 import Link from 'next/link';
 import { logout } from '@/actions/auth';
 import { updateAttendeeDays } from '@/actions/attendance';
+import { getSystemConfig, toggleMaintenanceMode } from '@/actions/system';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard({ session, activeEvent, attendee, pricingRules }: { session: any, activeEvent: any, attendee?: any, pricingRules?: any[] }) {
   const [loadingDays, setLoadingDays] = useState(false);
+  const [maintenanceActive, setMaintenanceActive] = useState(false);
+  const [loadingMaintenance, setLoadingMaintenance] = useState(false);
+
+  const isSuperAdmin = session?.username === 'admin';
+
+  useEffect(() => {
+    if (isSuperAdmin) {
+      getSystemConfig().then(res => {
+        if (res.success && res.data) {
+          setMaintenanceActive(res.data.maintenanceMode);
+        }
+      });
+    }
+  }, [isSuperAdmin]);
+
+  const handleToggleMaintenance = async () => {
+    const nextState = !maintenanceActive;
+    const confirmText = nextState 
+      ? '¿Estás seguro de ACTIVAR el modo mantenimiento? Los usuarios no podrán acceder a la app.' 
+      : '¿Estás seguro de DESACTIVAR el modo mantenimiento? La app volverá a estar pública.';
+    
+    if (!confirm(confirmText)) return;
+
+    setLoadingMaintenance(true);
+    const res = await toggleMaintenanceMode(nextState);
+    setLoadingMaintenance(false);
+    if (res.success) {
+      setMaintenanceActive(nextState);
+      alert(nextState ? '🔴 Mantenimiento activado' : '🟢 Mantenimiento desactivado. La app vuelve a estar activa.');
+      window.location.reload();
+    } else {
+      alert(res.error || 'Error al cambiar mantenimiento');
+    }
+  };
 
   const handleChangeDays = async (newVal: number, newDrinks?: boolean) => {
     if (!attendee) return;
@@ -194,6 +229,31 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                   </div>
                   <div style={{ fontSize: '2rem' }}>👥</div>
                 </Link>
+
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    onClick={handleToggleMaintenance}
+                    disabled={loadingMaintenance}
+                    className={`${styles.menuItem} ${styles.adminMenuItem}`}
+                    style={{ 
+                      textAlign: 'left', 
+                      background: maintenanceActive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)', 
+                      border: maintenanceActive ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div>
+                      <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem', color: maintenanceActive ? '#fca5a5' : '#ffffff' }}>
+                        Modo Mantenimiento
+                      </h3>
+                      <p className={styles.menuItemSubtitle} style={{ color: maintenanceActive ? '#f87171' : 'var(--text-secondary)' }}>
+                        {loadingMaintenance ? 'Cambiando...' : (maintenanceActive ? '🔴 Web Pausada (Solo Superadmin)' : '🟢 Web Pública (Operativa)')}
+                      </p>
+                    </div>
+                    <div style={{ fontSize: '2rem' }}>⚙️</div>
+                  </button>
+                )}
               </div>
             </div>
           </div>

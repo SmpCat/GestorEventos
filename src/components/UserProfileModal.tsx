@@ -49,6 +49,17 @@ export default function UserProfileModal({
     setError('');
   }, [user, isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !user) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,8 +105,26 @@ export default function UserProfileModal({
   };
 
   return (
-    <div className="modal-backdrop">
-      <div className="glass-panel modal-content max-w-lg w-full p-6 animate-scale-in" style={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
+    <div 
+      className="modal-backdrop" 
+      style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        backgroundColor: 'rgba(0, 0, 0, 0.85)', 
+        backdropFilter: 'blur(12px)', 
+        WebkitBackdropFilter: 'blur(12px)',
+        zIndex: 99999, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        overflowY: 'auto', 
+        padding: '1rem' 
+      }}
+    >
+      <div className="glass-panel modal-content max-w-lg w-full p-6 animate-scale-in" style={{ backgroundColor: 'rgba(15, 23, 42, 0.98)', border: '1px solid rgba(255, 255, 255, 0.2)', maxHeight: '90vh', overflowY: 'auto' }}>
         
         <div className="flex justify-between items-center mb-5 pb-3 border-b border-white/10">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">

@@ -39,7 +39,7 @@ export default function MaintenanceClient({ message }: { message?: string }) {
               className="text-xs text-gray-400 hover:text-white transition-colors underline"
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              🔒 Acceso Administrador
+              🔒 Acceso Superadministrador
             </button>
           ) : (
             <div className="w-full text-left">

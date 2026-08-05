@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { logout } from '@/actions/auth';
-import { getSystemConfig, toggleMaintenanceMode } from '@/actions/system';
 import UserProfileModal from './UserProfileModal';
 
 export default function Navbar({ session }: { session: any }) {
@@ -13,20 +12,6 @@ export default function Navbar({ session }: { session: any }) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [fullUser, setFullUser] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
-  const [maintenanceActive, setMaintenanceActive] = useState(false);
-  const [loadingMaintenance, setLoadingMaintenance] = useState(false);
-
-  const isSuperAdmin = session?.username === 'admin';
-
-  useEffect(() => {
-    if (isSuperAdmin) {
-      getSystemConfig().then(res => {
-        if (res.success && res.data) {
-          setMaintenanceActive(res.data.maintenanceMode);
-        }
-      });
-    }
-  }, [isSuperAdmin]);
 
   const fetchAndOpenProfile = async () => {
     setLoadingProfile(true);
@@ -60,26 +45,6 @@ export default function Navbar({ session }: { session: any }) {
     setIsProfileModalOpen(true);
   };
 
-  const handleToggleMaintenance = async () => {
-    const nextState = !maintenanceActive;
-    const confirmText = nextState 
-      ? '¿Estás seguro de ACTIVAR el modo mantenimiento? Los usuarios no podrán acceder a la app.' 
-      : '¿Estás seguro de DESACTIVAR el modo mantenimiento? La app volverá a estar pública.';
-    
-    if (!confirm(confirmText)) return;
-
-    setLoadingMaintenance(true);
-    const res = await toggleMaintenanceMode(nextState);
-    setLoadingMaintenance(false);
-    if (res.success) {
-      setMaintenanceActive(nextState);
-      alert(nextState ? '🔴 Mantenimiento activado' : '🟢 Mantenimiento desactivado. La app vuelve a estar activa.');
-      router.refresh();
-    } else {
-      alert(res.error || 'Error al cambiar mantenimiento');
-    }
-  };
-
   if (!session) return null;
 
   const isDashboard = pathname === '/';
@@ -89,60 +54,29 @@ export default function Navbar({ session }: { session: any }) {
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, paddingTop: '0.25rem', paddingBottom: '0.25rem', paddingLeft: '1rem', paddingRight: '1rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
         <div className="flex justify-between items-center bg-black/30 rounded-xl" style={{ padding: '0.25rem 1rem', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)' }}>
           
-          {isDashboard ? (
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/20 p-1 px-2 rounded-full border border-primary/30 text-xl flex items-center justify-center">👤</div>
-              <div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Bienvenido/a</p>
-                <p style={{ fontWeight: 'bold' }}>{session.name}</p>
-              </div>
+          {/* Identidad de usuario interactiva (Al clicar abre Mi Perfil) */}
+          <button
+            onClick={fetchAndOpenProfile}
+            disabled={loadingProfile}
+            className="flex items-center gap-3 text-left transition-all hover:opacity-80 active:scale-95"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.2rem 0.4rem', borderRadius: '0.5rem' }}
+            title="Haz clic para editar tu perfil"
+          >
+            <div className="bg-primary/20 p-1 px-2 rounded-full border border-primary/30 text-xl flex items-center justify-center">
+              {loadingProfile ? '⏳' : '👤'}
             </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <div className="bg-black/30 p-1 px-2 rounded-full border border-white/5 text-xl flex items-center justify-center opacity-70">👤</div>
-              <div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{session.name}</p>
-                <p style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>@{session.username}</p>
-              </div>
+            <div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {isDashboard ? 'Bienvenido/a (Mi Perfil)' : session.name}
+              </p>
+              <p style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>
+                {isDashboard ? session.name : `@${session.username}`}
+              </p>
             </div>
-          )}
+          </button>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={fetchAndOpenProfile}
-              className="btn"
-              disabled={loadingProfile}
-              style={{ 
-                padding: '0.3rem 0.75rem', 
-                fontSize: '0.85rem', 
-                fontWeight: 'bold',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: '#ffffff',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}
-            >
-              {loadingProfile ? '⏳' : '👤 Mi Perfil'}
-            </button>
-
-            {isSuperAdmin && (
-              <button
-                onClick={handleToggleMaintenance}
-                disabled={loadingMaintenance}
-                className="btn"
-                title="Superadmin: Control de Mantenimiento"
-                style={{
-                  padding: '0.3rem 0.75rem',
-                  fontSize: '0.85rem',
-                  fontWeight: 'bold',
-                  backgroundColor: maintenanceActive ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                  color: maintenanceActive ? '#fca5a5' : '#94a3b8',
-                  border: maintenanceActive ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                {loadingMaintenance ? '⏳' : (maintenanceActive ? '🔴 Mantenimiento ON' : '⚙️ Mantenimiento')}
-              </button>
-            )}
-
+          {/* Botón Salir / Volver */}
+          <div>
             {isDashboard ? (
               <button 
                 onClick={async () => {
@@ -170,6 +104,7 @@ export default function Navbar({ session }: { session: any }) {
               </button>
             )}
           </div>
+
         </div>
       </nav>
 
