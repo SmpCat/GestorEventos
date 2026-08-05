@@ -125,11 +125,20 @@ export async function deleteUser(id: string) {
   }
 }
 
-// Borrar a todos los usuarios NO administradores que no tengan ataduras
+// Borrar a todos los usuarios NO administradores que no tengan ataduras (Solo Superadmin)
 export async function deleteAllNonAdminUsers() {
   try {
+    const { getSession } = require('./auth');
+    const session = await getSession();
+    if (session?.username !== 'admin') {
+      return { success: false, error: 'Solo el Superadministrador (admin) puede ejecutar el borrado masivo.' };
+    }
+
     const nonAdmins = await prisma.user.findMany({
-      where: { isAdmin: false },
+      where: { 
+        username: { not: 'admin' },
+        isAdmin: false 
+      },
       include: {
         expenses: true,
         eventAttendances: {
@@ -160,6 +169,33 @@ export async function deleteAllNonAdminUsers() {
     return { success: true, deletedCount, skippedCount };
   } catch (error: any) {
     return { success: false, error: 'Error al hacer limpieza de usuarios: ' + error.message };
+  }
+}
+
+// Modificaciones masivas de usuarios (Exclusivo Superadmin)
+export async function bulkUpdateUsers(actionType: 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_MEMBER' | 'SET_NON_MEMBER') {
+  try {
+    const { getSession } = require('./auth');
+    const session = await getSession();
+    if (session?.username !== 'admin') {
+      return { success: false, error: 'Solo el Superadministrador (admin) puede realizar modificaciones masivas.' };
+    }
+
+    let updateData: any = {};
+    if (actionType === 'GRANT_ADMIN') updateData = { isAdmin: true };
+    if (actionType === 'REVOKE_ADMIN') updateData = { isAdmin: false };
+    if (actionType === 'SET_MEMBER') updateData = { isMember: true };
+    if (actionType === 'SET_NON_MEMBER') updateData = { isMember: false };
+
+    const res = await prisma.user.updateMany({
+      where: { username: { not: 'admin' } },
+      data: updateData
+    });
+
+    revalidatePath('/admin/users');
+    return { success: true, count: res.count };
+  } catch (error: any) {
+    return { success: false, error: 'Error en la actualización masiva: ' + error.message };
   }
 }
 

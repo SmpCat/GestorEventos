@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import UserFormModal from './UserFormModal';
 import TrashIcon from './TrashIcon';
-import { deleteUser, deleteAllNonAdminUsers } from '@/actions/users';
+import { deleteUser, deleteAllNonAdminUsers, bulkUpdateUsers } from '@/actions/users';
 import styles from './UserMaintenance.module.css';
 
 export default function UserMaintenance({ users, session }: { users: any[], session: any }) {
@@ -14,6 +14,8 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const isSuperAdmin = session?.username === 'admin';
 
   const filteredUsers = users.filter((user: any) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,6 +47,19 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
       }
       setActionLoading(null);
     }
+  };
+
+  const handleBulkUpdate = async (actionType: 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_MEMBER' | 'SET_NON_MEMBER', label: string) => {
+    if (!window.confirm(`¿Estás seguro de que deseas "${label}" para TODOS los usuarios de la plataforma? La cuenta Superadmin no se verá afectada.`)) return;
+
+    setActionLoading(actionType);
+    const res = await bulkUpdateUsers(actionType);
+    if (res.success) {
+      alert(`¡Operación masiva completada con éxito! Se han modificado ${res.count} usuarios.`);
+    } else {
+      alert(res.error || 'Error al ejecutar la acción masiva.');
+    }
+    setActionLoading(null);
   };
 
   const handleBulkDelete = async () => {
@@ -96,33 +111,60 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
           )}
         </div>
 
-        <div className={styles.userCard} style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <input 
-              type="checkbox"
-              checked={isSelectAll}
-              onChange={(e) => setIsSelectAll(e.target.checked)}
-              style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', flexShrink: 0 }}
-              title="Selección Maestra de Borrado"
-            />
-            <span style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
-              Borrado Masivo
-            </span>
-          </div>
-          {isSelectAll && (
-            <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'center' }}>
-              <button 
-                onClick={handleBulkDelete}
-                disabled={actionLoading === 'bulk'}
-                className={styles.deleteBtn}
-                style={{ padding: '0.375rem 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                title="Borrar Todos los Usuarios No Administradores"
-              >
-                {actionLoading === 'bulk' ? '⏳' : <TrashIcon />} Borrar a todos
-              </button>
+        {isSuperAdmin && (
+          <div className={styles.userCard} style={{ padding: '1rem', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <input 
+                type="checkbox"
+                checked={isSelectAll}
+                onChange={(e) => setIsSelectAll(e.target.checked)}
+                style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', flexShrink: 0 }}
+                title="Acciones Masivas del Superadministrador"
+              />
+              <span style={{ color: '#fef08a', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
+                👑 Acciones Masivas (Superadministrador)
+              </span>
             </div>
-          )}
-        </div>
+
+            {isSelectAll && (
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem' }}>
+                <button 
+                  onClick={() => handleBulkUpdate('GRANT_ADMIN', 'Otorgar rol de Administrador a todos')}
+                  disabled={actionLoading !== null}
+                  className="btn btn-secondary"
+                  style={{ padding: '0.5rem', fontSize: '0.8rem', fontWeight: 'bold' }}
+                >
+                  👑 Otorgar Admin a todos
+                </button>
+                <button 
+                  onClick={() => handleBulkUpdate('REVOKE_ADMIN', 'Quitar rol de Administrador a todos')}
+                  disabled={actionLoading !== null}
+                  className="btn btn-secondary"
+                  style={{ padding: '0.5rem', fontSize: '0.8rem', fontWeight: 'bold' }}
+                >
+                  👤 Quitar Admin a todos
+                </button>
+                <button 
+                  onClick={() => handleBulkUpdate('SET_MEMBER', 'Marcar a todos como Socios')}
+                  disabled={actionLoading !== null}
+                  className="btn btn-secondary"
+                  style={{ padding: '0.5rem', fontSize: '0.8rem', fontWeight: 'bold' }}
+                >
+                  🎗️ Marcar a todos como Socios
+                </button>
+                <button 
+                  onClick={handleBulkDelete}
+                  disabled={actionLoading === 'bulk'}
+                  className={styles.deleteBtn}
+                  style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.8rem' }}
+                  title="Borrar Todos los Usuarios No Administradores Limpios"
+                >
+                  {actionLoading === 'bulk' ? '⏳' : <TrashIcon />} Borrado Masivo (Limpios)
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="glass-panel">
