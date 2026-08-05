@@ -99,3 +99,6 @@
 
 ### 16. Alineación de Flechas de Despliegue en Tarjetas de Usuario
 - **Anclaje al Margen Derecho:** Reestructurado el layout de `userHeader` con Flexbox para fijar la flecha indicador de despliegue (`▼`/`▲`) 100% anclada al extremo derecho en todas las tarjetas independientemente de la longitud del nombre o los badges.
+
+### 17. Alineación Global de Flechas de Despliegue en Todas las Pantallas
+- **Consistencia Multipantalla:** Aplicada la misma estructura Flexbox aislante en `EventMaintenance.tsx` (Gestión de Eventos) para fijar las flechas `▼`/`▲` al margen derecho simétrico en toda la plataforma.
