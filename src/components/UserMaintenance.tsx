@@ -240,25 +240,30 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                 <div 
                   className={styles.userHeader} 
                   onClick={() => toggleExpand(user.id)}
-                  style={{ cursor: 'pointer', marginBottom: isExpanded ? '1rem' : '0' }}
+                  style={{ cursor: 'pointer', marginBottom: isExpanded ? '1rem' : '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}
                 >
-                  <div className={styles.userInfo}>
-                    <h3 className={styles.userName}>{user.name}</h3>
+                  <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                      <h3 className={styles.userName} style={{ margin: 0 }}>{user.name}</h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+                        {user.isMember ? (
+                          <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.18)', border: '1px solid rgba(255, 255, 255, 0.3)', color: '#ffffff', fontSize: '0.7rem', padding: '0.15rem 0.4rem', borderRadius: '6px', fontWeight: 600 }}>Socio</span>
+                        ) : (
+                          <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)', fontSize: '0.7rem', padding: '0.15rem 0.4rem', borderRadius: '6px' }}>No Socio</span>
+                        )}
+                        {user.age !== null && user.age !== undefined && (
+                          <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff', fontSize: '0.7rem', padding: '0.15rem 0.4rem', borderRadius: '6px' }}>{user.age} años</span>
+                        )}
+                        {user.isAdmin && (
+                          <span className={`badge ${styles.adminBadge}`} style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem' }}>Admin</span>
+                        )}
+                      </div>
+                    </div>
                     <span className={styles.userHandle}>@{user.username}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {user.isMember ? (
-                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.18)', border: '1px solid rgba(255, 255, 255, 0.3)', color: '#ffffff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 600 }}>Socio</span>
-                    ) : (
-                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>No Socio</span>
-                    )}
-                    {user.age !== null && user.age !== undefined && (
-                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>{user.age} años</span>
-                    )}
-                    {user.isAdmin && (
-                      <span className={`badge ${styles.adminBadge}`}>Admin</span>
-                    )}
-                    <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>{isExpanded ? '▲' : '▼'}</span>
+
+                  <div style={{ flexShrink: 0, paddingLeft: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                    <span style={{ fontSize: '0.85rem', opacity: 0.7, fontWeight: 'bold' }}>{isExpanded ? '▲' : '▼'}</span>
                   </div>
                 </div>
                 
