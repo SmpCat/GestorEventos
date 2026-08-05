@@ -87,3 +87,8 @@
 ### 13. Buscadores en Vivo en Gestión de Usuarios y Flujo de Caja
 - **Buscador en Usuarios (`/admin/users`):** Añadido campo `🔍 Buscar usuario por nombre o nick...` para filtrar al instante la cuadrícula de 31+ miembros.
 - **Buscador en Flujo de Caja (`/finances`):** Añadido filtro rápido en el selector de asistente al crear transacciones y buscador global en el historial de movimientos de caja.
+
+### 14. Acciones Masivas Exclusivas del Superadministrador (`admin`)
+- **Control Restringido:** Panel `👑 Acciones Masivas (Superadministrador)` disponible exclusivamente para el rol Superadmin.
+- **Operaciones Masivas:** Botones de un solo clic para *Otorgar Admin a todos*, *Quitar Admin a todos*, *Marcar a todos como Socios* y *Borrado Masivo (Usuarios Limpios)*.
+- **Protección Root Inviolable:** Todas las operaciones filtran implícitamente `username !== 'admin'`, garantizando que la cuenta del Superadministrador nunca sufra modificaciones involuntarias.
