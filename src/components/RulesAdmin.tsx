@@ -5,7 +5,7 @@ import { savePricingRules } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
 import styles from './RulesAdmin.module.css';
 
-export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseDays = [] }: { eventId: string, initialRules: any[], isAdmin: boolean, inUseDays?: number[] }) {
+export default function RulesAdmin({ eventId, initialRules = [], isAdmin, isSuperAdmin, inUseDays = [] }: { eventId: string, initialRules: any[], isAdmin: boolean, isSuperAdmin?: boolean, inUseDays?: number[] }) {
   const [rules, setRules] = useState<{ days: number | '', price: number | '' }[]>(initialRules);
   const [savedRulesJSON, setSavedRulesJSON] = useState<string>(JSON.stringify(initialRules));
   const [loading, setLoading] = useState<boolean>(false);
@@ -116,22 +116,24 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, inUseD
               <h3 className="text-xl font-bold tracking-tight text-white">Configurador de Tarifas</h3>
             </div>
 
-            {/* Fila 2: Botón de Cargar Tarifas Peña (Centrado verticalmente en el medio) */}
-            <div className="w-full">
-              <button
-                type="button"
-                onClick={handleLoadPenaPreset}
-                className="btn text-sm w-full md:w-auto font-semibold"
-                style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)', 
-                  border: '1px solid rgba(255, 255, 255, 0.25)', 
-                  color: '#ffffff', 
-                  padding: '0.6rem 1.2rem' 
-                }}
-              >
-                Cargar Tarifas Peña (Valdeganga)
-              </button>
-            </div>
+            {/* Fila 2: Botón de Cargar Tarifas Peña (Exclusivo Superadministrador) */}
+            {isSuperAdmin && (
+              <div className="w-full">
+                <button
+                  type="button"
+                  onClick={handleLoadPenaPreset}
+                  className="btn text-sm w-full md:w-auto font-semibold"
+                  style={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)', 
+                    border: '1px solid rgba(255, 255, 255, 0.25)', 
+                    color: '#ffffff', 
+                    padding: '0.6rem 1.2rem' 
+                  }}
+                >
+                  👑 Cargar Tarifas Peña (Valdeganga)
+                </button>
+              </div>
+            )}
           </div>
         )}
 

@@ -45,6 +45,7 @@ export default async function RulesPage() {
         eventId={activeEvent.id} 
         initialRules={rules} 
         isAdmin={session.isAdmin}
+        isSuperAdmin={session.username === 'admin'}
         inUseDays={inUseDays}
       />
     </div>
