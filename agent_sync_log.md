@@ -112,7 +112,7 @@
 - **Exclusión Técnica del Superadministrador:** Filtrada la cuenta `admin` / `Administrador` en la consulta `prisma.user.findMany` y en `assignableUsers` para garantizar que la cuenta técnica nunca aparezca en los desplegables de asignación.
 - **Buscador Principal al Principio de Todo:** Ubicado el buscador `🔍 Buscador de personas a asignar / productos` arriba del todo (justo debajo del título principal y antes de los formularios).
 - **Filtrado Doble en Tiempo Real:** Al escribir un nombre (ej. "Ana", "Eva", "Daniel"), se filtra tanto el listado de productos de la pantalla como las opciones del desplegable de asignación de cada tarjeta.
-
-
-
+### 20. Componente Desplegable Buscable por Persona / Nick (`SearchableUserSelect`)
+- **Desplegable Customizado con Buscador al Inicio:** Creado `SearchableUserSelect.tsx` para reemplazar el `<select>` HTML nativo de asignación en cada tarjeta de compra.
+- **Buscador en la Parte Superior del Menú:** Al desplegar la lista de personas para asignar, incluye justo arriba del todo un campo de texto auto-enfocado `🔍 Buscar por nombre o nick...` que filtra en tiempo real la lista de 50+ miembros tanto por nombre como por nick (@username).
 

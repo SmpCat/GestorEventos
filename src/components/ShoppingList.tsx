@@ -7,6 +7,7 @@ import TrashIcon from './TrashIcon';
 import PencilIcon from './PencilIcon';
 import AiLoadingOverlay from './AiLoadingOverlay';
 import ImageLightbox from './ImageLightbox';
+import SearchableUserSelect from './SearchableUserSelect';
 import styles from './ShoppingList.module.css';
 
 export default function ShoppingList({ items, evidences, eventId, users, currentUser }: { items: any[], evidences?: any[], eventId: string, users: any[], currentUser: any }) {
@@ -18,22 +19,12 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
 
   // Filtrar para asegurar que el Administrador no aparezca en el desplegable de asignaciones
   const assignableUsers = users.filter(u => u.username !== 'admin' && u.name !== 'Administrador');
 
-  // Filtrado de artículos según la búsqueda en tiempo real
-  const filteredItems = items.filter(item => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase().trim();
-    const matchesName = item.name.toLowerCase().includes(q);
-    const matchesAssignee = item.assignee?.name?.toLowerCase().includes(q);
-    return matchesName || matchesAssignee;
-  });
-
-  const pendingItems = filteredItems.filter(item => !item.isPurchased);
-  const purchasedItems = filteredItems.filter(item => item.isPurchased);
+  const pendingItems = items.filter(item => !item.isPurchased);
+  const purchasedItems = items.filter(item => item.isPurchased);
 
   const handleStartEdit = (item: any) => {
     setEditingItemId(item.id);
@@ -309,26 +300,13 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
         {!item.isPurchased && !isEditing && (
           <div className={styles.assignSelectWrapper}>
-            <select 
-              className={`input-field ${styles.assignSelect}`}
+            <SearchableUserSelect
+              users={assignableUsers}
               value={item.assigneeId || 'UNASSIGN'}
-              onChange={(e) => handleAssign(item.id, e.target.value)}
+              onChange={(selectedUserId) => handleAssign(item.id, selectedUserId)}
+              currentUserId={currentUser.id}
               disabled={isProcessing}
-            >
-              <option value="UNASSIGN">Libre (Cualquiera)</option>
-              {assignableUsers
-                .filter(u => {
-                  if (item.assigneeId === u.id) return true;
-                  if (!searchQuery.trim()) return true;
-                  const q = searchQuery.toLowerCase().trim();
-                  return u.name.toLowerCase().includes(q) || u.username.toLowerCase().includes(q);
-                })
-                .map(u => (
-                  <option key={u.id} value={u.id}>
-                    {u.id === currentUser.id ? '🙋‍♂️ ¡Yo lo compro!' : `Asignar a: ${u.name}`}
-                  </option>
-                ))}
-            </select>
+            />
           </div>
         )}
       </div>
@@ -346,63 +324,6 @@ export default function ShoppingList({ items, evidences, eventId, users, current
         <div>
           <h1>Lista de la Compra</h1>
           <p className="subtitle">Planifica qué falta por comprar para el evento activo.</p>
-        </div>
-      </div>
-
-      {/* Buscador principal al principio de todo (Filtra la lista y el desplegable de asignación) */}
-      <div className="glass-panel mb-6" style={{ marginBottom: '1.5rem' }}>
-        <div className={styles.innerBlackBox} style={{ padding: '0.85rem 1rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#fff' }}>
-              🔍 Buscador de personas a asignar / productos
-            </label>
-            <div style={{ position: 'relative', width: '100%' }}>
-              <input
-                type="text"
-                className="input-field"
-                placeholder="Escribe un nombre (ej. Ana, Eva, Daniel) o producto..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ 
-                  paddingLeft: '2.5rem', 
-                  paddingRight: searchQuery ? '2.5rem' : '1rem', 
-                  fontSize: '0.95rem', 
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.08)',
-                  borderColor: searchQuery ? 'rgba(56, 189, 248, 0.6)' : 'rgba(255,255,255,0.15)',
-                  boxShadow: searchQuery ? '0 0 12px rgba(56, 189, 248, 0.2)' : 'none'
-                }}
-              />
-              <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.7, pointerEvents: 'none', fontSize: '1rem' }}>
-                👤
-              </span>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  style={{
-                    position: 'absolute',
-                    right: '0.75rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: 'rgba(255,255,255,0.7)',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                    padding: '0.2rem'
-                  }}
-                  title="Borrar búsqueda"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-            {searchQuery && (
-              <p style={{ fontSize: '0.8rem', color: '#38bdf8', marginTop: '0.2rem', marginBottom: 0 }}>
-                Filtrando por: <strong>"{searchQuery}"</strong> ({filteredItems.length} resultado{filteredItems.length !== 1 ? 's' : ''})
-              </p>
-            )}
-          </div>
         </div>
       </div>
 
