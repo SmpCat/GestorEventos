@@ -129,4 +129,10 @@
 - **Solución Aplicada:** Eliminado el bloque de auto-creación masivo en `getAttendees`. Al pulsar *"🗑️ Expulsar de este evento"*, el registro se borra permanentemente de la base de datos y el usuario expulsado desaparece de inmediato de la lista de asistentes (`/pricing/attendees`) y balances (`/pricing/results`).
 - **Control en Dashboard:** El Dashboard (`src/app/page.tsx` y `Dashboard.tsx`) ahora gestiona correctamente el estado de usuarios no registrados/expulsados, permitiéndoles unirse de nuevo de forma voluntaria cuando lo deseen.
 
+### 24. Relocalización del Buscador de Usuarios (`/admin/users`)
+- **Diseño Mejorado:** Movido el campo de búsqueda `🔍 Buscar usuario por nombre o nick...` desde el panel superior hacia el interior del segundo panel (justo encima de la rejilla de tarjetas de usuario).
+- **Separación de Responsabilidades:** El primer panel superior queda reservado en exclusiva para las funciones de acción: `+ Añadir Usuario` y `👑 Edición Masiva Personalizada (Superadmin)`.
+
+
+
 

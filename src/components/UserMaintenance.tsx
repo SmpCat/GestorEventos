@@ -112,27 +112,6 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
           + Añadir Usuario
         </button>
 
-        <div style={{ position: 'relative', width: '100%' }}>
-          <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
-          <input 
-            type="text" 
-            className="input-field" 
-            placeholder="Buscar usuario por nombre o nick..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', paddingLeft: '2.5rem', paddingRight: '2.5rem', borderRadius: '12px' }}
-          />
-          {searchQuery && (
-            <button 
-              onClick={() => setSearchQuery('')}
-              style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', padding: '0.5rem' }}
-              title="Borrar búsqueda"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
         {isSuperAdmin && (
           <div 
             className={styles.userCard} 
@@ -226,7 +205,27 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
         )}
       </div>
 
-      <div className="glass-panel">
+      <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ position: 'relative', width: '100%' }}>
+          <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+          <input 
+            type="text" 
+            className="input-field" 
+            placeholder="Buscar usuario por nombre o nick..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: '100%', paddingLeft: '2.5rem', paddingRight: '2.5rem', borderRadius: '12px' }}
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', padding: '0.5rem' }}
+              title="Borrar búsqueda"
+            >
+              ✕
+            </button>
+          )}
+        </div>
         <div className={styles.usersGrid}>
           {filteredUsers.length === 0 ? (
             <div className={`glass-panel ${styles.emptyState}`}>
