@@ -120,5 +120,12 @@
 - **Ubicación Exacta:** Añadido un campo de texto `🔍 Buscar producto...` posicionado a la derecha de la casilla *"Marcar todos como comprados"* (y *"Devolver todos a pendientes"*).
 - **Filtrado en Tiempo Real:** Al escribir en este campo, se filtra en tiempo real el listado de productos de la lista de la compra con botón rápido de limpiar (`✕`).
 
+### 22. Campo Edad Obligatorio en Usuarios
+- **Restricción de Obligatoriedad:** Actualizados los formularios de registro público (`/register`), modal de administración (`UserFormModal.tsx`) y modal de perfil de usuario (`UserProfileModal.tsx`) para exigir el campo `Edad (años) *`.
+- **Campos Opcionales Exclusivos:** Se mantienen como los únicos campos opcionales `email` y `phone`.
+- **Validación de Servidor:** Las server actions `createUser`, `updateUser`, `registerPublicUser` y `updateMyProfile` comprueban que `age` esté presente y sea un número mayor que 0.
+
+
+
 
 

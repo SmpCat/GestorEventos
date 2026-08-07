@@ -25,7 +25,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
-    if (!formData.name || !formData.username || !formData.password) {
+    if (!formData.name || !formData.username || !formData.password || !formData.age) {
       setError('Por favor, rellena los campos obligatorios (*).');
       setLoading(false);
       return;
@@ -99,15 +99,16 @@ export default function RegisterPage() {
           </SelectField>
 
           <div className="input-group">
-            <label className="input-label">Edad (años)</label>
+            <label className="input-label">Edad (años) *</label>
             <input 
               type="number" 
               className="input-field" 
               placeholder="Ej. 25"
-              min="0"
+              min="1"
               max="120"
               value={formData.age}
               onChange={e => setFormData({...formData, age: e.target.value})}
+              required
             />
           </div>
 

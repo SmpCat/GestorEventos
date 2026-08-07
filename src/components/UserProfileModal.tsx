@@ -66,8 +66,8 @@ export default function UserProfileModal({
     e.preventDefault();
     setError('');
 
-    if (!formData.name.trim() || !formData.username.trim()) {
-      setError('El nombre y el usuario son obligatorios.');
+    if (!formData.name.trim() || !formData.username.trim() || !formData.age) {
+      setError('El nombre, el usuario y la edad son obligatorios.');
       return;
     }
 
@@ -87,7 +87,7 @@ export default function UserProfileModal({
       name: formData.name,
       username: formData.username,
       isMember: formData.isMember === 'true',
-      age: formData.age ? parseInt(formData.age, 10) : undefined,
+      age: formData.age,
       email: formData.email,
       phone: formData.phone,
       currentPassword: showPasswordSection ? formData.currentPassword : undefined,
@@ -171,15 +171,16 @@ export default function UserProfileModal({
             </div>
 
             <div className="input-group">
-              <label className="input-label">Edad (años)</label>
+              <label className="input-label">Edad (años) *</label>
               <input 
                 type="number" 
                 className="input-field" 
                 placeholder="Ej. 25"
-                min={0}
+                min={1}
                 max={120}
                 value={formData.age}
                 onChange={e => setFormData({ ...formData, age: e.target.value })}
+                required
               />
             </div>
           </div>

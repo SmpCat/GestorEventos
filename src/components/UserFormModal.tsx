@@ -51,8 +51,8 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
     setLoading(true);
 
     // Validación básica
-    if (!formData.name || !formData.username) {
-      alert('Nombre y Usuario son obligatorios.');
+    if (!formData.name || !formData.username || !formData.age) {
+      alert('Nombre, Usuario y Edad son obligatorios.');
       setLoading(false);
       return;
     }
@@ -144,15 +144,16 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
           </SelectField>
 
           <div className="input-group">
-            <label className="input-label">Edad (para cálculo de cuota)</label>
+            <label className="input-label">Edad (años) *</label>
             <input 
               type="number" 
               className="input-field" 
               placeholder="Ej. 25"
-              min="0"
+              min="1"
               max="120"
               value={formData.age}
               onChange={e => setFormData({...formData, age: e.target.value})}
+              required
             />
           </div>
 

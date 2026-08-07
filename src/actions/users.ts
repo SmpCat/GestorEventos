@@ -29,6 +29,14 @@ export async function getUsers() {
 // Crear un nuevo usuario
 export async function createUser(data: any) {
   try {
+    if (data.age === undefined || data.age === null || String(data.age).trim() === '') {
+      return { success: false, error: 'El campo Edad es obligatorio.' };
+    }
+    const ageNum = parseInt(String(data.age), 10);
+    if (isNaN(ageNum) || ageNum <= 0) {
+      return { success: false, error: 'Introduce una Edad válida superior a 0.' };
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const user = await prisma.user.create({
       data: {
@@ -39,7 +47,7 @@ export async function createUser(data: any) {
         phone: data.phone || null,
         isAdmin: data.isAdmin || false,
         isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
-        age: data.age ? parseInt(data.age, 10) : null,
+        age: ageNum,
       },
     });
     revalidatePath('/admin/users');
@@ -55,6 +63,14 @@ export async function createUser(data: any) {
 // Editar un usuario
 export async function updateUser(id: string, data: any) {
   try {
+    if (data.age === undefined || data.age === null || String(data.age).trim() === '') {
+      return { success: false, error: 'El campo Edad es obligatorio.' };
+    }
+    const ageNum = parseInt(String(data.age), 10);
+    if (isNaN(ageNum) || ageNum <= 0) {
+      return { success: false, error: 'Introduce una Edad válida superior a 0.' };
+    }
+
     const updateData: any = {
       name: data.name,
       username: data.username.trim().toLowerCase(),
@@ -62,7 +78,7 @@ export async function updateUser(id: string, data: any) {
       phone: data.phone || null,
       isAdmin: data.isAdmin,
       isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
-      age: data.age ? parseInt(data.age, 10) : null,
+      age: ageNum,
     };
 
     // Si envía password, lo actualizamos también
@@ -256,6 +272,14 @@ export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType
 // Registro público (Fuerza isAdmin = false por seguridad)
 export async function registerPublicUser(data: any) {
   try {
+    if (data.age === undefined || data.age === null || String(data.age).trim() === '') {
+      return { success: false, error: 'El campo Edad es obligatorio.' };
+    }
+    const ageNum = parseInt(String(data.age), 10);
+    if (isNaN(ageNum) || ageNum <= 0) {
+      return { success: false, error: 'Introduce una Edad válida superior a 0.' };
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const user = await prisma.user.create({
       data: {
@@ -266,7 +290,7 @@ export async function registerPublicUser(data: any) {
         phone: data.phone || null,
         isAdmin: false, // <-- RESTRICCIÓN DE SEGURIDAD BLINDADA
         isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
-        age: data.age ? parseInt(data.age, 10) : null,
+        age: ageNum,
       },
     });
     return { success: true, data: user };
@@ -283,7 +307,7 @@ export async function updateMyProfile(data: {
   name: string;
   username: string;
   isMember: boolean;
-  age?: number | string;
+  age: number | string;
   email?: string;
   phone?: string;
   currentPassword?: string;
@@ -294,6 +318,14 @@ export async function updateMyProfile(data: {
     const session = await getSession();
     if (!session) return { success: false, error: 'No has iniciado sesión.' };
 
+    if (data.age === undefined || data.age === null || String(data.age).trim() === '') {
+      return { success: false, error: 'El campo Edad es obligatorio.' };
+    }
+    const ageNum = parseInt(String(data.age), 10);
+    if (isNaN(ageNum) || ageNum <= 0) {
+      return { success: false, error: 'Introduce una Edad válida superior a 0.' };
+    }
+
     const currentUser = await prisma.user.findUnique({ where: { id: session.id } });
     if (!currentUser) return { success: false, error: 'Usuario no encontrado.' };
 
@@ -301,7 +333,7 @@ export async function updateMyProfile(data: {
       name: data.name,
       username: data.username.trim().toLowerCase(),
       isMember: Boolean(data.isMember),
-      age: data.age ? parseInt(String(data.age), 10) : null,
+      age: ageNum,
       email: data.email || null,
       phone: data.phone || null,
     };
