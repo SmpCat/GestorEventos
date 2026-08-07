@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import SelectField from './SelectField';
 import Link from 'next/link';
 import { logout } from '@/actions/auth';
-import { updateAttendeeDays } from '@/actions/attendance';
+import { updateAttendeeDays, joinEvent } from '@/actions/attendance';
 import { getSystemConfig, toggleMaintenanceMode } from '@/actions/system';
 import styles from './Dashboard.module.css';
 
@@ -46,11 +46,26 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
   };
 
   const handleChangeDays = async (newVal: number, newDrinks?: boolean) => {
-    if (!attendee) return;
-    const drinks = newDrinks !== undefined ? newDrinks : (attendee.drinksAlcohol ?? true);
-    if (newVal === attendee.daysAttending && drinks === attendee.drinksAlcohol) return;
-
+    if (!activeEvent) return;
     setLoadingDays(true);
+
+    if (!attendee) {
+      const res = await joinEvent(activeEvent.id, session.id, newVal, newDrinks ?? true);
+      if (!res.success) {
+        alert(res.error || 'Error al unirse al evento');
+      } else {
+        window.location.reload();
+      }
+      setLoadingDays(false);
+      return;
+    }
+
+    const drinks = newDrinks !== undefined ? newDrinks : (attendee.drinksAlcohol ?? true);
+    if (newVal === attendee.daysAttending && drinks === attendee.drinksAlcohol) {
+      setLoadingDays(false);
+      return;
+    }
+
     const res = await updateAttendeeDays(attendee.id, newVal, drinks);
     if (!res.success) alert(res.error || 'Error al actualizar asistencia');
     setLoadingDays(false);
@@ -134,6 +149,37 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                   );
                 })()}
 
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!attendee && activeEvent && !isSuperAdmin && (
+          <div className={styles.attendeeQuotaBox}>
+            <div className="glass-panel" style={{ width: '100%' }}>
+              <div className={styles.innerBlackBox}>
+                <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', marginBottom: '1rem', textAlign: 'center' }}>
+                  No estás registrado como participante en este evento. Selecciona tus días para unirte:
+                </p>
+                <div className="flex flex-col items-center gap-4 mb-2">
+                  <SelectField
+                    label="Asistencia"
+                    value={0}
+                    onChange={e => handleChangeDays(Number(e.target.value))}
+                    disabled={loadingDays}
+                    containerStyle={{ width: '100%', maxWidth: '240px', margin: 0 }}
+                    style={{ opacity: loadingDays ? 0.6 : 1 }}
+                  >
+                    <option value={0}>No lo sé aún / No asisto</option>
+                    {(() => {
+                      const availableDays = Array.from(new Set(pricingRules?.map(r => r.days) || [])).sort((a, b) => a - b);
+                      const daysList = availableDays.length > 0 ? availableDays : [1, 2, 3];
+                      return daysList.map(days => (
+                        <option key={days} value={days}>{days} {days === 1 ? 'día' : 'días'}</option>
+                      ));
+                    })()}
+                  </SelectField>
+                </div>
               </div>
             </div>
           </div>

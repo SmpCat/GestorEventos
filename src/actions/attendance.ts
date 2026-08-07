@@ -71,28 +71,7 @@ export async function savePricingRules(eventId: string, rules: PricingRuleInput[
 
 export async function getAttendees(eventId: string) {
   try {
-    // 1. Auto-registrar a cualquier usuario (excluyendo la cuenta técnica admin) que no tenga registro para este evento
-    const usersWithoutAttendance = await prisma.user.findMany({
-      where: {
-        username: { not: 'admin' },
-        eventAttendances: {
-          none: { eventId }
-        }
-      }
-    });
-
-    if (usersWithoutAttendance.length > 0) {
-      await prisma.eventAttendee.createMany({
-        data: usersWithoutAttendance.map(u => ({
-          userId: u.id,
-          eventId: eventId,
-          daysAttending: 0,
-          expectedPayment: 0
-        }))
-      });
-    }
-
-    // 2. Obtener la lista completa (excluyendo el usuario técnico admin)
+    // Obtener los asistentes del evento (excluyendo la cuenta técnica admin)
     const attendees = await prisma.eventAttendee.findMany({
       where: { 
         eventId,

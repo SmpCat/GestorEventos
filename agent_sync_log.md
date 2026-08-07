@@ -124,8 +124,9 @@
 - **Restricción de Obligatoriedad:** Actualizados los formularios de registro público (`/register`), modal de administración (`UserFormModal.tsx`) y modal de perfil de usuario (`UserProfileModal.tsx`) para exigir el campo `Edad (años) *`.
 - **Campos Opcionales Exclusivos:** Se mantienen como los únicos campos opcionales `email` y `phone`.
 - **Validación de Servidor:** Las server actions `createUser`, `updateUser`, `registerPublicUser` y `updateMyProfile` comprueban que `age` esté presente y sea un número mayor que 0.
-
-
-
+### 23. Corrección Crítica en la Expulsión de Asistentes (`deleteAttendee`)
+- **Causa Raíz Identificada:** `getAttendees` en `src/actions/attendance.ts` ejecutaba un bucle `createMany` automático que volvía a crear inmediatamente un registro `EventAttendee` para cualquier usuario expulsado al recargar la página.
+- **Solución Aplicada:** Eliminado el bloque de auto-creación masivo en `getAttendees`. Al pulsar *"🗑️ Expulsar de este evento"*, el registro se borra permanentemente de la base de datos y el usuario expulsado desaparece de inmediato de la lista de asistentes (`/pricing/attendees`) y balances (`/pricing/results`).
+- **Control en Dashboard:** El Dashboard (`src/app/page.tsx` y `Dashboard.tsx`) ahora gestiona correctamente el estado de usuarios no registrados/expulsados, permitiéndoles unirse de nuevo de forma voluntaria cuando lo deseen.
 
 

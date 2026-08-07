@@ -55,17 +55,7 @@ export default async function Home() {
           currentQuota
         };
       } else {
-        // Auto-registro: si hay evento activo y el usuario no tiene registro, lo creamos con 0 días
-        const newAttendee = await prisma.eventAttendee.create({
-          data: {
-            userId: session.id,
-            eventId: activeEvent.id,
-            daysAttending: 0,
-            expectedPayment: 0,
-          },
-          include: { payments: true }
-        });
-        attendee = { ...newAttendee, amountPaid: 0, currentQuota: 0 };
+        attendee = null;
       }
       pricingRules = rulesRes;
     }
