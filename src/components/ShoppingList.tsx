@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, scanShoppingListAI, deleteShoppingListEvidence, reScanShoppingListAI } from '@/actions/shopping';
+import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, updateShoppingItem, scanShoppingListAI, deleteShoppingListEvidence, reScanShoppingListAI } from '@/actions/shopping';
 import TrashIcon from './TrashIcon';
+import PencilIcon from './PencilIcon';
 import AiLoadingOverlay from './AiLoadingOverlay';
 import ImageLightbox from './ImageLightbox';
 import styles from './ShoppingList.module.css';
@@ -15,8 +16,35 @@ export default function ShoppingList({ items, evidences, eventId, users, current
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pending' | 'purchased'>('pending');
 
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
   const pendingItems = items.filter(item => !item.isPurchased);
   const purchasedItems = items.filter(item => item.isPurchased);
+
+  const handleStartEdit = (item: any) => {
+    setEditingItemId(item.id);
+    setEditingName(item.name);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setEditingName('');
+  };
+
+  const handleSaveEdit = async (itemId: string) => {
+    if (!editingName.trim()) return;
+    setLoading(`edit-${itemId}`);
+    const res = await updateShoppingItem(itemId, editingName.trim());
+    if (res.success) {
+      router.refresh();
+      setEditingItemId(null);
+      setEditingName('');
+    } else {
+      alert(res.error || 'Error al modificar el producto');
+    }
+    setLoading(null);
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,7 +191,8 @@ export default function ShoppingList({ items, evidences, eventId, users, current
   };
 
   const renderItem = (item: any) => {
-    const isProcessing = loading === `toggle-${item.id}` || loading === `delete-${item.id}` || loading === `assign-${item.id}`;
+    const isProcessing = loading === `toggle-${item.id}` || loading === `delete-${item.id}` || loading === `assign-${item.id}` || loading === `edit-${item.id}`;
+    const isEditing = editingItemId === item.id;
     
     return (
       <div 
@@ -172,15 +201,53 @@ export default function ShoppingList({ items, evidences, eventId, users, current
         style={{ opacity: isProcessing ? 0.5 : 1 }}
       >
         <div className={styles.itemHeader}>
-          <div className={styles.itemLeft}>
+          <div className={styles.itemLeft} style={{ flex: 1 }}>
             <input 
               type="checkbox" 
               checked={false}
               onChange={() => handleToggle(item.id, item.isPurchased)}
-              disabled={isProcessing}
+              disabled={isProcessing || isEditing}
               className={styles.checkbox}
               title={item.isPurchased ? "Devolver a pendientes" : "Marcar como comprado"}
             />
+            {isEditing ? (
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSaveEdit(item.id);
+                }} 
+                className={styles.inlineEditForm}
+              >
+                <input
+                  type="text"
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') handleCancelEdit();
+                  }}
+                  className={`input-field ${styles.inlineEditInput}`}
+                  autoFocus
+                  disabled={loading === `edit-${item.id}`}
+                />
+                <button 
+                  type="submit" 
+                  className={styles.saveEditBtn}
+                  disabled={loading === `edit-${item.id}` || !editingName.trim()}
+                  title="Guardar cambio"
+                >
+                  {loading === `edit-${item.id}` ? '⏳' : '✓'}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={handleCancelEdit} 
+                  className={styles.cancelEditBtn}
+                  disabled={loading === `edit-${item.id}`}
+                  title="Cancelar"
+                >
+                  ✕
+                </button>
+              </form>
+            ) : (
               <div className={styles.itemNameWrapper}>
                 <span className={styles.itemName} style={{ textDecoration: item.isPurchased ? 'line-through' : 'none' }}>
                   {item.name}
@@ -200,21 +267,34 @@ export default function ShoppingList({ items, evidences, eventId, users, current
                   </div>
                 )}
               </div>
-            </div>
+            )}
+          </div>
 
-          {!item.isPurchased && (
-            <button 
-              onClick={() => handleDelete(item.id)} 
-              disabled={isProcessing}
-              className={styles.deleteBtn}
-              title="Borrar producto"
-            >
-              {isProcessing ? '⏳' : <TrashIcon />}
-            </button>
+          {!isEditing && (
+            <div className={styles.actionButtons}>
+              <button 
+                onClick={() => handleStartEdit(item)} 
+                disabled={isProcessing}
+                className={styles.editBtn}
+                title="Modificar producto"
+              >
+                {loading === `edit-${item.id}` ? '⏳' : <PencilIcon />}
+              </button>
+              {!item.isPurchased && (
+                <button 
+                  onClick={() => handleDelete(item.id)} 
+                  disabled={isProcessing}
+                  className={styles.deleteBtn}
+                  title="Borrar producto"
+                >
+                  {isProcessing ? '⏳' : <TrashIcon />}
+                </button>
+              )}
+            </div>
           )}
         </div>
 
-        {!item.isPurchased && (
+        {!item.isPurchased && !isEditing && (
           <div className={styles.assignSelectWrapper}>
             <select 
               className={`input-field ${styles.assignSelect}`}

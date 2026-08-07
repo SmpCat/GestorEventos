@@ -102,3 +102,9 @@
 
 ### 17. Alineación Global de Flechas de Despliegue en Todas las Pantallas
 - **Consistencia Multipantalla:** Aplicada la misma estructura Flexbox aislante en `EventMaintenance.tsx` (Gestión de Eventos) para fijar las flechas `▼`/`▲` al margen derecho simétrico en toda la plataforma.
+
+### 18. Edición de Productos en la Lista de la Compra (`/shopping`)
+- **Icono de Edición (Lápiz):** Añadido el componente `PencilIcon.tsx` posicionado exactamente al lado de la papelera en cada fila de artículo de la lista de la compra.
+- **Edición Inline Interactiva:** Al pulsar el lápiz se activa un formulario inline con un campo de texto enfocado automáticamente, botón de guardar (`✓` / Enter) y botón de cancelar (`✕` / Escape).
+- **Acción Servidor (`updateShoppingItem`):** Creada la server action en `src/actions/shopping.ts` para actualizar el nombre en la base de datos SQLite y revalidar en tiempo real la ruta `/shopping`.
+

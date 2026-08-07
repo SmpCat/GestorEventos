@@ -133,6 +133,25 @@ export async function deleteItem(itemId: string) {
   }
 }
 
+// Modificar nombre de un artículo
+export async function updateShoppingItem(itemId: string, name: string) {
+  try {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return { success: false, error: 'El nombre del producto no puede estar vacío.' };
+    }
+    const item = await prisma.shoppingListItem.update({
+      where: { id: itemId },
+      data: { name: trimmed },
+    });
+    revalidatePath('/shopping');
+    return { success: true, data: item };
+  } catch (error: any) {
+    return { success: false, error: 'Error al modificar el producto: ' + error.message };
+  }
+}
+
+
 // ==============================================================
 // FUNCIONES DE INTELIGENCIA ARTIFICIAL (GEMINI)
 // ==============================================================
