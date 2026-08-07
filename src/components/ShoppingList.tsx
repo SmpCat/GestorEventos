@@ -18,9 +18,22 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const pendingItems = items.filter(item => !item.isPurchased);
-  const purchasedItems = items.filter(item => item.isPurchased);
+  // Filtrar para asegurar que el Administrador no aparezca en el desplegable de asignaciones
+  const assignableUsers = users.filter(u => u.username !== 'admin' && u.name !== 'Administrador');
+
+  // Filtrado de artículos según la búsqueda en tiempo real
+  const filteredItems = items.filter(item => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const matchesName = item.name.toLowerCase().includes(q);
+    const matchesAssignee = item.assignee?.name?.toLowerCase().includes(q);
+    return matchesName || matchesAssignee;
+  });
+
+  const pendingItems = filteredItems.filter(item => !item.isPurchased);
+  const purchasedItems = filteredItems.filter(item => item.isPurchased);
 
   const handleStartEdit = (item: any) => {
     setEditingItemId(item.id);
@@ -303,7 +316,7 @@ export default function ShoppingList({ items, evidences, eventId, users, current
               disabled={isProcessing}
             >
               <option value="UNASSIGN">Libre (Cualquiera)</option>
-              {users.map(u => (
+              {assignableUsers.map(u => (
                 <option key={u.id} value={u.id}>
                   {u.id === currentUser.id ? '🙋‍♂️ ¡Yo lo compro!' : `Asignar a: ${u.name}`}
                 </option>
@@ -385,7 +398,52 @@ export default function ShoppingList({ items, evidences, eventId, users, current
         </div>
       </div>
 
-      <h3 className={styles.sectionTitle}>📋 Lista</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginTop: '2.5rem', marginBottom: '1rem' }}>
+        <h3 className={styles.sectionTitle} style={{ margin: 0 }}>📋 Lista</h3>
+        
+        {/* Buscador en tiempo real de productos o asignados */}
+        <div style={{ position: 'relative', minWidth: '240px', flex: '1', maxWidth: '340px' }}>
+          <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.6, pointerEvents: 'none', fontSize: '0.9rem' }}>
+            🔍
+          </span>
+          <input
+            type="text"
+            className="input-field"
+            placeholder="Buscar producto o persona..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ 
+              paddingLeft: '2.25rem', 
+              paddingRight: searchQuery ? '2rem' : '0.75rem', 
+              paddingTop: '0.4rem', 
+              paddingBottom: '0.4rem', 
+              fontSize: '0.9rem', 
+              width: '100%',
+              background: 'rgba(255,255,255,0.06)',
+              borderColor: searchQuery ? 'rgba(56, 189, 248, 0.5)' : 'rgba(255,255,255,0.12)'
+            }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                position: 'absolute',
+                right: '0.6rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: 'rgba(255,255,255,0.6)',
+                cursor: 'pointer',
+                fontSize: '0.85rem'
+              }}
+              title="Limpiar búsqueda"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
       <div className={styles.tabsContainer}>
         <button 
           onClick={() => setActiveTab('pending')}

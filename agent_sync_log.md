@@ -108,3 +108,9 @@
 - **Edición Inline Interactiva:** Al pulsar el lápiz se activa un formulario inline con un campo de texto enfocado automáticamente, botón de guardar (`✓` / Enter) y botón de cancelar (`✕` / Escape).
 - **Acción Servidor (`updateShoppingItem`):** Creada la server action en `src/actions/shopping.ts` para actualizar el nombre en la base de datos SQLite y revalidar en tiempo real la ruta `/shopping`.
 
+### 19. Exclusión de Administrador y Buscador en Lista de la Compra (`/shopping`)
+- **Exclusión Técnica del Superadministrador:** Filtrada la cuenta `admin` / `Administrador` en la consulta `prisma.user.findMany` y en `assignableUsers` para garantizar que la cuenta técnica no aparezca en los desplegables de asignación.
+- **Buscador en Tiempo Real:** Añadido campo de búsqueda `🔍 Buscar producto o persona...` con botón de limpieza (`✕`) que filtra al instante los artículos pendientes y comprados por nombre o persona asignada.
+
+
+

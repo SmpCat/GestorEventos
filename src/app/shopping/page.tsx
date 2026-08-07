@@ -27,10 +27,13 @@ export default async function ShoppingPage() {
     );
   }
 
-  // Obtener Usuarios para el desplegable de asignación
+  // Obtener Usuarios para el desplegable de asignación (excluyendo la cuenta técnica admin)
   const users = await prisma.user.findMany({
+    where: {
+      username: { not: 'admin' }
+    },
     orderBy: { name: 'asc' },
-    select: { id: true, name: true }
+    select: { id: true, name: true, username: true }
   });
 
   // Obtener los productos
