@@ -116,3 +116,9 @@
 - **Desplegable Customizado con Buscador al Inicio:** Creado `SearchableUserSelect.tsx` para reemplazar el `<select>` HTML nativo de asignación en cada tarjeta de compra.
 - **Buscador en la Parte Superior del Menú:** Al desplegar la lista de personas para asignar, incluye justo arriba del todo un campo de texto auto-enfocado `🔍 Buscar por nombre o nick...` que filtra en tiempo real la lista de 50+ miembros tanto por nombre como por nick (@username).
 
+### 21. Buscador de Productos al Lado de "Marcar todos como comprados" (`/shopping`)
+- **Ubicación Exacta:** Añadido un campo de texto `🔍 Buscar producto...` posicionado a la derecha de la casilla *"Marcar todos como comprados"* (y *"Devolver todos a pendientes"*).
+- **Filtrado en Tiempo Real:** Al escribir en este campo, se filtra en tiempo real el listado de productos de la lista de la compra con botón rápido de limpiar (`✕`).
+
+
+

@@ -19,12 +19,20 @@ export default function ShoppingList({ items, evidences, eventId, users, current
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Filtrar para asegurar que el Administrador no aparezca en el desplegable de asignaciones
   const assignableUsers = users.filter(u => u.username !== 'admin' && u.name !== 'Administrador');
 
-  const pendingItems = items.filter(item => !item.isPurchased);
-  const purchasedItems = items.filter(item => item.isPurchased);
+  // Filtrar productos por búsqueda
+  const filteredItems = items.filter(item => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return item.name.toLowerCase().includes(q) || item.assignee?.name?.toLowerCase().includes(q);
+  });
+
+  const pendingItems = filteredItems.filter(item => !item.isPurchased);
+  const purchasedItems = filteredItems.filter(item => item.isPurchased);
 
   const handleStartEdit = (item: any) => {
     setEditingItemId(item.id);
@@ -402,35 +410,87 @@ export default function ShoppingList({ items, evidences, eventId, users, current
       <div className="glass-panel" style={{ opacity: activeTab === 'purchased' ? 0.8 : 1 }}>
         <div className={styles.innerBlackBox}>
           
-          {(activeTab === 'pending' && pendingItems.length > 0) && (
+          {activeTab === 'pending' && (
             <div className={styles.bulkActionRow} style={{ opacity: loading === 'toggle-bulk' ? 0.5 : 1 }}>
-              <input 
-                type="checkbox"
-                className={styles.checkbox}
-                checked={false}
-                disabled={loading === 'toggle-bulk'}
-                onChange={(e) => {
-                  handleToggleBulk(pendingItems.map(i => i.id), true);
-                  e.target.checked = false;
-                }}
-              />
-              <span className={styles.bulkActionText}>Marcar todos como comprados</span>
+              {pendingItems.length > 0 ? (
+                <div className={styles.bulkActionLeft}>
+                  <input 
+                    type="checkbox"
+                    className={styles.checkbox}
+                    checked={false}
+                    disabled={loading === 'toggle-bulk'}
+                    onChange={(e) => {
+                      handleToggleBulk(pendingItems.map(i => i.id), true);
+                      e.target.checked = false;
+                    }}
+                  />
+                  <span className={styles.bulkActionText}>Marcar todos como comprados</span>
+                </div>
+              ) : <div />}
+
+              {/* Buscador de productos de la lista a la derecha */}
+              <div className={styles.productSearchWrapper}>
+                <input
+                  type="text"
+                  className={`input-field ${styles.productSearchInput}`}
+                  placeholder="🔍 Buscar producto..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <span className={styles.productSearchIcon}>🔍</span>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className={styles.productSearchClearBtn}
+                    title="Limpiar búsqueda"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
-          {(activeTab === 'purchased' && purchasedItems.length > 0) && (
+          {activeTab === 'purchased' && (
             <div className={styles.bulkActionRow} style={{ opacity: loading === 'toggle-bulk' ? 0.5 : 1 }}>
-              <input 
-                type="checkbox"
-                className={styles.checkbox}
-                checked={false}
-                disabled={loading === 'toggle-bulk'}
-                onChange={(e) => {
-                  handleToggleBulk(purchasedItems.map(i => i.id), false);
-                  e.target.checked = false;
-                }}
-              />
-              <span className={styles.bulkActionText}>Devolver todos a pendientes</span>
+              {purchasedItems.length > 0 ? (
+                <div className={styles.bulkActionLeft}>
+                  <input 
+                    type="checkbox"
+                    className={styles.checkbox}
+                    checked={false}
+                    disabled={loading === 'toggle-bulk'}
+                    onChange={(e) => {
+                      handleToggleBulk(purchasedItems.map(i => i.id), false);
+                      e.target.checked = false;
+                    }}
+                  />
+                  <span className={styles.bulkActionText}>Devolver todos a pendientes</span>
+                </div>
+              ) : <div />}
+
+              {/* Buscador de productos de la lista a la derecha */}
+              <div className={styles.productSearchWrapper}>
+                <input
+                  type="text"
+                  className={`input-field ${styles.productSearchInput}`}
+                  placeholder="🔍 Buscar producto..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <span className={styles.productSearchIcon}>🔍</span>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className={styles.productSearchClearBtn}
+                    title="Limpiar búsqueda"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
