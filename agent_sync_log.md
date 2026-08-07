@@ -108,9 +108,11 @@
 - **Edición Inline Interactiva:** Al pulsar el lápiz se activa un formulario inline con un campo de texto enfocado automáticamente, botón de guardar (`✓` / Enter) y botón de cancelar (`✕` / Escape).
 - **Acción Servidor (`updateShoppingItem`):** Creada la server action en `src/actions/shopping.ts` para actualizar el nombre en la base de datos SQLite y revalidar en tiempo real la ruta `/shopping`.
 
-### 19. Exclusión de Administrador y Buscador en Lista de la Compra (`/shopping`)
-- **Exclusión Técnica del Superadministrador:** Filtrada la cuenta `admin` / `Administrador` en la consulta `prisma.user.findMany` y en `assignableUsers` para garantizar que la cuenta técnica no aparezca en los desplegables de asignación.
-- **Buscador en Tiempo Real:** Añadido campo de búsqueda `🔍 Buscar producto o persona...` con botón de limpieza (`✕`) que filtra al instante los artículos pendientes y comprados por nombre o persona asignada.
+### 19. Exclusión de Administrador y Buscador Principal al Inicio (`/shopping`)
+- **Exclusión Técnica del Superadministrador:** Filtrada la cuenta `admin` / `Administrador` en la consulta `prisma.user.findMany` y en `assignableUsers` para garantizar que la cuenta técnica nunca aparezca en los desplegables de asignación.
+- **Buscador Principal al Principio de Todo:** Ubicado el buscador `🔍 Buscador de personas a asignar / productos` arriba del todo (justo debajo del título principal y antes de los formularios).
+- **Filtrado Doble en Tiempo Real:** Al escribir un nombre (ej. "Ana", "Eva", "Daniel"), se filtra tanto el listado de productos de la pantalla como las opciones del desplegable de asignación de cada tarjeta.
+
 
 
 
