@@ -167,11 +167,10 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-### 36. Rediseño de Botones y Distribución de Tarjeta (`ShoppingListCard.tsx` & `ShoppingList.tsx`)
-- **Estilo Unificado de Botón IA (`ShoppingList.tsx`):** Aplicado el mismo formato `btn btn-primary` al botón `📸 Crear Lista desde Foto (IA)` para máxima coherencia con `📝 + Nueva Lista Manual`.
-- **Flecha Desplegable a la Derecha del Título:** Colocada la flecha de expandir/plegar (🔽/🔼) a la derecha del título en la primera fila de la tarjeta.
-- **Botón `📷 Foto` Bajado y en Blanco:** Reubicado el botón `📷 Foto` a la fila inferior de controles junto al desplegable de encargado, en blanco estético con visor Lightbox al pulsar.
-- **Texto y Estilo "Compra hecha":** Sustituido "Comprar todo" por "Compra hecha" en estilo blanco/glassmorphism integrable con el tema oscuro.
+### 37. Visor Lightbox a Pantalla Completa con React Portal (`ImageLightbox.tsx`)
+- **Renderizado en `document.body` (`createPortal`):** Actualizado `ImageLightbox.tsx` para renderizar el modal flotante mediante un Portal directo en el `document.body`.
+- **Resultado Estético:** Elimina cualquier restricción de apilamiento o recortes de contenedor padre (`glass-panel`), permitiendo mostrar la foto de la lista en su proporción completa y vertical nativa a pantalla completa con fondo negro translúcido y botón único `✕` arriba a la derecha.
+
 
 
 
