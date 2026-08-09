@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import SelectField from './SelectField';
 import { bulkUpdateUsersFiltered, FilterType, BulkActionType } from '@/actions/users';
-import styles from './Dashboard.module.css';
 
 const FILTER_LABELS: Record<FilterType, string> = {
   ALL: 'Todos los usuarios',
@@ -27,13 +27,24 @@ const ACTION_LABELS: Record<BulkActionType, string> = {
   DELETE_CLEAN: 'Borrar usuarios limpios (sin historial de cuenta)'
 };
 
-export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boolean }) {
-  const [open, setOpen] = useState(false);
+export default function BulkUserEditPage({ isSuperAdmin }: { isSuperAdmin: boolean }) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('ALL');
   const [selectedAction, setSelectedAction] = useState<BulkActionType>('SET_NON_MEMBER');
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
-  if (!isSuperAdmin) return null;
+  if (!isSuperAdmin) {
+    return (
+      <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: '#fca5a5', maxWidth: '600px', margin: '3rem auto' }}>
+        <h2 style={{ marginBottom: '0.75rem' }}>⛔ Acceso Restringido</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+          Solo el Superadministrador (admin) tiene permiso para acceder a la edición masiva.
+        </p>
+        <Link href="/" className="btn" style={{ padding: '0.75rem 1.5rem', display: 'inline-block' }}>
+          Volver al Inicio
+        </Link>
+      </div>
+    );
+  }
 
   const handleExecuteFilteredBulk = async () => {
     const filterText = FILTER_LABELS[selectedFilter];
@@ -66,45 +77,40 @@ export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boole
   };
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`${styles.menuItem} ${styles.adminMenuItem}`}
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '1rem' }}>
+      
+      {/* Botón de volver */}
+      <Link 
+        href="/" 
         style={{ 
-          textAlign: 'left', 
-          background: open ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.05)', 
-          border: open ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
-          cursor: 'pointer'
+          display: 'inline-flex', 
+          alignItems: 'center', 
+          gap: '0.5rem', 
+          color: 'var(--text-secondary)', 
+          textDecoration: 'none', 
+          marginBottom: '1.5rem',
+          fontSize: '0.9rem',
+          fontWeight: 'bold'
         }}
       >
-        <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Edición Masiva</h3>
-          <p className={styles.menuItemSubtitle}>
-            {open ? '▲ Plegar panel' : 'Cambios masivos por filtro'}
-          </p>
-        </div>
-        <div style={{ fontSize: '2rem' }}>👑</div>
-      </button>
+        ← Volver al Dashboard
+      </Link>
 
-      {open && (
-        <div 
-          style={{ 
-            gridColumn: '1 / -1',
-            marginTop: '0.5rem',
-            padding: '1.25rem', 
-            border: '1px solid rgba(255, 255, 255, 0.15)', 
-            background: 'rgba(15, 23, 42, 0.65)', 
-            backdropFilter: 'blur(10px)',
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem'
-          }}
-        >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          👑 Edición Masiva Personalizada
+        </h1>
+        <p className="subtitle" style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+          Aplica modificaciones y permisos masivos por filtro a los usuarios del sistema.
+        </p>
+      </div>
+
+      <div className="glass-panel" style={{ padding: '2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 'bold' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', color: '#ffffff', marginBottom: '0.5rem', fontWeight: 'bold' }}>
                 1. Filtrar Usuarios Objetivo:
               </label>
               <SelectField
@@ -124,7 +130,7 @@ export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boole
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 'bold' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', color: '#ffffff', marginBottom: '0.5rem', fontWeight: 'bold' }}>
                 2. Acción Masiva a Ejecutar:
               </label>
               <SelectField
@@ -146,26 +152,29 @@ export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boole
             </div>
           </div>
 
-          <button
-            onClick={handleExecuteFilteredBulk}
-            disabled={actionLoading}
-            className="btn"
-            style={{ 
-              width: '100%', 
-              padding: '0.75rem', 
-              fontSize: '0.9rem', 
-              fontWeight: 'bold',
-              backgroundColor: (selectedAction === 'DELETE_CLEAN' || selectedAction === 'EXPEL_CLEAN_ATTENDEES') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-              border: (selectedAction === 'DELETE_CLEAN' || selectedAction === 'EXPEL_CLEAN_ATTENDEES') ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.2)',
-              color: (selectedAction === 'DELETE_CLEAN' || selectedAction === 'EXPEL_CLEAN_ATTENDEES') ? '#fca5a5' : '#ffffff',
-              borderRadius: '10px',
-              cursor: 'pointer'
-            }}
-          >
-            {actionLoading ? '⏳ Aplicando cambios masivos...' : '⚡ Aplicar Cambio Masivo'}
-          </button>
+          <div style={{ paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: '0.5rem' }}>
+            <button
+              onClick={handleExecuteFilteredBulk}
+              disabled={actionLoading}
+              className="btn"
+              style={{ 
+                width: '100%', 
+                padding: '1rem', 
+                fontSize: '1rem', 
+                fontWeight: 'bold',
+                backgroundColor: (selectedAction === 'DELETE_CLEAN' || selectedAction === 'EXPEL_CLEAN_ATTENDEES') ? 'rgba(239, 68, 68, 0.25)' : 'var(--accent-primary, #3b82f6)',
+                border: (selectedAction === 'DELETE_CLEAN' || selectedAction === 'EXPEL_CLEAN_ATTENDEES') ? '1px solid rgba(239, 68, 68, 0.6)' : '1px solid rgba(255, 255, 255, 0.2)',
+                color: (selectedAction === 'DELETE_CLEAN' || selectedAction === 'EXPEL_CLEAN_ATTENDEES') ? '#fca5a5' : '#ffffff',
+                borderRadius: '12px',
+                cursor: 'pointer'
+              }}
+            >
+              {actionLoading ? '⏳ Aplicando cambios masivos...' : '⚡ Aplicar Cambio Masivo'}
+            </button>
+          </div>
+
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }

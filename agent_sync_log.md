@@ -155,4 +155,6 @@
   - `processReceiptAction` y `saveManualExpenseAction` comprueban si `currentUser.canUploadTickets === false` para denegar la subida en el servidor.
   - La vista de gastos (`/expenses`) detecta el permiso del usuario actual para mostrar el aviso `🚫 Subida de Tickets Deshabilitada`.
 
-
+### 29. Creación de la Pantalla Exclusiva para Edición Masiva (`/admin/bulk-edit`)
+- **Navegación por Página Completa:** Convertido el botón de **Edición Masiva** en la *Zona de Administración* del Dashboard en un enlace de navegación directa hacia `/admin/bulk-edit`.
+- **Nueva Vista (`BulkUserEditPage.tsx` & `page.tsx`):** Creada la pantalla dedicada con su cabecera, botón de retorno al Dashboard y contenedor Glassmorphism independiente para ejecutar las acciones y filtros masivos de forma cómoda y limpia.

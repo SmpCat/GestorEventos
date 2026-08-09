@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { logout } from '@/actions/auth';
 import { updateAttendeeDays, joinEvent } from '@/actions/attendance';
 import { getSystemConfig, toggleMaintenanceMode } from '@/actions/system';
-import BulkUserEditCard from './BulkUserEditCard';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard({ session, activeEvent, attendee, pricingRules }: { session: any, activeEvent: any, attendee?: any, pricingRules?: any[] }) {
@@ -303,7 +302,13 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                 )}
 
                 {isSuperAdmin && (
-                  <BulkUserEditCard isSuperAdmin={isSuperAdmin} />
+                  <Link href="/admin/bulk-edit" className={`${styles.menuItem} ${styles.adminMenuItem}`}>
+                    <div>
+                      <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Edición Masiva</h3>
+                      <p className={styles.menuItemSubtitle}>Cambios masivos por filtro</p>
+                    </div>
+                    <div style={{ fontSize: '2rem' }}>👑</div>
+                  </Link>
                 )}
               </div>
             </div>
