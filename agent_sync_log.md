@@ -167,10 +167,12 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-### 35. Ajustes de UI en Tarjeta de Lista (`ShoppingListCard.tsx`)
-- **Flecha Desplegable a la Derecha:** Movido el botón de expandir/plegar (🔽/🔼) al extremo derecho de la cabecera de la tarjeta para una mejor alineación y usabilidad táctil.
-- **Iconografía en Blanco:** Cambiado el color de los iconos de edición (`PencilIcon`) y borrado (`TrashIcon`) en la cabecera y en cada fila de producto a color blanco (`#ffffff`) con opacidad suavizada.
-- **Acción "Comprar Todo / Desmarcar Todo" por Lista:** Añadido el botón `✅ Comprar todo` / `🔄 Desmarcar todo` directamente en la tarjeta de cada lista para marcar o desmarcar todos sus productos con un solo clic.
+### 36. Rediseño de Botones y Distribución de Tarjeta (`ShoppingListCard.tsx` & `ShoppingList.tsx`)
+- **Estilo Unificado de Botón IA (`ShoppingList.tsx`):** Aplicado el mismo formato `btn btn-primary` al botón `📸 Crear Lista desde Foto (IA)` para máxima coherencia con `📝 + Nueva Lista Manual`.
+- **Flecha Desplegable a la Derecha del Título:** Colocada la flecha de expandir/plegar (🔽/🔼) a la derecha del título en la primera fila de la tarjeta.
+- **Botón `📷 Foto` Bajado y en Blanco:** Reubicado el botón `📷 Foto` a la fila inferior de controles junto al desplegable de encargado, en blanco estético con visor Lightbox al pulsar.
+- **Texto y Estilo "Compra hecha":** Sustituido "Comprar todo" por "Compra hecha" en estilo blanco/glassmorphism integrable con el tema oscuro.
+
 
 
 

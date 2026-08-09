@@ -142,10 +142,10 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
     <div className="glass-panel" style={{ marginBottom: '1.5rem' }}>
       <div className={styles.innerBlackBox}>
         {/* Cabecera de la Lista */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', paddingBottom: isExpanded ? '0.75rem' : '0', borderBottom: isExpanded ? '1px solid rgba(255, 255, 255, 0.1)' : 'none' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingBottom: isExpanded ? '0.75rem' : '0', borderBottom: isExpanded ? '1px solid rgba(255, 255, 255, 0.1)' : 'none' }}>
           
-          {/* Título de la lista a la izquierda */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
+          {/* Fila 1: Título de la lista a la izquierda + Flecha Desplegable a la DERECHA */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '0.5rem' }}>
             {isEditingListName ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flex: 1 }}>
                 <input
@@ -164,47 +164,43 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                 <button onClick={() => setIsEditingListName(false)} className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem' }}>✕</button>
               </div>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
                 <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 600 }}>
                   {list.name}
                 </h3>
                 <button 
                   onClick={() => { setIsEditingListName(true); setListName(list.name); }} 
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.8, color: '#ffffff', fontSize: '0.9rem' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.9, color: '#ffffff', fontSize: '0.9rem', padding: '2px' }}
                   title="Renombrar lista"
                 >
                   <PencilIcon />
                 </button>
-
-                {/* Foto miniaturizada si proviene de escaneo */}
-                {list.imageUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setLightboxImage(list.imageUrl)}
-                    style={{
-                      background: 'none',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '6px',
-                      padding: '2px 6px',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                    title="Ver foto de la lista"
-                  >
-                    <img src={list.imageUrl} alt="Foto lista" style={{ width: '22px', height: '22px', objectFit: 'cover', borderRadius: '4px' }} />
-                    <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)' }}>📷 Foto</span>
-                  </button>
-                )}
               </div>
             )}
+
+            {/* Flecha Desplegable 🔽 / 🔼 (A la DERECHA del título) */}
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="btn"
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: '#ffffff',
+                padding: '0.35rem 0.65rem',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '1rem'
+              }}
+              title={isExpanded ? 'Plegar lista' : 'Desplegar lista'}
+            >
+              {isExpanded ? '🔼' : '🔽'}
+            </button>
           </div>
 
-          {/* Controles de la derecha de la lista: Marcar todo comprado, Encargado, Borrar en blanco y Flecha Desplegable a la derecha */}
+          {/* Fila 2: Controles abajo (Compra hecha en blanco, Foto en blanco, Encargado, Borrar) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
             
-            {/* Mover/marcar toda la lista como comprada */}
+            {/* Botón Compra hecha (estilo blanco glassmorphism) */}
             {list.items && list.items.length > 0 && (
               <button
                 type="button"
@@ -212,22 +208,47 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                 disabled={loading === 'toggle-entire-list'}
                 className="btn"
                 style={{
-                  backgroundColor: pendingItems.length > 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-                  color: pendingItems.length > 0 ? '#4ade80' : '#e2e8f0',
-                  border: pendingItems.length > 0 ? '1px solid rgba(34, 197, 94, 0.4)' : '1px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
                   padding: '0.35rem 0.65rem',
-                  fontSize: '0.8rem',
+                  fontSize: '0.85rem',
                   borderRadius: '8px',
                   whiteSpace: 'nowrap'
                 }}
                 title={pendingItems.length > 0 ? 'Marcar toda la lista como comprada' : 'Devolver toda la lista a pendiente'}
               >
-                {loading === 'toggle-entire-list' ? '⏳' : pendingItems.length > 0 ? '✅ Comprar todo' : '🔄 Desmarcar todo'}
+                {loading === 'toggle-entire-list' ? '⏳' : pendingItems.length > 0 ? 'Compra hecha' : 'Desmarcar compra'}
+              </button>
+            )}
+
+            {/* Botón Foto en blanco bajado a esta fila */}
+            {list.imageUrl && (
+              <button
+                type="button"
+                onClick={() => setLightboxImage(list.imageUrl)}
+                className="btn"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  padding: '0.35rem 0.65rem',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+                title="Ver foto de la lista"
+              >
+                <img src={list.imageUrl} alt="Foto lista" style={{ width: '20px', height: '20px', objectFit: 'cover', borderRadius: '4px' }} />
+                <span>📷 Foto</span>
               </button>
             )}
 
             {/* Asignación de Encargado a nivel de Lista */}
-            <div style={{ minWidth: '160px' }}>
+            <div style={{ flex: 1, minWidth: '160px' }}>
               <SearchableUserSelect
                 users={assignableUsers}
                 value={list.assigneeId || 'UNASSIGN'}
@@ -245,7 +266,7 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                 background: 'rgba(255, 255, 255, 0.1)',
                 color: '#ffffff',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
-                padding: '0.4rem 0.6rem',
+                padding: '0.35rem 0.65rem',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 display: 'flex',
@@ -256,25 +277,8 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
             >
               <TrashIcon />
             </button>
-
-            {/* Botón Flecha Desplegable 🔽 / 🔼 (A la DERECHA) */}
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="btn"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff',
-                padding: '0.4rem 0.65rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-              title={isExpanded ? 'Plegar lista' : 'Desplegar lista'}
-            >
-              {isExpanded ? '🔼' : '🔽'}
-            </button>
           </div>
+
         </div>
 
         {/* Cuerpo Desplegable de la Lista */}

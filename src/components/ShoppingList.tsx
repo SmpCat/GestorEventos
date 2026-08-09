@@ -172,13 +172,10 @@ export default function ShoppingList({ lists, eventId, users, currentUser }: Sho
             />
             <button 
               type="button"
-              className="btn"
+              className="btn btn-primary"
               onClick={() => document.getElementById('ai-scanner-input')?.click()}
               disabled={loading === 'scanning'}
               style={{
-                backgroundColor: 'var(--color-primary-transparent)',
-                color: '#fff',
-                border: '1px solid var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
