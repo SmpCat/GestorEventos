@@ -301,11 +301,13 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                     <div style={{ fontSize: '2rem' }}>⚙️</div>
                   </button>
                 )}
+
+                {isSuperAdmin && (
+                  <BulkUserEditCard isSuperAdmin={isSuperAdmin} />
+                )}
               </div>
             </div>
           </div>
-
-          <BulkUserEditCard isSuperAdmin={isSuperAdmin} />
         </div>
       )}
 

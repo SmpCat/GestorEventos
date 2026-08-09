@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import SelectField from './SelectField';
 import { bulkUpdateUsersFiltered, FilterType, BulkActionType } from '@/actions/users';
+import styles from './Dashboard.module.css';
 
 const FILTER_LABELS: Record<FilterType, string> = {
   ALL: 'Todos los usuarios',
@@ -25,7 +26,7 @@ const ACTION_LABELS: Record<BulkActionType, string> = {
 };
 
 export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boolean }) {
-  const [isSelectAll, setIsSelectAll] = useState(false);
+  const [open, setOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('ALL');
   const [selectedAction, setSelectedAction] = useState<BulkActionType>('SET_NON_MEMBER');
   const [actionLoading, setActionLoading] = useState<boolean>(false);
@@ -63,32 +64,42 @@ export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boole
   };
 
   return (
-    <div 
-      style={{ 
-        padding: '1.25rem', 
-        border: '1px solid rgba(255, 255, 255, 0.15)', 
-        background: 'rgba(15, 23, 42, 0.65)', 
-        backdropFilter: 'blur(10px)',
-        borderRadius: '16px',
-        marginTop: '1rem'
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <input 
-          type="checkbox"
-          checked={isSelectAll}
-          onChange={(e) => setIsSelectAll(e.target.checked)}
-          style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', flexShrink: 0 }}
-          title="Edición Masiva Personalizada por Filtro"
-        />
-        <span style={{ color: '#ffffff', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
-          👑 Edición Masiva Personalizada (Superadmin)
-        </span>
-      </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`${styles.menuItem} ${styles.adminMenuItem}`}
+        style={{ 
+          textAlign: 'left', 
+          background: open ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.05)', 
+          border: open ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+          cursor: 'pointer'
+        }}
+      >
+        <div>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Edición Masiva</h3>
+          <p className={styles.menuItemSubtitle}>
+            {open ? '▲ Plegar panel' : 'Cambios masivos por filtro'}
+          </p>
+        </div>
+        <div style={{ fontSize: '2rem' }}>👑</div>
+      </button>
 
-      {isSelectAll && (
-        <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          
+      {open && (
+        <div 
+          style={{ 
+            gridColumn: '1 / -1',
+            marginTop: '0.5rem',
+            padding: '1.25rem', 
+            border: '1px solid rgba(255, 255, 255, 0.15)', 
+            background: 'rgba(15, 23, 42, 0.65)', 
+            backdropFilter: 'blur(10px)',
+            borderRadius: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem'
+          }}
+        >
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 'bold' }}>
@@ -149,9 +160,8 @@ export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boole
           >
             {actionLoading ? '⏳ Aplicando cambios masivos...' : '⚡ Aplicar Cambio Masivo'}
           </button>
-
         </div>
       )}
-    </div>
+    </>
   );
 }

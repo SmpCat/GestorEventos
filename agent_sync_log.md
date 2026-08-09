@@ -143,6 +143,6 @@
 - **Modularización del Componente:** Creado `BulkUserEditCard.tsx` para encapsular las acciones masivas personalizadas del Superadmin por filtro (rol socio/no socio, admin, fijar edad a 18, borrado de usuarios o asistentes limpios).
 - **Limpieza en Vista Usuarios (`/admin/users`):** Retirada la tarjeta de edición masiva del panel superior de `/admin/users`, dejando exclusivamente la acción `+ Añadir Usuario`.
 - **Integración en Dashboard (`Dashboard.tsx`):** Añadido `BulkUserEditCard` directamente dentro del bloque `👑 Zona de Administración` del Dashboard para un acceso centralizado.
-
-
-
+### 27. Conversión de Edición Masiva en Tarjeta de Menú (`👑 Zona de Administración`)
+- **Integración Directa en la Rejilla de Menú:** Convertido `BulkUserEditCard.tsx` en una cuarta tarjeta interactiva (**`Edición Masiva`** 👑) perfectamente integrada junto a *Gestión de Eventos*, *Usuarios* y *Modo Mantenimiento* dentro del contenedor `menuGrid` de la *Zona de Administración*.
+- **Despliegue Interactivo:** Al hacer clic sobre la tarjeta de *Edición Masiva*, se despliegan suavemente los controles de filtrado y acciones masivas justo debajo de la rejilla de botones.
