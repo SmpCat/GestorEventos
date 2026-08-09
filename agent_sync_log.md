@@ -167,7 +167,9 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-- **Vista Principal (`ShoppingList.tsx`):** Implementados botones `📝 + Nueva Lista Manual` (modal) y `📸 Crear Lista desde Foto (IA)` junto al buscador global de listas y productos.
-- **Compilación:** Verificada con `npm run build` (0 errores).
+### 33. Corrección de Invalidez de Caché en Instancia Dev de Prisma (`src/lib/prisma.ts`)
+- **Causa del Error:** Durante la recarga en caliente (`next dev`), `globalThis.prisma` mantenía en memoria una instancia de `PrismaClient` creada previamente a los cambios en el esquema Prisma (lo que provocaba que `prisma.shoppingList` fuera `undefined`).
+- **Solución:** Actualizado `src/lib/prisma.ts` para verificar la existencia del nuevo modelo `shoppingList` en la instancia cacheada y reinicializar `new PrismaClient()` automáticamente si falta.
+
 
 
