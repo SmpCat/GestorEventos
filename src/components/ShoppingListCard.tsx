@@ -7,6 +7,7 @@ import {
   deleteShoppingList, 
   addShoppingItemToList, 
   togglePurchased, 
+  togglePurchasedBulk,
   updateShoppingItem, 
   deleteItem 
 } from '@/actions/shopping';
@@ -76,6 +77,22 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
     }
   };
 
+  const handleToggleEntireList = async () => {
+    if (!list.items || list.items.length === 0) return;
+    const targetStatus = pendingItems.length > 0;
+    const itemIds = list.items.map((i: any) => i.id);
+    const msg = targetStatus
+      ? `¿Marcar todos los productos de "${list.name}" como comprados?`
+      : `¿Devolver todos los productos de "${list.name}" a pendientes?`;
+
+    if (window.confirm(msg)) {
+      setLoading('toggle-entire-list');
+      await togglePurchasedBulk(itemIds, targetStatus, currentUser.id);
+      router.refresh();
+      setLoading(null);
+    }
+  };
+
   // --- Handlers de Productos ---
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,26 +143,9 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
       <div className={styles.innerBlackBox}>
         {/* Cabecera de la Lista */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', paddingBottom: isExpanded ? '0.75rem' : '0', borderBottom: isExpanded ? '1px solid rgba(255, 255, 255, 0.1)' : 'none' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '220px' }}>
-            {/* Botón Flecha Desplegable 🔽 / 🔼 */}
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="btn"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#fff',
-                padding: '0.35rem 0.65rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-              title={isExpanded ? 'Plegar lista' : 'Desplegar lista'}
-            >
-              {isExpanded ? '🔼' : '🔽'}
-            </button>
-
-            {/* Nombre de la Lista */}
+          
+          {/* Título de la lista a la izquierda */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
             {isEditingListName ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flex: 1 }}>
                 <input
@@ -164,47 +164,70 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                 <button onClick={() => setIsEditingListName(false)} className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem' }}>✕</button>
               </div>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 600 }}>
                   {list.name}
                 </h3>
                 <button 
                   onClick={() => { setIsEditingListName(true); setListName(list.name); }} 
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.6, fontSize: '0.9rem' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.8, color: '#ffffff', fontSize: '0.9rem' }}
                   title="Renombrar lista"
                 >
-                  ✏️
+                  <PencilIcon />
                 </button>
+
+                {/* Foto miniaturizada si proviene de escaneo */}
+                {list.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setLightboxImage(list.imageUrl)}
+                    style={{
+                      background: 'none',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '6px',
+                      padding: '2px 6px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    title="Ver foto de la lista"
+                  >
+                    <img src={list.imageUrl} alt="Foto lista" style={{ width: '22px', height: '22px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)' }}>📷 Foto</span>
+                  </button>
+                )}
               </div>
             )}
           </div>
 
-          {/* Controles de la derecha de la lista: Encargado, Foto mini y Borrar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            {/* Foto miniaturizada si proviene de escaneo */}
-            {list.imageUrl && (
+          {/* Controles de la derecha de la lista: Marcar todo comprado, Encargado, Borrar en blanco y Flecha Desplegable a la derecha */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            
+            {/* Mover/marcar toda la lista como comprada */}
+            {list.items && list.items.length > 0 && (
               <button
                 type="button"
-                onClick={() => setLightboxImage(list.imageUrl)}
+                onClick={handleToggleEntireList}
+                disabled={loading === 'toggle-entire-list'}
+                className="btn"
                 style={{
-                  background: 'none',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '6px',
-                  padding: '2px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
+                  backgroundColor: pendingItems.length > 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                  color: pendingItems.length > 0 ? '#4ade80' : '#e2e8f0',
+                  border: pendingItems.length > 0 ? '1px solid rgba(34, 197, 94, 0.4)' : '1px solid rgba(255, 255, 255, 0.2)',
+                  padding: '0.35rem 0.65rem',
+                  fontSize: '0.8rem',
+                  borderRadius: '8px',
+                  whiteSpace: 'nowrap'
                 }}
-                title="Ver foto de la lista"
+                title={pendingItems.length > 0 ? 'Marcar toda la lista como comprada' : 'Devolver toda la lista a pendiente'}
               >
-                <img src={list.imageUrl} alt="Foto lista" style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
-                <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)' }}>📷 Ver Foto</span>
+                {loading === 'toggle-entire-list' ? '⏳' : pendingItems.length > 0 ? '✅ Comprar todo' : '🔄 Desmarcar todo'}
               </button>
             )}
 
             {/* Asignación de Encargado a nivel de Lista */}
-            <div style={{ minWidth: '180px' }}>
+            <div style={{ minWidth: '160px' }}>
               <SearchableUserSelect
                 users={assignableUsers}
                 value={list.assigneeId || 'UNASSIGN'}
@@ -214,21 +237,42 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
               />
             </div>
 
-            {/* Botón Borrar Lista */}
+            {/* Botón Borrar Lista (Icono Papelera en blanco) */}
             <button
               onClick={handleDeleteList}
               disabled={loading === 'delete-list'}
               style={{
-                background: 'rgba(239, 68, 68, 0.15)',
-                color: '#ef4444',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                padding: '0.35rem 0.6rem',
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                padding: '0.4rem 0.6rem',
                 borderRadius: '8px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
               title="Borrar esta lista"
             >
               <TrashIcon />
+            </button>
+
+            {/* Botón Flecha Desplegable 🔽 / 🔼 (A la DERECHA) */}
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="btn"
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: '#ffffff',
+                padding: '0.4rem 0.65rem',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '1rem'
+              }}
+              title={isExpanded ? 'Plegar lista' : 'Desplegar lista'}
+            >
+              {isExpanded ? '🔼' : '🔽'}
             </button>
           </div>
         </div>
@@ -333,11 +377,11 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                       </div>
 
                       {!isEditingThisItem && (
-                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                           <button
                             onClick={() => { setEditingItemId(item.id); setEditingItemName(item.name); }}
                             disabled={isItemProcessing}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.7 }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ffffff', opacity: 0.9, padding: '2px' }}
                             title="Editar producto"
                           >
                             <PencilIcon />
@@ -345,7 +389,7 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                           <button
                             onClick={() => handleDeleteItem(item.id)}
                             disabled={isItemProcessing}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', opacity: 0.7 }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ffffff', opacity: 0.9, padding: '2px' }}
                             title="Borrar producto"
                           >
                             <TrashIcon />
