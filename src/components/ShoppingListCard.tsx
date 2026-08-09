@@ -9,7 +9,8 @@ import {
   togglePurchased, 
   togglePurchasedBulk,
   updateShoppingItem, 
-  deleteItem 
+  deleteItem,
+  rescanShoppingListAI 
 } from '@/actions/shopping';
 import TrashIcon from './TrashIcon';
 import PencilIcon from './PencilIcon';
@@ -91,6 +92,18 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
       router.refresh();
       setLoading(null);
     }
+  };
+
+  const handleRescanList = async () => {
+    setLoading('rescan-list');
+    const res = await rescanShoppingListAI(list.id);
+    if (res.success) {
+      alert(`✅ IA procesada con éxito: ${res.count} productos añadidos.`);
+      router.refresh();
+    } else {
+      alert(`⚠️ ${res.error || 'No se pudieron extraer productos'}`);
+    }
+    setLoading(null);
   };
 
   // --- Handlers de Productos ---
@@ -246,29 +259,52 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
               </button>
             )}
 
-            {/* Botón Foto en blanco bajado a esta fila */}
+            {/* Botón Foto en blanco + Botón Re-escanear con IA */}
             {list.imageUrl && (
-              <button
-                type="button"
-                onClick={() => setLightboxImage(list.imageUrl)}
-                className="btn"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  color: '#ffffff',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '8px',
-                  padding: '0.35rem 0.65rem',
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px'
-                }}
-                title="Ver foto de la lista"
-              >
-                <img src={list.imageUrl} alt="Foto lista" style={{ width: '20px', height: '20px', objectFit: 'cover', borderRadius: '4px' }} />
-                <span>📷 Foto</span>
-              </button>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setLightboxImage(list.imageUrl)}
+                  className="btn"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '8px',
+                    padding: '0.35rem 0.65rem',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                  title="Ver foto de la lista"
+                >
+                  <img src={list.imageUrl} alt="Foto lista" style={{ width: '20px', height: '20px', objectFit: 'cover', borderRadius: '4px' }} />
+                  <span>📷 Foto</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRescanList}
+                  disabled={loading === 'rescan-list'}
+                  className="btn"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '8px',
+                    padding: '0.35rem 0.5rem',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center'
+                  }}
+                  title="Re-escanear esta foto con IA para intentar extraer productos"
+                >
+                  {loading === 'rescan-list' ? '⏳' : '🔄'}
+                </button>
+              </div>
             )}
 
             {/* Asignación de Encargado a nivel de Lista */}
@@ -404,7 +440,12 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
       </div>
 
       {lightboxImage && (
-        <ImageLightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />
+        <ImageLightbox 
+          imageUrl={lightboxImage} 
+          onClose={() => setLightboxImage(null)} 
+          onRescan={handleRescanList}
+          isRescanning={loading === 'rescan-list'}
+        />
       )}
     </div>
   );

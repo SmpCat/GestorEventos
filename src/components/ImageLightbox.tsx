@@ -6,9 +6,11 @@ import { createPortal } from 'react-dom';
 interface ImageLightboxProps {
   imageUrl: string | null;
   onClose: () => void;
+  onRescan?: () => void;
+  isRescanning?: boolean;
 }
 
-export default function ImageLightbox({ imageUrl, onClose }: ImageLightboxProps) {
+export default function ImageLightbox({ imageUrl, onClose, onRescan, isRescanning = false }: ImageLightboxProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,6 +47,39 @@ export default function ImageLightbox({ imageUrl, onClose }: ImageLightboxProps)
       }}
       onClick={onClose}
     >
+      {/* Botón Re-escanear con IA arriba a la izquierda */}
+      {onRescan && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRescan();
+          }}
+          disabled={isRescanning}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '20px',
+            background: 'rgba(56, 189, 248, 0.25)',
+            border: '1px solid rgba(56, 189, 248, 0.5)',
+            color: '#38bdf8',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            padding: '0.5rem 1rem',
+            borderRadius: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            zIndex: 1000000,
+            boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+          }}
+          title="Re-escanear esta foto con IA"
+        >
+          {isRescanning ? '⏳ Procesando...' : '🔄 Re-escanear con IA'}
+        </button>
+      )}
+
       {/* Botón Cerrar (X) arriba a la derecha */}
       <button 
         type="button"

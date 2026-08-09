@@ -348,3 +348,80 @@ Ejemplo de salida exacta que espero de ti:
     };
   }
 }
+
+export async function rescanShoppingListAI(listId: string) {
+  try {
+    const list = await prisma.shoppingList.findUnique({
+      where: { id: listId },
+      include: { items: true }
+    });
+
+    if (!list) return { success: false, error: 'Lista no encontrada' };
+    if (!list.imageUrl) return { success: false, error: 'Esta lista no tiene una foto adjunta' };
+
+    const filePath = path.join(process.cwd(), 'public', list.imageUrl);
+    if (!fs.existsSync(filePath)) {
+      return { success: false, error: 'No se encuentra el archivo de imagen en el servidor' };
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      return { success: false, error: 'No hay clave de API de Gemini configurada en el servidor.' };
+    }
+
+    const buffer = fs.readFileSync(filePath);
+    const base64Image = buffer.toString('base64');
+    const mimeType = list.imageUrl.endsWith('.png') ? 'image/png' : 'image/jpeg';
+
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+
+    const prompt = `Eres un asistente experto en transcripción. 
+Extrae todos los artículos de la lista de la compra de esta imagen. 
+Ignora firmas, títulos u otros textos irrelevantes. 
+Si hay cantidades, inclúyelas junto al nombre (ej. "2 tomates").
+DEVLEVLE ÚNICAMENTE UN ARRAY EN FORMATO JSON, sin bloques de código Markdown (\`\`\`), sin la palabra "json".
+Ejemplo de salida exacta que espero de ti:
+["Manzanas", "2 Litros de leche", "Pan de molde", "Patatas"]`;
+
+    const imagePart = {
+      inlineData: {
+        data: base64Image,
+        mimeType
+      }
+    };
+
+    const result = await generateContentWithRetry(model, [prompt, imagePart]);
+    const text = result.response.text();
+    const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+    let parsedItems: string[] = [];
+    try {
+      parsedItems = JSON.parse(cleanedText);
+    } catch (e) {
+      return { success: false, error: 'La IA no devolvió un JSON válido al re-escanear.' };
+    }
+
+    if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
+      return { success: false, error: 'La IA no detectó productos nuevos en la imagen.' };
+    }
+
+    // Insertar productos reconocidos
+    await prisma.$transaction(
+      parsedItems.map(name =>
+        prisma.shoppingListItem.create({
+          data: {
+            listId: list.id,
+            name: String(name).trim()
+          }
+        })
+      )
+    );
+
+    try { revalidatePath('/shopping'); } catch (_) {}
+    return { success: true, count: parsedItems.length };
+  } catch (error: any) {
+    console.error('Error al re-escanear lista:', error);
+    return { success: false, error: 'Error al re-escanear con IA: ' + error.message };
+  }
+}

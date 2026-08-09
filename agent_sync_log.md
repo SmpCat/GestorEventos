@@ -167,9 +167,10 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-### 40. Generación de las 4 Listas de la Compra Reales de Producción
-- **Creación Múltiple Simulada:** Generadas en `dev.db` las 4 listas escaneadas con sus nombres pedidos por el usuario (`Lista 1`, `Lista 2`, `Lista 3`, `Lista 4`).
-- **Población de Productos y Fotos:** Asignadas sus 4 imágenes reales de producción (`lista-42bd1437637e.jpg`, `lista-e731da2d98a7.jpg`, `lista-989b7363e83c.jpg`, `lista-cafccf457b10.jpg`) y sus 119 productos leídos distribuidos en cada una de sus tarjetas correspondientes.
+### 41. Re-escaneo de Fotos de Listas con IA (`rescanShoppingListAI`)
+- **Acción Server-Side (`src/actions/shopping.ts`):** Implementada la función `rescanShoppingListAI(listId)` que lee el archivo de foto adjunto de una `ShoppingList` existente y re-ejecuta la extracción de productos con Gemini AI.
+- **Botón `🔄 Re-escanear`:** Añadido un botón `🔄` junto a `📷 Foto` en la tarjeta de la lista y un botón flotante `🔄 Re-escanear con IA` dentro de la vista Lightbox a pantalla completa (`ImageLightbox.tsx`) para reintentar la lectura en cualquier momento.
+
 
 
 
