@@ -300,7 +300,7 @@ Ejemplo de salida exacta que espero de ti:
           imageUrl: savedImageUrl
         }
       });
-      revalidatePath('/shopping');
+      try { revalidatePath('/shopping'); } catch (_) {}
       return { 
         success: false, 
         error: 'La IA no devolvió un formato válido, pero la lista con su foto se guardó.',
@@ -324,7 +324,7 @@ Ejemplo de salida exacta que espero de ti:
       }
     });
 
-    revalidatePath('/shopping');
+    try { revalidatePath('/shopping'); } catch (_) {}
     return { success: true, count: parsedItems.length, data: newList };
 
   } catch (error: any) {
@@ -340,7 +340,7 @@ Ejemplo de salida exacta que espero de ti:
         });
       } catch (_) {}
     }
-    revalidatePath('/shopping');
+    try { revalidatePath('/shopping'); } catch (_) {}
     return { 
       success: false, 
       error: 'La IA no pudo interpretar los textos (' + error.message + '), pero la lista se ha creado y la foto ha quedado guardada.',
