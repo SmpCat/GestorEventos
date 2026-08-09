@@ -48,6 +48,7 @@ export async function createUser(data: any) {
         isAdmin: data.isAdmin || false,
         isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
         age: ageNum,
+        canUploadTickets: data.canUploadTickets !== undefined ? Boolean(data.canUploadTickets) : true,
       },
     });
     revalidatePath('/admin/users');
@@ -80,6 +81,10 @@ export async function updateUser(id: string, data: any) {
       isMember: data.isMember !== undefined ? Boolean(data.isMember) : false,
       age: ageNum,
     };
+
+    if (data.canUploadTickets !== undefined) {
+      updateData.canUploadTickets = Boolean(data.canUploadTickets);
+    }
 
     // Si envía password, lo actualizamos también
     if (data.password) {
@@ -188,9 +193,17 @@ export async function deleteAllNonAdminUsers() {
   }
 }
 
-// Modificaciones masivas de usuarios con filtro personalizado (Exclusivo Superadmin)
 export type FilterType = 'ALL' | 'UNDER_18' | 'OVER_18' | 'MEMBERS' | 'NON_MEMBERS' | 'ADMINS' | 'NON_ADMINS';
-export type BulkActionType = 'SET_MEMBER' | 'SET_NON_MEMBER' | 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_AGE_18' | 'DELETE_CLEAN' | 'EXPEL_CLEAN_ATTENDEES';
+export type BulkActionType = 
+  | 'SET_MEMBER' 
+  | 'SET_NON_MEMBER' 
+  | 'GRANT_ADMIN' 
+  | 'REVOKE_ADMIN' 
+  | 'SET_AGE_18' 
+  | 'DISABLE_TICKET_UPLOAD'
+  | 'ENABLE_TICKET_UPLOAD'
+  | 'EXPEL_CLEAN_ATTENDEES' 
+  | 'DELETE_CLEAN';
 
 export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType: BulkActionType) {
   try {
@@ -301,6 +314,8 @@ export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType
     if (actionType === 'GRANT_ADMIN') updateData = { isAdmin: true };
     if (actionType === 'REVOKE_ADMIN') updateData = { isAdmin: false };
     if (actionType === 'SET_AGE_18') updateData = { age: 18 };
+    if (actionType === 'DISABLE_TICKET_UPLOAD') updateData = { canUploadTickets: false };
+    if (actionType === 'ENABLE_TICKET_UPLOAD') updateData = { canUploadTickets: true };
 
     const res = await prisma.user.updateMany({
       where: baseWhere,

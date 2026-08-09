@@ -25,6 +25,7 @@ model User {
   isAdmin        Boolean         @default(false)
   isMember       Boolean         @default(true)  // ¿Es socio/a de la peña? (Por defecto Sí)
   age            Int?                            // Edad del usuario
+  canUploadTickets Boolean       @default(true)  // ¿Puede subir tickets de compra? (Por defecto Sí)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   

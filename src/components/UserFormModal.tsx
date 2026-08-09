@@ -13,7 +13,8 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
     phone: '',
     isAdmin: false,
     isMember: false,
-    age: ''
+    age: '',
+    canUploadTickets: true
   });
   
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,8 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
         phone: user.phone || '',
         isAdmin: user.isAdmin || false,
         isMember: user.isMember || false,
-        age: user.age !== null && user.age !== undefined ? String(user.age) : ''
+        age: user.age !== null && user.age !== undefined ? String(user.age) : '',
+        canUploadTickets: user.canUploadTickets !== undefined ? user.canUploadTickets : true
       });
     } else {
       setFormData({
@@ -39,7 +41,8 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
         phone: '',
         isAdmin: false,
         isMember: false,
-        age: ''
+        age: '',
+        canUploadTickets: true
       });
     }
   }, [user, isOpen]);
@@ -168,6 +171,19 @@ export default function UserFormModal({ isOpen, onClose, user, onSaved, session 
               Otorgar permisos de Administrador
             </label>
             <p className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>Los administradores pueden gestionar eventos y facturas de todos.</p>
+          </div>
+
+          <div className="input-group">
+            <label className="checkbox-label">
+              <input 
+                type="checkbox" 
+                checked={formData.canUploadTickets}
+                onChange={e => setFormData({...formData, canUploadTickets: e.target.checked})}
+                style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--accent-primary)' }}
+              />
+              Permitir subida de tickets de compra
+            </label>
+            <p className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>Permite a este usuario registrar gastos fotográficos o manuales.</p>
           </div>
 
           {/* Sección de Campos Opcionales al final */}

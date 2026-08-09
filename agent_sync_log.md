@@ -146,3 +146,13 @@
 ### 27. Conversión de Edición Masiva en Tarjeta de Menú (`👑 Zona de Administración`)
 - **Integración Directa en la Rejilla de Menú:** Convertido `BulkUserEditCard.tsx` en una cuarta tarjeta interactiva (**`Edición Masiva`** 👑) perfectamente integrada junto a *Gestión de Eventos*, *Usuarios* y *Modo Mantenimiento* dentro del contenedor `menuGrid` de la *Zona de Administración*.
 - **Despliegue Interactivo:** Al hacer clic sobre la tarjeta de *Edición Masiva*, se despliegan suavemente los controles de filtrado y acciones masivas justo debajo de la rejilla de botones.
+
+### 28. Subida de Tickets por Usuario y Acciones Masivas (`🔒 / 🔓`)
+- **Permiso Individual por Usuario (`canUploadTickets`):** Añadido el campo `canUploadTickets Boolean @default(true)` al modelo `User` en Prisma y sincronizada la base de datos.
+- **Acciones Masivas de Subida de Tickets:** Eliminado el botón global de deshabilitación de `/expenses`. Añadidas las acciones masivas `🔒 Deshabilitar subida de tickets` y `🔓 Habilitar subida de tickets` al desplegable de la tarjeta *Edición Masiva* en la *Zona de Administración*. Permite aplicar la restricción/permiso de forma flexible según cualquier filtro objetivo (ej. solo a usuarios normales `NON_ADMINS`, menores de edad `UNDER_18`, etc.).
+- **Control Individual y Validación en Servidor:**
+  - Añadido el checkbox *Permitir subida de tickets de compra* en la modal de edición individual de usuario (`UserFormModal.tsx`).
+  - `processReceiptAction` y `saveManualExpenseAction` comprueban si `currentUser.canUploadTickets === false` para denegar la subida en el servidor.
+  - La vista de gastos (`/expenses`) detecta el permiso del usuario actual para mostrar el aviso `🚫 Subida de Tickets Deshabilitada`.
+
+

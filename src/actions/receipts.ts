@@ -17,9 +17,12 @@ export type ReceiptData = {
 
 export async function processReceiptAction(formData: FormData) {
   try {
-    const config = await prisma.systemConfig.findUnique({ where: { id: "global" } });
-    if (config?.disableTicketUpload) {
-      return { success: false, error: "La subida de tickets (fotográficos y manuales) está actualmente deshabilitada por la administración." };
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+
+    const currentUser = await prisma.user.findUnique({ where: { id: session.id } });
+    if (currentUser && currentUser.canUploadTickets === false) {
+      return { success: false, error: "Tu usuario tiene deshabilitada la subida de tickets." };
     }
 
     const file = formData.get("receipt") as File | null;
@@ -187,13 +190,13 @@ export async function deleteExpenseEvidence(evidenceId: string) {
 
 export async function saveManualExpenseAction(data: { store: string; amount: number; description: string; date: string }) {
   try {
-    const config = await prisma.systemConfig.findUnique({ where: { id: "global" } });
-    if (config?.disableTicketUpload) {
-      return { success: false, error: "La subida de tickets (fotográficos y manuales) está actualmente deshabilitada por la administración." };
-    }
-
     const session = await getSession();
     if (!session) return { success: false, error: "No autorizado" };
+
+    const currentUser = await prisma.user.findUnique({ where: { id: session.id } });
+    if (currentUser && currentUser.canUploadTickets === false) {
+      return { success: false, error: "Tu usuario tiene deshabilitada la subida de tickets." };
+    }
 
     const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
     if (!activeEvent) return { success: false, error: "No hay evento activo" };

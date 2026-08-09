@@ -14,13 +14,13 @@ export default async function ExpensesPage() {
     redirect('/');
   }
 
-  // Buscar Evento Activo y Configuración Global
-  const [activeEvent, configRes] = await Promise.all([
+  // Buscar Evento Activo y Datos del Usuario Actual
+  const [activeEvent, currentUser] = await Promise.all([
     getActiveEventCached(),
-    getSystemConfig()
+    prisma.user.findUnique({ where: { id: session.id }, select: { canUploadTickets: true } })
   ]);
 
-  const disableTicketUpload = configRes.data?.disableTicketUpload ?? false;
+  const canUploadTickets = currentUser?.canUploadTickets ?? true;
 
   if (!activeEvent) {
     return (
@@ -50,7 +50,7 @@ export default async function ExpensesPage() {
         isAdmin={session.isAdmin} 
         isSuperAdmin={session.username === 'admin'}
         currentUserId={session.id} 
-        disableTicketUpload={disableTicketUpload}
+        canUploadTickets={canUploadTickets}
       />
     </div>
   );

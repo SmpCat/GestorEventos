@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI } from '@/actions/receipts';
-import { toggleTicketUpload } from '@/actions/system';
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
 import AiLoadingOverlay from './AiLoadingOverlay';
@@ -14,36 +13,17 @@ export default function ExpenseList({
   isAdmin, 
   isSuperAdmin,
   currentUserId,
-  disableTicketUpload = false
+  canUploadTickets = true
 }: { 
   expenses: any[]; 
   isAdmin: boolean; 
   isSuperAdmin?: boolean;
   currentUserId: string;
-  disableTicketUpload?: boolean;
+  canUploadTickets?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
-  const [togglingTicketUpload, setTogglingTicketUpload] = useState(false);
-
-  const handleToggleTicketUpload = async () => {
-    const nextState = !disableTicketUpload;
-    const confirmMsg = nextState
-      ? '¿Estás seguro de DESHABILITAR la subida de tickets (tanto manual como fotográfica)?'
-      : '¿Estás seguro de HABILITAR de nuevo la subida de tickets?';
-    if (!window.confirm(confirmMsg)) return;
-
-    setTogglingTicketUpload(true);
-    const res = await toggleTicketUpload(nextState);
-    setTogglingTicketUpload(false);
-    if (res.success) {
-      alert(nextState ? '🔒 Subida de tickets deshabilitada' : '🔓 Subida de tickets habilitada');
-      router.refresh();
-    } else {
-      alert(res.error || 'Error al cambiar configuración');
-    }
-  };
   
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -183,38 +163,17 @@ export default function ExpenseList({
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <h3 className={styles.sectionTitle} style={{ margin: 0 }}>🧾 Añadir Gasto</h3>
-        {isSuperAdmin && (
-          <button
-            onClick={handleToggleTicketUpload}
-            disabled={togglingTicketUpload}
-            className="btn"
-            style={{
-              backgroundColor: disableTicketUpload ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.08)',
-              border: disableTicketUpload ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.2)',
-              color: disableTicketUpload ? '#fca5a5' : '#ffffff',
-              padding: '0.4rem 0.9rem',
-              fontSize: '0.85rem',
-              fontWeight: 'bold',
-              borderRadius: '10px',
-              cursor: 'pointer'
-            }}
-          >
-            {togglingTicketUpload ? '⏳ Actualizando...' : (disableTicketUpload ? '🔓 Habilitar Subida de Tickets' : '🔒 Deshabilitar Subida de Tickets')}
-          </button>
-        )}
-      </div>
+      <h3 className={styles.sectionTitle} style={{ marginBottom: '0.75rem' }}>🧾 Añadir Gasto</h3>
 
       <div className="glass-panel" style={{ marginBottom: '4rem' }}>
         <div className={styles.innerBlackBox}>
-          {disableTicketUpload ? (
+          {!canUploadTickets ? (
             <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#fca5a5' }}>
               <p style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
                 🚫 Subida de Tickets Deshabilitada
               </p>
               <p style={{ fontSize: '0.875rem', opacity: 0.85, color: 'var(--text-secondary)' }}>
-                La entrada de tickets (tanto manual como fotográfica) se encuentra desactivada por la administración.
+                Tu usuario tiene deshabilitada la entrada de tickets (tanto manual como fotográfica) por la administración.
               </p>
             </div>
           ) : (

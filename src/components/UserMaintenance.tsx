@@ -24,6 +24,8 @@ const ACTION_LABELS: Record<BulkActionType, string> = {
   GRANT_ADMIN: 'Otorgar rol de Administrador',
   REVOKE_ADMIN: 'Quitar rol de Administrador',
   SET_AGE_18: 'Establecer Edad en 18 años',
+  DISABLE_TICKET_UPLOAD: 'Deshabilitar subida de tickets',
+  ENABLE_TICKET_UPLOAD: 'Habilitar subida de tickets',
   DELETE_CLEAN: 'Borrar usuarios limpios (sin pagos/tickets)',
   EXPEL_CLEAN_ATTENDEES: 'Borrar asistentes limpios (sin historial del evento)'
 };

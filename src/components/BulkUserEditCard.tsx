@@ -21,6 +21,8 @@ const ACTION_LABELS: Record<BulkActionType, string> = {
   GRANT_ADMIN: 'Otorgar rol de Administrador',
   REVOKE_ADMIN: 'Quitar rol de Administrador',
   SET_AGE_18: 'Establecer Edad en 18 años',
+  DISABLE_TICKET_UPLOAD: 'Deshabilitar subida de tickets',
+  ENABLE_TICKET_UPLOAD: 'Habilitar subida de tickets',
   EXPEL_CLEAN_ATTENDEES: 'Borrar asistentes limpios (sin historial del evento)',
   DELETE_CLEAN: 'Borrar usuarios limpios (sin historial de cuenta)'
 };
@@ -136,6 +138,8 @@ export default function BulkUserEditCard({ isSuperAdmin }: { isSuperAdmin: boole
                 <option value="GRANT_ADMIN">👑 Otorgar rol de Administrador</option>
                 <option value="REVOKE_ADMIN">🛡️ Quitar rol de Administrador</option>
                 <option value="SET_AGE_18">🎂 Fijar Edad en 18 años</option>
+                <option value="DISABLE_TICKET_UPLOAD">🔒 Deshabilitar subida de tickets</option>
+                <option value="ENABLE_TICKET_UPLOAD">🔓 Habilitar subida de tickets</option>
                 <option value="EXPEL_CLEAN_ATTENDEES">🧹 Borrar asistentes limpios (sin historial del evento)</option>
                 <option value="DELETE_CLEAN">🗑️ Borrar usuarios limpios (sin historial de cuenta)</option>
               </SelectField>
