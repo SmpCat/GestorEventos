@@ -42,11 +42,12 @@ export async function login(data: any) {
       .sign(key);
 
     // Guardar en Cookie HttpOnly
+    const isHttps = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_BASE_URL?.startsWith('https');
     const cookieStore = await cookies();
     cookieStore.set('session', sessionToken, {
       expires,
       httpOnly: true,
-      secure: false, // Forzar a false para que funcione en móviles por HTTP local
+      secure: Boolean(isHttps),
       sameSite: 'lax',
       path: '/',
     });
@@ -60,10 +61,14 @@ export async function login(data: any) {
 
 export async function logout() {
   const cookieStore = await cookies();
+  const isHttps = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_BASE_URL?.startsWith('https');
   
   // 1. Borrar sesión
   cookieStore.set('session', '', {
     expires: new Date(0),
+    httpOnly: true,
+    secure: Boolean(isHttps),
+    sameSite: 'lax',
     path: '/',
   });
 
