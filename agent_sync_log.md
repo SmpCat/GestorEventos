@@ -167,9 +167,10 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-### 38. Reubicación de Papelera y Eliminación de Log de Historial (`ShoppingListCard.tsx`)
-- **Papelera en Fila de Título:** Reubicado el botón de borrar lista (papelera blanca) en la primera fila, posicionado directamente entre el icono de edición del título y la flecha desplegable `[Título] [✏️] [🗑️] [🔽]`.
-- **Simplificación Visual de Productos:** Eliminado el micro-texto de auditoría (`item.history`) debajo de cada producto para una interfaz limpia, legible y sin distracciones.
+### 39. Desplegable Inteligente (`SearchableUserSelect.tsx`) y Espaciado de Seguridad
+- **Despliegue Inteligente Hacia Arriba (`openUpwards`):** Calculado el espacio del viewport en `SearchableUserSelect.tsx`. Si el selector está en la parte inferior de la pantalla móvil (menos de 240px de espacio inferior), la lista de personas se abre desplegándose automáticamente hacia arriba (`bottom: calc(100% + 4px)`), evitando estancamientos y bloqueos de scroll.
+- **Separación de Seguridad en Papelera:** Incrementado el margen y espaciado entre el botón `TrashIcon` y la flecha `🔽/🔼` en `ShoppingListCard.tsx` para impedir toques accidentales.
+
 
 
 

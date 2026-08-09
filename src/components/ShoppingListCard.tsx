@@ -178,8 +178,8 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
               </div>
             )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              {/* Botón Borrar Lista (entre lápiz de edición y flecha) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {/* Botón Borrar Lista (con separación de seguridad) */}
               <button
                 onClick={handleDeleteList}
                 disabled={loading === 'delete-list'}
@@ -187,12 +187,14 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                   background: 'none',
                   border: 'none',
                   color: '#ffffff',
-                  opacity: 0.9,
+                  opacity: 0.8,
                   cursor: 'pointer',
-                  padding: '4px',
+                  padding: '6px',
+                  borderRadius: '6px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  marginRight: '0.5rem'
                 }}
                 title="Borrar esta lista"
               >

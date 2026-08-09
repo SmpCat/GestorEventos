@@ -25,6 +25,7 @@ export default function SearchableUserSelect({
 }: SearchableUserSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [openUpwards, setOpenUpwards] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,9 +40,18 @@ export default function SearchableUserSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Autoenfocar el campo de búsqueda al abrir el desplegable
+  // Calcular si abrir hacia arriba o abajo según el espacio disponible en la pantalla
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      // Si hay menos de 240px abajo y hay más espacio arriba, desplegar hacia arriba
+      if (spaceBelow < 240 && rect.top > spaceBelow) {
+        setOpenUpwards(true);
+      } else {
+        setOpenUpwards(false);
+      }
+
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 50);
@@ -100,25 +110,25 @@ export default function SearchableUserSelect({
           {labelText}
         </span>
         <span style={{ fontSize: '0.75rem', opacity: 0.6, marginLeft: '0.5rem' }}>
-          {isOpen ? '▲' : '▼'}
+          {isOpen ? (openUpwards ? '▼' : '▲') : (openUpwards ? '▲' : '▼')}
         </span>
       </button>
 
-      {/* Menú desplegable flotante con buscador en la parte superior */}
+      {/* Menú desplegable flotante con dirección dinámica (arriba o abajo) */}
       {isOpen && (
         <div
           style={{
             position: 'absolute',
-            top: 'calc(100% + 4px)',
+            ...(openUpwards ? { bottom: 'calc(100% + 4px)' } : { top: 'calc(100% + 4px)' }),
             left: 0,
             right: 0,
-            zIndex: 100,
+            zIndex: 9999,
             backgroundColor: '#0f172a',
-            border: '1px solid rgba(255,255,255,0.18)',
+            border: '1px solid rgba(255,255,255,0.2)',
             borderRadius: '10px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.85), 0 0 1px rgba(255,255,255,0.3)',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.9), 0 0 1px rgba(255,255,255,0.3)',
             padding: '0.5rem',
-            maxHeight: '260px',
+            maxHeight: 'min(240px, 35vh)',
             display: 'flex',
             flexDirection: 'column',
             gap: '0.4rem',
@@ -169,7 +179,7 @@ export default function SearchableUserSelect({
           </div>
 
           {/* Lista de personas filtrada */}
-          <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', WebkitOverflowScrolling: 'touch' }}>
             <button
               type="button"
               onClick={() => handleSelect('UNASSIGN')}
