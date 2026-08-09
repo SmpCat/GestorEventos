@@ -2,7 +2,7 @@ import { getSession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ShoppingList from '@/components/ShoppingList';
-import { getShoppingList, getShoppingListEvidences } from '@/actions/shopping';
+import { getShoppingLists } from '@/actions/shopping';
 import { getActiveEventCached } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -27,7 +27,7 @@ export default async function ShoppingPage() {
     );
   }
 
-  // Obtener Usuarios para el desplegable de asignación (excluyendo la cuenta técnica admin)
+  // Obtener Usuarios para el desplegable de asignación
   const users = await prisma.user.findMany({
     where: {
       username: { not: 'admin' }
@@ -36,21 +36,14 @@ export default async function ShoppingPage() {
     select: { id: true, name: true, username: true }
   });
 
-  // Obtener los productos
-  const result = await getShoppingList(activeEvent.id);
-  const items = result.success && result.data ? result.data : [];
-
-  // Obtener las evidencias (listas escaneadas)
-  const evidencesResult = await getShoppingListEvidences(activeEvent.id);
-  const evidences = evidencesResult.success && evidencesResult.data ? evidencesResult.data : [];
+  // Obtener las listas de la compra completas con sus productos
+  const result = await getShoppingLists(activeEvent.id);
+  const lists = result.success && result.data ? result.data : [];
 
   return (
     <div className="px-4 space-y-10">
-
-      {/* Lista de la compra interactiva */}
       <ShoppingList 
-        items={items} 
-        evidences={evidences}
+        lists={lists}
         eventId={activeEvent.id} 
         users={users} 
         currentUser={session}

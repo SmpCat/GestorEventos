@@ -9,14 +9,14 @@ export async function getEvents() {
     const eventsRaw = await prisma.event.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
-        _count: { select: { expenses: true, shoppingList: true } },
+        _count: { select: { expenses: true, shoppingLists: true } },
         attendees: { include: { _count: { select: { payments: true } } } }
       }
     });
 
     const events = eventsRaw.map(e => {
       const hasExpenses = e._count.expenses > 0;
-      const hasShopping = e._count.shoppingList > 0;
+      const hasShopping = e._count.shoppingLists > 0;
       const hasPayments = e.attendees.some(a => a._count.payments > 0);
       const isProtected = hasExpenses || hasShopping || hasPayments;
       
@@ -76,7 +76,7 @@ export async function updateEvent(id: string, data: { name: string, startDate?: 
     const eventCheck = await prisma.event.findUnique({
       where: { id },
       include: {
-        _count: { select: { expenses: true, shoppingList: true } },
+        _count: { select: { expenses: true, shoppingLists: true } },
         attendees: { include: { _count: { select: { payments: true } } } }
       }
     });
@@ -84,7 +84,7 @@ export async function updateEvent(id: string, data: { name: string, startDate?: 
     if (!eventCheck) return { success: false, error: 'Evento no encontrado.' };
 
     const hasExpenses = eventCheck._count.expenses > 0;
-    const hasShopping = eventCheck._count.shoppingList > 0;
+    const hasShopping = eventCheck._count.shoppingLists > 0;
     const hasPayments = eventCheck.attendees.some(a => a._count.payments > 0);
     const isProtected = (hasExpenses || hasShopping || hasPayments) && !eventCheck.isActive;
 
@@ -136,7 +136,7 @@ export async function deleteEvent(id: string) {
     const event = await prisma.event.findUnique({
       where: { id },
       include: {
-        _count: { select: { expenses: true, shoppingList: true } },
+        _count: { select: { expenses: true, shoppingLists: true } },
         attendees: { include: { _count: { select: { payments: true } } } }
       }
     });
@@ -148,7 +148,7 @@ export async function deleteEvent(id: string) {
     }
 
     const hasExpenses = event._count.expenses > 0;
-    const hasShopping = event._count.shoppingList > 0;
+    const hasShopping = event._count.shoppingLists > 0;
     const hasPayments = event.attendees.some(a => a._count.payments > 0);
     const isProtected = hasExpenses || hasShopping || hasPayments;
 

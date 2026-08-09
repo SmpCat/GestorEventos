@@ -7,40 +7,138 @@ import path from 'path';
 import crypto from 'crypto';
 import { generateContentWithRetry } from '@/lib/ai-scanner';
 
-// Obtener la lista de la compra de un evento
-export async function getShoppingList(eventId: string) {
+// ---------------------------------------------------------
+// LISTAS DE LA COMPRA (PADRE)
+// ---------------------------------------------------------
+
+// Obtener todas las listas de la compra de un evento con sus productos y encargado
+export async function getShoppingLists(eventId: string) {
   try {
-    const items = await prisma.shoppingListItem.findMany({
+    const lists = await prisma.shoppingList.findMany({
       where: { eventId },
       include: {
         assignee: {
-          select: { id: true, name: true }
+          select: { id: true, name: true, username: true }
         },
-        history: {
+        items: {
           include: {
-            user: { select: { username: true } }
+            history: {
+              include: {
+                user: { select: { username: true } }
+              },
+              orderBy: { date: 'asc' }
+            }
           },
-          orderBy: { date: 'asc' }
+          orderBy: [
+            { isPurchased: 'asc' },
+            { createdAt: 'desc' }
+          ]
         }
       },
-      orderBy: [
-        { isPurchased: 'asc' }, // Los no comprados primero
-        { createdAt: 'desc' }
-      ],
+      orderBy: { createdAt: 'desc' }
     });
-    return { success: true, data: items };
+    return { success: true, data: lists };
   } catch (error: any) {
-    return { success: false, error: 'Error al obtener la lista: ' + error.message };
+    return { success: false, error: 'Error al obtener las listas: ' + error.message };
   }
 }
 
-// Añadir un artículo manualmente
-export async function addShoppingItem(eventId: string, name: string, userId: string) {
+// Crear una nueva lista (Manual o escaneada)
+export async function createShoppingList(eventId: string, name: string, assigneeId?: string | null, imageUrl?: string | null) {
   try {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return { success: false, error: 'El nombre de la lista no puede estar vacío.' };
+    }
+
+    const newList = await prisma.shoppingList.create({
+      data: {
+        name: trimmed,
+        eventId,
+        assigneeId: assigneeId || null,
+        imageUrl: imageUrl || null
+      },
+      include: {
+        assignee: { select: { id: true, name: true, username: true } },
+        items: true
+      }
+    });
+
+    revalidatePath('/shopping');
+    return { success: true, data: newList };
+  } catch (error: any) {
+    return { success: false, error: 'Error al crear la lista: ' + error.message };
+  }
+}
+
+// Actualizar una lista (nombre y/o encargado)
+export async function updateShoppingList(listId: string, name: string, assigneeId?: string | null) {
+  try {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return { success: false, error: 'El nombre de la lista no puede estar vacío.' };
+    }
+
+    const updated = await prisma.shoppingList.update({
+      where: { id: listId },
+      data: {
+        name: trimmed,
+        assigneeId: assigneeId === 'UNASSIGN' ? null : assigneeId
+      },
+      include: {
+        assignee: { select: { id: true, name: true, username: true } }
+      }
+    });
+
+    revalidatePath('/shopping');
+    return { success: true, data: updated };
+  } catch (error: any) {
+    return { success: false, error: 'Error al actualizar la lista: ' + error.message };
+  }
+}
+
+// Borrar una lista completa con todos sus productos
+export async function deleteShoppingList(listId: string) {
+  try {
+    const list = await prisma.shoppingList.findUnique({
+      where: { id: listId }
+    });
+
+    if (list?.imageUrl) {
+      const filename = path.basename(list.imageUrl);
+      const filepath = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists', filename);
+      if (fs.existsSync(filepath)) {
+        try { fs.unlinkSync(filepath); } catch (_) {}
+      }
+    }
+
+    await prisma.shoppingList.delete({
+      where: { id: listId }
+    });
+
+    revalidatePath('/shopping');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: 'Error al borrar la lista: ' + error.message };
+  }
+}
+
+// ---------------------------------------------------------
+// PRODUCTOS DENTRO DE UNA LISTA (HIJOS)
+// ---------------------------------------------------------
+
+// Añadir un artículo manualmente a una lista específica
+export async function addShoppingItemToList(listId: string, name: string, userId: string) {
+  try {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return { success: false, error: 'El nombre del producto no puede estar vacío.' };
+    }
+
     const item = await prisma.shoppingListItem.create({
       data: {
-        name,
-        eventId,
+        name: trimmed,
+        listId,
         history: {
           create: {
             action: 'CREATED',
@@ -49,6 +147,7 @@ export async function addShoppingItem(eventId: string, name: string, userId: str
         }
       },
     });
+
     revalidatePath('/shopping');
     return { success: true, data: item };
   } catch (error: any) {
@@ -81,7 +180,6 @@ export async function togglePurchased(itemId: string, isPurchased: boolean, user
 // Marcar múltiples artículos como comprados o no comprados a la vez
 export async function togglePurchasedBulk(itemIds: string[], isPurchased: boolean, userId: string) {
   try {
-    // Para actualizar múltiples artículos con su historial, necesitamos hacer un $transaction
     await prisma.$transaction(async (tx) => {
       await tx.shoppingListItem.updateMany({
         where: { id: { in: itemIds } },
@@ -106,21 +204,7 @@ export async function togglePurchasedBulk(itemIds: string[], isPurchased: boolea
   }
 }
 
-// Asignar el artículo a un usuario para que lo compre
-export async function assignItem(itemId: string, userId: string | null) {
-  try {
-    const item = await prisma.shoppingListItem.update({
-      where: { id: itemId },
-      data: { assigneeId: userId },
-    });
-    revalidatePath('/shopping');
-    return { success: true, data: item };
-  } catch (error: any) {
-    return { success: false, error: 'Error al asignar el producto: ' + error.message };
-  }
-}
-
-// Borrar un artículo
+// Borrar un producto individual
 export async function deleteItem(itemId: string) {
   try {
     await prisma.shoppingListItem.delete({
@@ -133,7 +217,7 @@ export async function deleteItem(itemId: string) {
   }
 }
 
-// Modificar nombre de un artículo
+// Modificar nombre de un producto
 export async function updateShoppingItem(itemId: string, name: string) {
   try {
     const trimmed = name.trim();
@@ -151,16 +235,14 @@ export async function updateShoppingItem(itemId: string, name: string) {
   }
 }
 
+// ---------------------------------------------------------
+// IA Y ESCANEO FOTOGRÁFICO DE LISTAS
+// ---------------------------------------------------------
 
-// ==============================================================
-// FUNCIONES DE INTELIGENCIA ARTIFICIAL (GEMINI)
-// ==============================================================
-
-export async function scanShoppingListAI(eventId: string, base64Image: string, mimeType: string) {
-  let savedEvidenceUrl = null;
-  let evidenceId = null;
+export async function scanShoppingListAI(eventId: string, base64Image: string, mimeType: string, listName?: string) {
+  let savedImageUrl = null;
   
-  // 1. Guardar la evidencia física y en base de datos INMEDIATAMENTE (sin escanear de momento)
+  // 1. Guardar la imagen físicamente en public/uploads/shopping-lists
   try {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists');
     if (!fs.existsSync(uploadDir)) {
@@ -170,21 +252,10 @@ export async function scanShoppingListAI(eventId: string, base64Image: string, m
     const filename = `lista-${crypto.randomBytes(6).toString('hex')}.jpg`;
     const filepath = path.join(uploadDir, filename);
     
-    // Guardar archivo
     fs.writeFileSync(filepath, Buffer.from(base64Image, 'base64'));
-    
-    // Registrar en base de datos como NO escaneada inicialmente (isScanned: false)
-    const evidence = await prisma.shoppingListEvidence.create({
-      data: {
-        url: `/uploads/shopping-lists/${filename}`,
-        eventId,
-        isScanned: false
-      }
-    });
-    savedEvidenceUrl = evidence.url;
-    evidenceId = evidence.id;
+    savedImageUrl = `/uploads/shopping-lists/${filename}`;
   } catch (err: any) {
-    console.error("Error guardando la evidencia inicial:", err);
+    console.error("Error guardando la evidencia física:", err);
   }
 
   // 2. Procesar con la IA
@@ -195,15 +266,13 @@ export async function scanShoppingListAI(eventId: string, base64Image: string, m
 
     const { GoogleGenerativeAI } = require('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
-    // Usamos el modelo rápido y multimodal para visión
     const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
     
     const prompt = `Eres un asistente experto en transcripción. 
 Extrae todos los artículos de la lista de la compra de esta imagen. 
 Ignora firmas, títulos u otros textos irrelevantes. 
 Si hay cantidades, inclúyelas junto al nombre (ej. "2 tomates").
-DEVUELVE ÚNICAMENTE UN ARRAY EN FORMATO JSON, sin bloques de código Markdown (\`\`\`), sin la palabra "json".
+DEVLEVLE ÚNICAMENTE UN ARRAY EN FORMATO JSON, sin bloques de código Markdown (\`\`\`), sin la palabra "json".
 Ejemplo de salida exacta que espero de ti:
 ["Manzanas", "2 Litros de leche", "Pan de molde", "Patatas"]`;
 
@@ -216,214 +285,54 @@ Ejemplo de salida exacta que espero de ti:
 
     const result = await generateContentWithRetry(model, [prompt, imagePart]);
     const text = result.response.text();
-    
-    // Limpiamos el texto por si la IA devuelve bloques markdown
     const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
     
     let parsedItems: string[] = [];
     try {
       parsedItems = JSON.parse(cleanedText);
     } catch (e) {
+      // Si la IA falla pero se guardó la imagen, creamos la lista vacía con la foto
+      const finalListName = listName?.trim() || `Lista Manuscrita (${new Date().toLocaleDateString('es-ES')})`;
+      await prisma.shoppingList.create({
+        data: {
+          name: finalListName,
+          eventId,
+          imageUrl: savedImageUrl
+        }
+      });
       revalidatePath('/shopping');
       return { 
         success: false, 
-        error: 'La IA no devolvió un formato válido, pero la foto se guardó en la galería. Intentó responder: ' + cleanedText,
-        savedEvidenceUrl 
+        error: 'La IA no devolvió un formato válido, pero la lista con su foto se guardó.',
+        savedImageUrl 
       };
     }
 
-    if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
-      revalidatePath('/shopping');
-      return { 
-        success: false, 
-        error: 'La IA no pudo detectar artículos en la imagen, pero la foto se guardó en la galería.', 
-        savedEvidenceUrl 
-      };
-    }
+    const finalListName = listName?.trim() || `Lista Escaneada (${new Date().toLocaleDateString('es-ES')})`;
 
-    // Preparamos los datos para la BBDD
-    const dataToInsert = parsedItems.map(name => ({
-      name: String(name).trim(),
-      eventId
-    }));
-
-    // Inserción masiva de productos
-    await prisma.shoppingListItem.createMany({
-      data: dataToInsert
+    // Crear la lista con sus productos leídos
+    const newList = await prisma.shoppingList.create({
+      data: {
+        name: finalListName,
+        eventId,
+        imageUrl: savedImageUrl,
+        items: {
+          create: (Array.isArray(parsedItems) ? parsedItems : []).map(name => ({
+            name: String(name).trim()
+          }))
+        }
+      }
     });
 
-    // Como ha ido bien, marcamos la evidencia como escaneada con éxito
-    if (evidenceId) {
-      await prisma.shoppingListEvidence.update({
-        where: { id: evidenceId },
-        data: { isScanned: true }
-      });
-    }
-
     revalidatePath('/shopping');
-    return { success: true, count: parsedItems.length, savedEvidenceUrl };
+    return { success: true, count: parsedItems.length, data: newList };
 
   } catch (error: any) {
-    revalidatePath('/shopping'); // Para asegurarnos de que la galería muestre la foto guardada
+    revalidatePath('/shopping');
     return { 
       success: false, 
-      error: 'La IA no pudo procesar la lista: ' + error.message + '. Pero la foto se guardó correctamente en la galería inferior.',
-      savedEvidenceUrl 
+      error: 'Error al procesar con IA: ' + error.message,
+      savedImageUrl 
     };
   }
 }
-
-// Re-escanear una lista ya existente en la base de datos
-export async function reScanShoppingListAI(evidenceId: string) {
-  try {
-    const evidence = await prisma.shoppingListEvidence.findUnique({
-      where: { id: evidenceId }
-    });
-    if (!evidence) {
-      return { success: false, error: 'Evidencia no encontrada.' };
-    }
-
-    // Convertir la ruta física a absoluta
-    const filename = evidence.url.replace('/uploads/shopping-lists/', '');
-    const filepath = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists', filename);
-    
-    if (!fs.existsSync(filepath)) {
-      return { success: false, error: 'El archivo físico de la imagen no existe en el servidor.' };
-    }
-
-    // Leer el archivo local
-    const base64Image = fs.readFileSync(filepath).toString('base64');
-    
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error('No hay clave de API de Gemini configurada en el servidor.');
-    }
-
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
-    
-    const prompt = `Eres un asistente experto en transcripción. 
-Extrae todos los artículos de la lista de la compra de esta imagen. 
-Ignora firmas, títulos u otros textos irrelevantes. 
-Si hay cantidades, inclúyelas junto al nombre (ej. "2 tomates").
-DEVUELVE ÚNICAMENTE UN ARRAY EN FORMATO JSON, sin bloques de código Markdown (\`\`\`), sin la palabra "json".
-Ejemplo de salida exacta que espero de ti:
-["Manzanas", "2 Litros de leche", "Pan de molde", "Patatas"]`;
-
-    const imagePart = {
-      inlineData: {
-        data: base64Image,
-        mimeType: 'image/jpeg'
-      }
-    };
-
-    const result = await generateContentWithRetry(model, [prompt, imagePart]);
-    const text = result.response.text();
-    const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-    
-    let parsedItems: string[] = [];
-    try {
-      parsedItems = JSON.parse(cleanedText);
-    } catch (e) {
-      return { success: false, error: 'La IA no devolvió un formato válido. Intentó responder: ' + cleanedText };
-    }
-
-    if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
-      return { success: false, error: 'La IA no pudo detectar artículos en la imagen.' };
-    }
-
-    // Inserción de productos
-    const dataToInsert = parsedItems.map(name => ({
-      name: String(name).trim(),
-      eventId: evidence.eventId
-    }));
-
-    await prisma.shoppingListItem.createMany({
-      data: dataToInsert
-    });
-
-    // Marcar como escaneada con éxito
-    await prisma.shoppingListEvidence.update({
-      where: { id: evidenceId },
-      data: { isScanned: true }
-    });
-
-    revalidatePath('/shopping');
-    return { success: true, count: parsedItems.length };
-  } catch (error: any) {
-    return { success: false, error: 'Error procesando la imagen con IA: ' + error.message };
-  }
-}
-
-export async function getShoppingListEvidences(eventId: string) {
-  try {
-    const evidences = await prisma.shoppingListEvidence.findMany({
-      where: { eventId },
-      orderBy: { createdAt: 'desc' }
-    });
-    return { success: true, data: evidences };
-  } catch (error: any) {
-    return { success: false, error: 'Error al obtener evidencias: ' + error.message };
-  }
-}
-
-// Borrar evidencia de compra
-export async function deleteShoppingListEvidence(evidenceId: string) {
-  try {
-    const evidence = await prisma.shoppingListEvidence.findUnique({
-      where: { id: evidenceId }
-    });
-    if (!evidence) return { success: false, error: 'Evidencia no encontrada' };
-
-    // Borrar de la base de datos
-    await prisma.shoppingListEvidence.delete({
-      where: { id: evidenceId }
-    });
-
-    // Borrar el archivo físico si existe
-    if (evidence.url) {
-      const filename = evidence.url.replace('/uploads/shopping-lists/', '');
-      const filepath = path.join(process.cwd(), 'public', 'uploads', 'shopping-lists', filename);
-      if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath);
-      }
-    }
-
-    revalidatePath('/shopping');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: 'Error al borrar evidencia: ' + error.message };
-  }
-}
-
-// Borrar TODOS los productos de la lista de la compra de un evento
-export async function deleteAllShoppingItems(eventId: string) {
-  try {
-    await prisma.$transaction(async (tx) => {
-      // 1. Obtener IDs de items del evento
-      const items = await tx.shoppingListItem.findMany({
-        where: { eventId },
-        select: { id: true }
-      });
-      const itemIds = items.map(i => i.id);
-
-      // 2. Borrar historial asociado
-      if (itemIds.length > 0) {
-        await tx.shoppingListHistory.deleteMany({
-          where: { shoppingListItemId: { in: itemIds } }
-        });
-      }
-
-      // 3. Borrar los artículos
-      await tx.shoppingListItem.deleteMany({
-        where: { eventId }
-      });
-    });
-
-    revalidatePath('/shopping');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: 'Error al vaciar la lista de la compra: ' + error.message };
-  }
-}
-

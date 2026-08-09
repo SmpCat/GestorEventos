@@ -32,7 +32,7 @@ model User {
   // Relaciones
   eventAttendances EventAttendee[]
   expenses         Expense[]
-  shoppingTasks    ShoppingListItem[] // Tareas de compra asignadas
+  assignedShoppingLists ShoppingList[] @relation("ShoppingListAssignee") // Listas asignadas al usuario
   
   // Auditoría
   registeredPayments       Payment[]           @relation("PaymentRegisteredBy")
@@ -56,7 +56,7 @@ model Event {
   attendees       EventAttendee[]
   pricingRules    PricingRule[]
   expenses        Expense[]
-  shoppingList    ShoppingListItem[]
+  shoppingLists   ShoppingList[]
   shoppingEvidences ShoppingListEvidence[]
   payments        Payment[]
 }
@@ -131,18 +131,39 @@ model PricingRule {
   @@index([eventId])
 }
 
-model ShoppingListItem {
+model ShoppingList {
   id          String   @id @default(uuid())
-  name        String   // ej. "100 cervezas"
-  isPurchased Boolean  @default(false)
+  name        String   // ej. "Bebidas a comprar"
   
   // Relación con el Evento
   eventId     String
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   
-  // Asignado a alguien para que lo compre (Opcional)
+  // Asistente asignado a TODA la lista (Opcional)
   assigneeId  String?
-  assignee    User?    @relation(fields: [assigneeId], references: [id])
+  assignee    User?    @relation("ShoppingListAssignee", fields: [assigneeId], references: [id])
+
+  // Foto/Evidencia manuscrita vinculada a esta lista (Opcional)
+  imageUrl    String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Productos pertenecientes a esta lista
+  items       ShoppingListItem[]
+
+  @@index([eventId])
+  @@index([assigneeId])
+}
+
+model ShoppingListItem {
+  id          String   @id @default(uuid())
+  name        String   // ej. "100 cervezas"
+  isPurchased Boolean  @default(false)
+  
+  // Relación con la Lista padre
+  listId      String
+  list        ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
   
   // Vinculado al ticket final cuando ya se ha comprado (Opcional)
   expenseItemId String? @unique
@@ -154,8 +175,7 @@ model ShoppingListItem {
   // Historial de cambios
   history     ShoppingListHistory[]
 
-  @@index([eventId])
-  @@index([assigneeId])
+  @@index([listId])
 }
 
 model ShoppingListEvidence {

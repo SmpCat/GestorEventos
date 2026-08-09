@@ -165,7 +165,7 @@ export async function deleteAllNonAdminUsers() {
         eventAttendances: {
           include: { payments: true }
         },
-        shoppingTasks: true
+        assignedShoppingLists: true
       }
     });
 
@@ -175,9 +175,9 @@ export async function deleteAllNonAdminUsers() {
     for (const user of nonAdmins) {
       const hasExpenses = user.expenses.length > 0;
       const hasPayments = user.eventAttendances.some((att: any) => att.payments.length > 0);
-      const hasShoppingItems = user.shoppingTasks && user.shoppingTasks.length > 0;
+      const hasShoppingLists = user.assignedShoppingLists && user.assignedShoppingLists.length > 0;
 
-      if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+      if (!hasExpenses && !hasPayments && !hasShoppingLists) {
         await prisma.eventAttendee.deleteMany({ where: { userId: user.id } });
         await prisma.user.delete({ where: { id: user.id } });
         deletedCount++;
@@ -247,7 +247,7 @@ export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType
           user: {
             include: {
               expenses: { where: { eventId: activeEvent.id } },
-              shoppingTasks: { where: { eventId: activeEvent.id } }
+              assignedShoppingLists: { where: { eventId: activeEvent.id } }
             }
           }
         }
@@ -259,9 +259,9 @@ export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType
       for (const att of attendees) {
         const hasExpenses = att.user.expenses.length > 0;
         const hasPayments = att.payments.length > 0;
-        const hasShoppingItems = att.user.shoppingTasks && att.user.shoppingTasks.length > 0;
+        const hasShoppingLists = att.user.assignedShoppingLists && att.user.assignedShoppingLists.length > 0;
 
-        if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+        if (!hasExpenses && !hasPayments && !hasShoppingLists) {
           await prisma.eventAttendee.delete({ where: { id: att.id } });
           deletedCount++;
         } else {
@@ -282,7 +282,7 @@ export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType
         include: {
           expenses: true,
           eventAttendances: { include: { payments: true } },
-          shoppingTasks: true
+          assignedShoppingLists: true
         }
       });
 
@@ -292,9 +292,9 @@ export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType
       for (const user of targetUsers) {
         const hasExpenses = user.expenses.length > 0;
         const hasPayments = user.eventAttendances.some((att: any) => att.payments.length > 0);
-        const hasShoppingItems = user.shoppingTasks && user.shoppingTasks.length > 0;
+        const hasShoppingLists = user.assignedShoppingLists && user.assignedShoppingLists.length > 0;
 
-        if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+        if (!hasExpenses && !hasPayments && !hasShoppingLists) {
           await prisma.eventAttendee.deleteMany({ where: { userId: user.id } });
           await prisma.user.delete({ where: { id: user.id } });
           deletedCount++;

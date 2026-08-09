@@ -351,7 +351,7 @@ export async function expelAllNonAdminAttendees(eventId: string) {
         user: {
           include: {
             expenses: { where: { eventId } },
-            shoppingTasks: { where: { eventId } }
+            assignedShoppingLists: { where: { eventId } }
           }
         }
       }
@@ -363,9 +363,9 @@ export async function expelAllNonAdminAttendees(eventId: string) {
     for (const att of attendees) {
       const hasExpenses = att.user.expenses.length > 0;
       const hasPayments = att.payments.length > 0;
-      const hasShoppingItems = att.user.shoppingTasks && att.user.shoppingTasks.length > 0;
+      const hasShoppingLists = att.user.assignedShoppingLists && att.user.assignedShoppingLists.length > 0;
 
-      if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+      if (!hasExpenses && !hasPayments && !hasShoppingLists) {
         await prisma.eventAttendee.delete({ where: { id: att.id } });
         deletedCount++;
       } else {

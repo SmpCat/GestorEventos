@@ -163,8 +163,11 @@
 - **Script de Replicación Automática (`pull_from_nas.sh`):** Creado script ejecutable para descargar la base de datos real de producción (`prod.db`) desde el NAS QNAP y reemplazar limpiamente `dev.db` en local (haciendo un backup `dev.db.bak`), además de sincronizar con `rsync` todas las imágenes reales de la carpeta `/public/uploads` (tickets y listas de la compra).
 - **Ejecución y Verificación:** Ejecutada la réplica exitosamente; descargadas 25 fotos de tickets, 5 imágenes de listas de la compra y la base de datos real con todas sus relaciones sincronizadas.
 
-### 31. Acción y Botón de Vaciado de la Lista de la Compra (`deleteAllShoppingItems`)
-- **Acción del Servidor (`deleteAllShoppingItems`):** Implementada función transaccional en `src/actions/shopping.ts` para eliminar todos los productos de la lista de la compra del evento activo y limpiar su historial relacionado.
-- **Botón `🗑️ Vaciar Lista` en la Interfaz:** Añadido un botón destacado en la vista `ShoppingList.tsx` junto al título de la lista con confirmación de seguridad para permitir vaciar la lista directamente desde la app.
-- **Ejecución Local:** Limpiada la lista en `dev.db` eliminando los 152 artículos locales como solicitó el usuario.
+### 32. Nueva Arquitectura de Listas de la Compra Múltiples (Agrupadas, Asignación por Lista y UI Desplegable)
+- **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
+- **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
+- **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
+- **Vista Principal (`ShoppingList.tsx`):** Implementados botones `📝 + Nueva Lista Manual` (modal) y `📸 Crear Lista desde Foto (IA)` junto al buscador global de listas y productos.
+- **Compilación:** Verificada con `npm run build` (0 errores).
+
 

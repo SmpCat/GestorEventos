@@ -2,162 +2,67 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, updateShoppingItem, scanShoppingListAI, deleteShoppingListEvidence, reScanShoppingListAI, deleteAllShoppingItems } from '@/actions/shopping';
-import TrashIcon from './TrashIcon';
-import PencilIcon from './PencilIcon';
+import { createShoppingList, scanShoppingListAI } from '@/actions/shopping';
+import ShoppingListCard from './ShoppingListCard';
 import AiLoadingOverlay from './AiLoadingOverlay';
-import ImageLightbox from './ImageLightbox';
 import SearchableUserSelect from './SearchableUserSelect';
 import styles from './ShoppingList.module.css';
 
-export default function ShoppingList({ items, evidences, eventId, users, currentUser }: { items: any[], evidences?: any[], eventId: string, users: any[], currentUser: any }) {
-  const router = useRouter();
-  const [newItemName, setNewItemName] = useState('');
-  const [loading, setLoading] = useState<string | null>(null);
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'pending' | 'purchased'>('pending');
+interface ShoppingListProps {
+  lists: any[];
+  eventId: string;
+  users: any[];
+  currentUser: any;
+}
 
-  const [editingItemId, setEditingItemId] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState('');
+export default function ShoppingList({ lists, eventId, users, currentUser }: ShoppingListProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState<string | null>(null);
+
+  // Estado para modal de creación manual
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [newListName, setNewListName] = useState('');
+  const [newListAssignee, setNewListAssignee] = useState<string>('UNASSIGN');
+
+  // Buscador global de listas / productos
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filtrar para asegurar que el Administrador no aparezca en el desplegable de asignaciones
   const assignableUsers = users.filter(u => u.username !== 'admin' && u.name !== 'Administrador');
 
-  // Filtrar productos por búsqueda
-  const filteredItems = items.filter(item => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase().trim();
-    return item.name.toLowerCase().includes(q) || item.assignee?.name?.toLowerCase().includes(q);
-  });
-
-  const pendingItems = filteredItems.filter(item => !item.isPurchased);
-  const purchasedItems = filteredItems.filter(item => item.isPurchased);
-
-  const handleStartEdit = (item: any) => {
-    setEditingItemId(item.id);
-    setEditingName(item.name);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingItemId(null);
-    setEditingName('');
-  };
-
-  const handleSaveEdit = async (itemId: string) => {
-    if (!editingName.trim()) return;
-    setLoading(`edit-${itemId}`);
-    const res = await updateShoppingItem(itemId, editingName.trim());
-    if (res.success) {
-      router.refresh();
-      setEditingItemId(null);
-      setEditingName('');
-    } else {
-      alert(res.error || 'Error al modificar el producto');
-    }
-    setLoading(null);
-  };
-
-  const handleAdd = async (e: React.FormEvent) => {
+  // Handlers para Crear Lista Manual
+  const handleCreateManualList = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemName.trim()) return;
-    setLoading('add');
-    await addShoppingItem(eventId, newItemName, currentUser.id);
-    router.refresh();
-    setNewItemName('');
+    if (!newListName.trim()) return;
+
+    setLoading('create-list');
+    const res = await createShoppingList(
+      eventId, 
+      newListName.trim(), 
+      newListAssignee === 'UNASSIGN' ? null : newListAssignee
+    );
+
+    if (res.success) {
+      setNewListName('');
+      setNewListAssignee('UNASSIGN');
+      setIsManualModalOpen(false);
+      router.refresh();
+    } else {
+      alert(res.error || 'Error al crear la lista');
+    }
     setLoading(null);
   };
 
-  const handleToggle = async (itemId: string, currentStatus: boolean) => {
-    const msg = currentStatus 
-      ? '¿Devolver este artículo a la lista de pendientes?' 
-      : '¿Marcar este artículo como comprado?';
-      
-    if (window.confirm(msg)) {
-      setLoading(`toggle-${itemId}`);
-      await togglePurchased(itemId, !currentStatus, currentUser.id);
-      router.refresh();
-      setLoading(null);
-    }
-  };
-
-  const handleToggleBulk = async (itemIds: string[], targetStatus: boolean) => {
-    const msg = targetStatus
-      ? '¿Marcar todos estos artículos como comprados?'
-      : '¿Devolver todos estos artículos a la lista de pendientes?';
-
-    if (window.confirm(msg)) {
-      setLoading('toggle-bulk');
-      await togglePurchasedBulk(itemIds, targetStatus, currentUser.id);
-      router.refresh();
-      setLoading(null);
-    }
-  };
-
-  const handleAssign = async (itemId: string, userId: string) => {
-    setLoading(`assign-${itemId}`);
-    await assignItem(itemId, userId === 'UNASSIGN' ? null : userId);
-    router.refresh();
-    setLoading(null);
-  };
-
-  const handleDelete = async (itemId: string) => {
-    if (window.confirm('¿Seguro que quieres borrar esto de la lista?')) {
-      setLoading(`delete-${itemId}`);
-      deleteItem(itemId).then(() => {
-        router.refresh();
-        setLoading(null);
-      });
-    }
-  };
-
-  const handleDeleteEvidence = async (evidenceId: string) => {
-    if (window.confirm('¿Seguro que quieres borrar esta foto? Se eliminará definitivamente.')) {
-      setLoading(`delete-ev-${evidenceId}`);
-      await deleteShoppingListEvidence(evidenceId);
-      router.refresh();
-      setLoading(null);
-    }
-  };
-
-  const handleDeleteAll = async () => {
-    if (window.confirm('⚠️ ¿Seguro que quieres borrar TODOS los productos de la lista de la compra? Esta acción no se puede deshacer.')) {
-      setLoading('delete-all');
-      const res = await deleteAllShoppingItems(eventId);
-      if (res.success) {
-        router.refresh();
-      } else {
-        alert(res.error || 'Error al vaciar la lista');
-      }
-      setLoading(null);
-    }
-  };
-
-
-  const handleReScan = async (evidenceId: string) => {
-    setLoading(`rescan-ev-${evidenceId}`);
-    try {
-      const res = await reScanShoppingListAI(evidenceId);
-      if (res.success) {
-        alert(`¡Éxito! La IA ha procesado la lista y ha añadido ${res.count} artículos.`);
-        router.refresh();
-      } else {
-        alert(`No se pudo escanear: ${res.error}`);
-      }
-    } catch (err: any) {
-      alert(`Error al procesar: ${err.message}`);
-    } finally {
-      setLoading(null);
-    }
-  };
-
+  // Handlers para Cargar Foto con IA
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const listTitle = prompt('Nombre para la nueva lista escaneada:', `Lista Manuscrita (${new Date().toLocaleDateString('es-ES')})`);
+    if (listTitle === null) return; // Cancelado por usuario
+
     setLoading('scanning');
 
-    // Función auxiliar para redimensionar la imagen en el cliente y evitar que pese megas
+    // Función auxiliar para comprimir la imagen en el cliente
     const compressImage = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -188,7 +93,6 @@ export default function ShoppingList({ items, evidences, eventId, users, current
             const ctx = canvas.getContext('2d');
             ctx?.drawImage(img, 0, 0, width, height);
             
-            // Exportamos como JPEG al 70% de calidad para ahorrar muchísimo peso
             const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
             resolve(dataUrl.split(',')[1]); 
           };
@@ -199,409 +103,217 @@ export default function ShoppingList({ items, evidences, eventId, users, current
     };
 
     try {
-      const base64String = await compressImage(file);
-      
-      const res = await scanShoppingListAI(eventId, base64String, 'image/jpeg');
+      const base64Data = await compressImage(file);
+      const res = await scanShoppingListAI(eventId, base64Data, 'image/jpeg', listTitle);
       
       if (res.success) {
-        alert(`¡Magia! La IA ha encontrado y añadido ${res.count} artículos a tu lista.`);
+        alert(`¡Éxito! Se ha creado la lista "${listTitle}" con ${res.count} productos extraídos por la IA.`);
+        router.refresh();
       } else {
-        alert(`Ups, hubo un problema con la IA: ${res.error}`);
+        alert(`Aviso: ${res.error}`);
+        router.refresh();
       }
     } catch (err: any) {
-      alert('Error de conexión o imagen demasiado grande: ' + err.message);
+      alert(`Error al procesar la imagen: ${err.message}`);
     } finally {
       setLoading(null);
-      if (e.target) e.target.value = '';
     }
   };
 
-  const renderItem = (item: any) => {
-    const isProcessing = loading === `toggle-${item.id}` || loading === `delete-${item.id}` || loading === `assign-${item.id}` || loading === `edit-${item.id}`;
-    const isEditing = editingItemId === item.id;
-    
-    return (
-      <div 
-        key={item.id} 
-        className={styles.itemRow}
-        style={{ opacity: isProcessing ? 0.5 : 1 }}
-      >
-        <div className={styles.itemHeader}>
-          <div className={styles.itemLeft} style={{ flex: 1 }}>
-            <input 
-              type="checkbox" 
-              checked={false}
-              onChange={() => handleToggle(item.id, item.isPurchased)}
-              disabled={isProcessing || isEditing}
-              className={styles.checkbox}
-              title={item.isPurchased ? "Devolver a pendientes" : "Marcar como comprado"}
-            />
-            {isEditing ? (
-              <form 
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSaveEdit(item.id);
-                }} 
-                className={styles.inlineEditForm}
-              >
-                <input
-                  type="text"
-                  value={editingName}
-                  onChange={(e) => setEditingName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Escape') handleCancelEdit();
-                  }}
-                  className={`input-field ${styles.inlineEditInput}`}
-                  autoFocus
-                  disabled={loading === `edit-${item.id}`}
-                />
-                <button 
-                  type="submit" 
-                  className={styles.saveEditBtn}
-                  disabled={loading === `edit-${item.id}` || !editingName.trim()}
-                  title="Guardar cambio"
-                >
-                  {loading === `edit-${item.id}` ? '⏳' : '✓'}
-                </button>
-                <button 
-                  type="button" 
-                  onClick={handleCancelEdit} 
-                  className={styles.cancelEditBtn}
-                  disabled={loading === `edit-${item.id}`}
-                  title="Cancelar"
-                >
-                  ✕
-                </button>
-              </form>
-            ) : (
-              <div className={styles.itemNameWrapper}>
-                <span className={styles.itemName} style={{ textDecoration: item.isPurchased ? 'line-through' : 'none' }}>
-                  {item.name}
-                </span>
-                {item.history && item.history.length > 0 && (
-                  <div style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '2px', lineHeight: '1.2' }}>
-                    {item.history.map((h: any, idx: number) => {
-                      const dateStr = new Date(h.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                      const actionText = h.action === 'CREATED' ? 'Añadido' : h.action === 'PURCHASED' ? 'Comprado' : 'Desmarcado';
-                      return (
-                        <span key={h.id}>
-                          {actionText} por @{h.user?.username || '?'} ({dateStr})
-                          {idx < item.history.length - 1 ? ' • ' : ''}
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {!isEditing && (
-            <div className={styles.actionButtons}>
-              <button 
-                onClick={() => handleStartEdit(item)} 
-                disabled={isProcessing}
-                className={styles.editBtn}
-                title="Modificar producto"
-              >
-                {loading === `edit-${item.id}` ? '⏳' : <PencilIcon />}
-              </button>
-              {!item.isPurchased && (
-                <button 
-                  onClick={() => handleDelete(item.id)} 
-                  disabled={isProcessing}
-                  className={styles.deleteBtn}
-                  title="Borrar producto"
-                >
-                  {isProcessing ? '⏳' : <TrashIcon />}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {!item.isPurchased && !isEditing && (
-          <div className={styles.assignSelectWrapper}>
-            <SearchableUserSelect
-              users={assignableUsers}
-              value={item.assigneeId || 'UNASSIGN'}
-              onChange={(selectedUserId) => handleAssign(item.id, selectedUserId)}
-              currentUserId={currentUser.id}
-              disabled={isProcessing}
-            />
-          </div>
-        )}
-      </div>
-    );
-  };
+  // Filtrado de listas según búsqueda
+  const filteredLists = lists.filter(list => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const matchesListName = list.name.toLowerCase().includes(q);
+    const matchesAssignee = list.assignee?.name?.toLowerCase().includes(q);
+    const matchesItem = (list.items || []).some((item: any) => item.name.toLowerCase().includes(q));
+    return matchesListName || matchesAssignee || matchesItem;
+  });
 
   return (
     <div className={styles.container}>
       <AiLoadingOverlay 
-        isVisible={loading === 'scanning' || (typeof loading === 'string' && loading.startsWith('rescan-ev-'))} 
-        message={typeof loading === 'string' && loading.startsWith('rescan-ev-') ? "Re-escaneando lista con IA..." : "Vinculando productos del ticket con la lista..."} 
+        isVisible={loading === 'scanning'} 
+        message="Interpretando lista manuscrita con Inteligencia Artificial..." 
       />
-      
+
       <div className={styles.headerRow}>
         <div>
-          <h1>Lista de la Compra</h1>
-          <p className="subtitle">Planifica qué falta por comprar para el evento activo.</p>
+          <h1>Listas de la Compra</h1>
+          <p className="subtitle">Crea y gestiona múltiples listas organizadas para el evento activo.</p>
         </div>
       </div>
 
-      <h3 className={`${styles.sectionTitle} ${styles.sectionTitleFirst}`}>🛒 Añadir a la lista</h3>
-      <div className="glass-panel">
+      {/* Bloque superior de acciones de creación */}
+      <h3 className={`${styles.sectionTitle} ${styles.sectionTitleFirst}`}>➕ Crear Nueva Lista</h3>
+      <div className="glass-panel" style={{ marginBottom: '2rem' }}>
         <div className={styles.innerBlackBox}>
-          <div className={styles.addFormWrapper}>
-            <div className={styles.inputRow}>
-              <span className={styles.rowLabel}>Manualmente</span>
-              <form onSubmit={handleAdd} className={styles.addForm}>
-                <input 
-                  type="text" 
-                  className={`input-field ${styles.addInput}`} 
-                  placeholder="Escribe un producto..."
-                  value={newItemName}
-                  onChange={e => setNewItemName(e.target.value)}
-                  disabled={loading === 'add'}
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* Botón Crear Lista Manual */}
+            <button
+              onClick={() => setIsManualModalOpen(true)}
+              className="btn btn-primary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem', fontSize: '1rem' }}
+            >
+              <span style={{ fontSize: '1.2rem' }}>📝</span> + Nueva Lista Manual
+            </button>
+
+            <span style={{ opacity: 0.4 }}>o alternativamente</span>
+
+            {/* Botón Crear Lista desde Foto (IA) */}
+            <input 
+              type="file" 
+              accept="image/*" 
+              id="ai-scanner-input" 
+              style={{ display: 'none' }} 
+              onChange={handleImageUpload} 
+              disabled={loading === 'scanning'}
+            />
+            <button 
+              type="button"
+              className="btn"
+              onClick={() => document.getElementById('ai-scanner-input')?.click()}
+              disabled={loading === 'scanning'}
+              style={{
+                backgroundColor: 'var(--color-primary-transparent)',
+                color: '#fff',
+                border: '1px solid var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.25rem',
+                fontSize: '1rem',
+                opacity: loading === 'scanning' ? 0.7 : 1
+              }}
+            >
+              <span style={{ fontSize: '1.2rem' }}>📸</span> Crear Lista desde Foto (IA)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal para Crear Lista Manual */}
+      {isManualModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(5px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '1rem'
+        }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '1.5rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#fff' }}>📝 Crear Nueva Lista de la Compra</h3>
+            <form onSubmit={handleCreateManualList}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.4rem', color: 'rgba(255,255,255,0.8)' }}>
+                  Nombre de la lista:
+                </label>
+                <input
+                  type="text"
+                  className="input-field"
+                  placeholder="Ej. Bebidas, Carnes, Limpieza..."
+                  value={newListName}
+                  onChange={(e) => setNewListName(e.target.value)}
+                  autoFocus
+                  required
                 />
-                <button type="submit" className={`btn ${styles.addBtn}`} disabled={loading === 'add' || !newItemName.trim()}>
-                  +
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.4rem', color: 'rgba(255,255,255,0.8)' }}>
+                  Encargado asignado (Opcional):
+                </label>
+                <SearchableUserSelect
+                  users={assignableUsers}
+                  value={newListAssignee}
+                  onChange={setNewListAssignee}
+                  currentUserId={currentUser.id}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsManualModalOpen(false)}
+                  className="btn btn-secondary"
+                  disabled={loading === 'create-list'}
+                >
+                  Cancelar
                 </button>
-              </form>
-            </div>
-            
-            <div className={styles.orDivider}>
-              <span className={styles.orText}>o alternativamente...</span>
-            </div>
-
-            <div className={styles.inputRow}>
-              <span className={styles.rowLabel}>Fotográficamente</span>
-              <input 
-                type="file" 
-                accept="image/*" 
-                id="ai-scanner-input" 
-                className="hidden" 
-                onChange={handleImageUpload} 
-                disabled={loading === 'scanning'}
-                style={{ display: 'none' }}
-              />
-              <button 
-                type="button"
-                className={`btn ${styles.uploadBtn}`}
-                onClick={() => document.getElementById('ai-scanner-input')?.click()}
-                disabled={loading === 'scanning'}
-                style={{ opacity: loading === 'scanning' ? 0.7 : 1 }}
-              >
-                {loading === 'scanning' ? (
-                  '⏳ Procesando con IA...'
-                ) : (
-                  <>
-                    <span style={{ fontSize: '1.5rem' }}>📸</span> Subir o hacer foto a una lista
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1.5rem 0 0.5rem 0' }}>
-        <h3 className={styles.sectionTitle} style={{ margin: 0 }}>📋 Lista</h3>
-        {items.length > 0 && (
-          <button 
-            onClick={handleDeleteAll} 
-            disabled={loading === 'delete-all'}
-            className="btn" 
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.15)', 
-              color: '#ef4444', 
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              padding: '0.4rem 0.8rem',
-              fontSize: '0.85rem',
-              borderRadius: '8px',
-              cursor: 'pointer'
-            }}
-          >
-            {loading === 'delete-all' ? '⏳ Vaciando...' : '🗑️ Vaciar Lista'}
-          </button>
-        )}
-      </div>
-      <div className={styles.tabsContainer}>
-        <button 
-          onClick={() => setActiveTab('pending')}
-          className={`${styles.tabBtn} ${activeTab === 'pending' ? styles.tabBtnPending : `${styles.tabBtnPendingInactive} ${styles.tabBtnInactiveHover}`}`}
-        >
-          🛒 Pendientes ({pendingItems.length})
-        </button>
-        <button 
-          onClick={() => setActiveTab('purchased')}
-          className={`${styles.tabBtn} ${activeTab === 'purchased' ? styles.tabBtnPurchased : `${styles.tabBtnPurchasedInactive} ${styles.tabBtnInactiveHover}`}`}
-        >
-          ✅ Comprados ({purchasedItems.length})
-        </button>
-      </div>
-
-      <div className="glass-panel" style={{ opacity: activeTab === 'purchased' ? 0.8 : 1 }}>
-        <div className={styles.innerBlackBox}>
-          
-          {activeTab === 'pending' && (
-            <div className={styles.bulkActionRow} style={{ opacity: loading === 'toggle-bulk' ? 0.5 : 1 }}>
-              {pendingItems.length > 0 ? (
-                <div className={styles.bulkActionLeft}>
-                  <input 
-                    type="checkbox"
-                    className={styles.checkbox}
-                    checked={false}
-                    disabled={loading === 'toggle-bulk'}
-                    onChange={(e) => {
-                      handleToggleBulk(pendingItems.map(i => i.id), true);
-                      e.target.checked = false;
-                    }}
-                  />
-                  <span className={styles.bulkActionText}>Marcar todos como comprados</span>
-                </div>
-              ) : <div />}
-
-              {/* Buscador de productos de la lista a la derecha */}
-              <div className={styles.productSearchWrapper}>
-                <input
-                  type="text"
-                  className={`input-field ${styles.productSearchInput}`}
-                  placeholder="🔍 Buscar producto..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <span className={styles.productSearchIcon}>🔍</span>
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className={styles.productSearchClearBtn}
-                    title="Limpiar búsqueda"
-                  >
-                    ✕
-                  </button>
-                )}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={loading === 'create-list' || !newListName.trim()}
+                >
+                  {loading === 'create-list' ? '⏳ Creando...' : 'Crear Lista'}
+                </button>
               </div>
-            </div>
-          )}
-
-          {activeTab === 'purchased' && (
-            <div className={styles.bulkActionRow} style={{ opacity: loading === 'toggle-bulk' ? 0.5 : 1 }}>
-              {purchasedItems.length > 0 ? (
-                <div className={styles.bulkActionLeft}>
-                  <input 
-                    type="checkbox"
-                    className={styles.checkbox}
-                    checked={false}
-                    disabled={loading === 'toggle-bulk'}
-                    onChange={(e) => {
-                      handleToggleBulk(purchasedItems.map(i => i.id), false);
-                      e.target.checked = false;
-                    }}
-                  />
-                  <span className={styles.bulkActionText}>Devolver todos a pendientes</span>
-                </div>
-              ) : <div />}
-
-              {/* Buscador de productos de la lista a la derecha */}
-              <div className={styles.productSearchWrapper}>
-                <input
-                  type="text"
-                  className={`input-field ${styles.productSearchInput}`}
-                  placeholder="🔍 Buscar producto..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <span className={styles.productSearchIcon}>🔍</span>
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className={styles.productSearchClearBtn}
-                    title="Limpiar búsqueda"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className={styles.itemsContainer}>
-            {activeTab === 'pending' ? (
-              pendingItems.length === 0 ? (
-                <p className={styles.emptyState}>No hay nada pendiente.</p>
-              ) : (
-                pendingItems.map(renderItem)
-              )
-            ) : (
-              purchasedItems.length === 0 ? (
-                <p className={styles.emptyState}>Aún no se ha comprado nada.</p>
-              ) : (
-                purchasedItems.map(renderItem)
-              )
-            )}
-          </div>
-        </div>
-      </div>
-
-      {evidences && evidences.length > 0 && (
-        <div>
-          <h3 className={styles.sectionTitle}>📷 Listas Originales</h3>
-          <div className="glass-panel">
-            <div className={styles.innerBlackBox}>
-              <div className={styles.galleryGrid}>
-                {evidences.map((ev: any) => {
-                  const apiImageUrl = `/api${ev.url}`;
-                  const dateStr = new Date(ev.createdAt).toLocaleString('es-ES', {
-                    day: '2-digit', month: '2-digit', year: '2-digit',
-                    hour: '2-digit', minute: '2-digit'
-                  });
-                  return (
-                    <div key={ev.id} className={styles.galleryItem}>
-                        <div className={styles.galleryHeader}>
-                          <span className={styles.galleryDate} title={ev.isScanned ? "Escaneado por IA con éxito" : "No escaneado / Error IA"}>
-                            {ev.isScanned ? '✅' : '⚠️'} {dateStr}
-                          </span>
-                          <div style={{ display: 'flex', gap: '0.25rem' }}>
-                            {!ev.isScanned && (
-                              <button
-                                onClick={() => handleReScan(ev.id)}
-                                disabled={loading === `rescan-ev-${ev.id}` || loading === `delete-ev-${ev.id}`}
-                                className={styles.galleryReScanBtn}
-                                title="Volver a escanear con IA"
-                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff' }}
-                              >
-                                {loading === `rescan-ev-${ev.id}` ? '⏳' : '🔄'}
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDeleteEvidence(ev.id)}
-                              disabled={loading === `delete-ev-${ev.id}` || loading === `rescan-ev-${ev.id}`}
-                              className={styles.galleryDeleteBtn}
-                              title="Borrar foto"
-                            >
-                              {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
-                            </button>
-                          </div>
-                        </div>
-                        <div 
-                          onClick={() => setLightboxImage(apiImageUrl)}
-                          className={styles.galleryLink}
-                          style={{ opacity: (loading === `delete-ev-${ev.id}` || loading === `rescan-ev-${ev.id}`) ? 0.5 : 1, cursor: 'pointer' }}
-                        >
-                          <img src={apiImageUrl} alt="Ticket" className={styles.galleryImg} />
-                        </div>
-                      </div>
-                  );
-                })}
-              </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
-      <ImageLightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />
+
+      {/* Buscador global de listas */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
+          📋 Listas Registradas ({filteredLists.length})
+        </h3>
+
+        <div style={{ position: 'relative', minWidth: '260px' }}>
+          <input
+            type="text"
+            className="input-field"
+            placeholder="🔍 Buscar lista o producto..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ paddingLeft: '2.2rem', paddingRight: searchQuery ? '2rem' : '0.75rem' }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                position: 'absolute',
+                right: '0.6rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: 'rgba(255,255,255,0.6)',
+                cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Renderizado de las Listas */}
+      {filteredLists.length > 0 ? (
+        filteredLists.map((list) => (
+          <ShoppingListCard
+            key={list.id}
+            list={list}
+            users={users}
+            currentUser={currentUser}
+          />
+        ))
+      ) : (
+        <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem 1.5rem', color: 'rgba(255,255,255,0.5)' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🛒</div>
+          <h4 style={{ color: '#fff', marginBottom: '0.5rem' }}>No hay listas creadas</h4>
+          <p style={{ margin: 0, fontSize: '0.9rem' }}>
+            {searchQuery ? 'Ninguna lista coincide con tu búsqueda.' : 'Crea tu primera lista manualmente o escanea una foto manuscrita.'}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
