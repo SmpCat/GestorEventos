@@ -162,3 +162,9 @@
 ### 30. Replicación de Datos y Fotos de Producción a Desarrollo (`pull_from_nas.sh`)
 - **Script de Replicación Automática (`pull_from_nas.sh`):** Creado script ejecutable para descargar la base de datos real de producción (`prod.db`) desde el NAS QNAP y reemplazar limpiamente `dev.db` en local (haciendo un backup `dev.db.bak`), además de sincronizar con `rsync` todas las imágenes reales de la carpeta `/public/uploads` (tickets y listas de la compra).
 - **Ejecución y Verificación:** Ejecutada la réplica exitosamente; descargadas 25 fotos de tickets, 5 imágenes de listas de la compra y la base de datos real con todas sus relaciones sincronizadas.
+
+### 31. Acción y Botón de Vaciado de la Lista de la Compra (`deleteAllShoppingItems`)
+- **Acción del Servidor (`deleteAllShoppingItems`):** Implementada función transaccional en `src/actions/shopping.ts` para eliminar todos los productos de la lista de la compra del evento activo y limpiar su historial relacionado.
+- **Botón `🗑️ Vaciar Lista` en la Interfaz:** Añadido un botón destacado en la vista `ShoppingList.tsx` junto al título de la lista con confirmación de seguridad para permitir vaciar la lista directamente desde la app.
+- **Ejecución Local:** Limpiada la lista en `dev.db` eliminando los 152 artículos locales como solicitó el usuario.
+

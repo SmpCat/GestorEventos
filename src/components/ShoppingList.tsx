@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, updateShoppingItem, scanShoppingListAI, deleteShoppingListEvidence, reScanShoppingListAI } from '@/actions/shopping';
+import { addShoppingItem, togglePurchased, togglePurchasedBulk, assignItem, deleteItem, updateShoppingItem, scanShoppingListAI, deleteShoppingListEvidence, reScanShoppingListAI, deleteAllShoppingItems } from '@/actions/shopping';
 import TrashIcon from './TrashIcon';
 import PencilIcon from './PencilIcon';
 import AiLoadingOverlay from './AiLoadingOverlay';
@@ -119,6 +119,20 @@ export default function ShoppingList({ items, evidences, eventId, users, current
       setLoading(null);
     }
   };
+
+  const handleDeleteAll = async () => {
+    if (window.confirm('⚠️ ¿Seguro que quieres borrar TODOS los productos de la lista de la compra? Esta acción no se puede deshacer.')) {
+      setLoading('delete-all');
+      const res = await deleteAllShoppingItems(eventId);
+      if (res.success) {
+        router.refresh();
+      } else {
+        alert(res.error || 'Error al vaciar la lista');
+      }
+      setLoading(null);
+    }
+  };
+
 
   const handleReScan = async (evidenceId: string) => {
     setLoading(`rescan-ev-${evidenceId}`);
@@ -391,7 +405,27 @@ export default function ShoppingList({ items, evidences, eventId, users, current
         </div>
       </div>
 
-      <h3 className={styles.sectionTitle}>📋 Lista</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1.5rem 0 0.5rem 0' }}>
+        <h3 className={styles.sectionTitle} style={{ margin: 0 }}>📋 Lista</h3>
+        {items.length > 0 && (
+          <button 
+            onClick={handleDeleteAll} 
+            disabled={loading === 'delete-all'}
+            className="btn" 
+            style={{ 
+              backgroundColor: 'rgba(239, 68, 68, 0.15)', 
+              color: '#ef4444', 
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              padding: '0.4rem 0.8rem',
+              fontSize: '0.85rem',
+              borderRadius: '8px',
+              cursor: 'pointer'
+            }}
+          >
+            {loading === 'delete-all' ? '⏳ Vaciando...' : '🗑️ Vaciar Lista'}
+          </button>
+        )}
+      </div>
       <div className={styles.tabsContainer}>
         <button 
           onClick={() => setActiveTab('pending')}

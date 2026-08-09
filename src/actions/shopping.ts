@@ -395,3 +395,35 @@ export async function deleteShoppingListEvidence(evidenceId: string) {
     return { success: false, error: 'Error al borrar evidencia: ' + error.message };
   }
 }
+
+// Borrar TODOS los productos de la lista de la compra de un evento
+export async function deleteAllShoppingItems(eventId: string) {
+  try {
+    await prisma.$transaction(async (tx) => {
+      // 1. Obtener IDs de items del evento
+      const items = await tx.shoppingListItem.findMany({
+        where: { eventId },
+        select: { id: true }
+      });
+      const itemIds = items.map(i => i.id);
+
+      // 2. Borrar historial asociado
+      if (itemIds.length > 0) {
+        await tx.shoppingListHistory.deleteMany({
+          where: { shoppingListItemId: { in: itemIds } }
+        });
+      }
+
+      // 3. Borrar los artículos
+      await tx.shoppingListItem.deleteMany({
+        where: { eventId }
+      });
+    });
+
+    revalidatePath('/shopping');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: 'Error al vaciar la lista de la compra: ' + error.message };
+  }
+}
+
