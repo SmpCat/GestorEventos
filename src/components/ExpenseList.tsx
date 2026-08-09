@@ -134,8 +134,13 @@ export default function ExpenseList({
 
   const handleReScan = async (expenseId: string) => {
     setLoading(`rescan-exp-${expenseId}`);
+    const timeout = setTimeout(() => {
+      setLoading(null);
+      alert('⏱️ El escaneo tardó demasiado. Inténtalo de nuevo en unos segundos.');
+    }, 45000);
     try {
       const res = await reScanExpenseAI(expenseId);
+      clearTimeout(timeout);
       if (res.success) {
         alert("¡Éxito! El ticket ha sido escaneado correctamente y el gasto ha sido actualizado.");
         router.refresh();
@@ -143,6 +148,7 @@ export default function ExpenseList({
         alert(`No se pudo escanear: ${res.error}`);
       }
     } catch (err: any) {
+      clearTimeout(timeout);
       alert(`Error al procesar: ${err.message}`);
     } finally {
       setLoading(null);
@@ -154,7 +160,8 @@ export default function ExpenseList({
       <AiLoadingOverlay 
         isVisible={isUploading || (typeof loading === 'string' && loading.startsWith('rescan-exp-'))} 
         title="Analizando Ticket"
-        message={typeof loading === 'string' && loading.startsWith('rescan-exp-') ? "Re-escaneando ticket con IA..." : "Extrayendo comercio, importe y fecha con IA..."} 
+        message={typeof loading === 'string' && loading.startsWith('rescan-exp-') ? "Re-escaneando ticket con IA..." : "Extrayendo comercio, importe y fecha con IA..."}
+        onCancel={typeof loading === 'string' && loading.startsWith('rescan-exp-') ? () => setLoading(null) : undefined}
       />
       
       <div className={styles.headerRow}>

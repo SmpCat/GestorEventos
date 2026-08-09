@@ -107,7 +107,12 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
 
   const handleRescanList = async () => {
     setLoading('rescan-list');
+    const timeout = setTimeout(() => {
+      setLoading(null);
+      alert('⏱️ El escaneo tardó demasiado. Inténtalo de nuevo en unos segundos.');
+    }, 45000);
     const res = await rescanShoppingListAI(list.id);
+    clearTimeout(timeout);
     if (res.success) {
       alert(`✅ IA procesada con éxito: ${res.count} productos añadidos.`);
       router.refresh();
@@ -168,6 +173,7 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
         isVisible={loading === 'rescan-list'}
         title="Analizando Lista"
         message="Interpretando lista manuscrita con Inteligencia Artificial..."
+        onCancel={() => setLoading(null)}
       />
       <div className={styles.innerBlackBox}>
         {/* Cabecera de la Lista */}
