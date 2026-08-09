@@ -16,6 +16,7 @@ import TrashIcon from './TrashIcon';
 import PencilIcon from './PencilIcon';
 import SearchableUserSelect from './SearchableUserSelect';
 import ImageLightbox from './ImageLightbox';
+import AiLoadingOverlay from './AiLoadingOverlay';
 import styles from './ShoppingList.module.css';
 
 interface ShoppingListCardProps {
@@ -26,7 +27,7 @@ interface ShoppingListCardProps {
 
 export default function ShoppingListCard({ list, users, currentUser }: ShoppingListCardProps) {
   const router = useRouter();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
 
   // Edición del nombre de la lista
@@ -163,6 +164,11 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
 
   return (
     <div className="glass-panel" style={{ marginBottom: '1.5rem' }}>
+      <AiLoadingOverlay
+        isVisible={loading === 'rescan-list'}
+        title="Analizando Lista"
+        message="Interpretando lista manuscrita con Inteligencia Artificial..."
+      />
       <div className={styles.innerBlackBox}>
         {/* Cabecera de la Lista */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingBottom: isExpanded ? '0.75rem' : '0', borderBottom: isExpanded ? '1px solid rgba(255, 255, 255, 0.1)' : 'none' }}>
