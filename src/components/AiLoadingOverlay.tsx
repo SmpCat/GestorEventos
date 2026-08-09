@@ -3,10 +3,11 @@ import styles from './AiLoadingOverlay.module.css';
 
 interface AiLoadingOverlayProps {
   isVisible: boolean;
+  title?: string;
   message?: string;
 }
 
-export default function AiLoadingOverlay({ isVisible, message = "Extrayendo artículos y precios..." }: AiLoadingOverlayProps) {
+export default function AiLoadingOverlay({ isVisible, title = "Analizando Imagen", message = "Extrayendo información con IA..." }: AiLoadingOverlayProps) {
   if (!isVisible) return null;
 
   return (
@@ -22,7 +23,7 @@ export default function AiLoadingOverlay({ isVisible, message = "Extrayendo art�
           </div>
           <div className={styles.laser}></div>
         </div>
-        <h3 className={styles.title}>Analizando Ticket</h3>
+        <h3 className={styles.title}>{title}</h3>
         <p className={styles.subtitle}>{message}</p>
         <div className={styles.pulseDots}>
           <span></span><span></span><span></span>

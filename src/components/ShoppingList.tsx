@@ -134,6 +134,7 @@ export default function ShoppingList({ lists, eventId, users, currentUser }: Sho
     <div className={styles.container}>
       <AiLoadingOverlay 
         isVisible={loading === 'scanning'} 
+        title="Analizando Lista"
         message="Interpretando lista manuscrita con Inteligencia Artificial..." 
       />
 

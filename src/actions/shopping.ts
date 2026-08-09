@@ -328,10 +328,22 @@ Ejemplo de salida exacta que espero de ti:
     return { success: true, count: parsedItems.length, data: newList };
 
   } catch (error: any) {
+    if (savedImageUrl) {
+      try {
+        const finalListName = listName?.trim() || `Lista Manuscrita (${new Date().toLocaleDateString('es-ES')})`;
+        await prisma.shoppingList.create({
+          data: {
+            name: finalListName,
+            eventId,
+            imageUrl: savedImageUrl
+          }
+        });
+      } catch (_) {}
+    }
     revalidatePath('/shopping');
     return { 
       success: false, 
-      error: 'Error al procesar con IA: ' + error.message,
+      error: 'La IA no pudo interpretar los textos (' + error.message + '), pero la lista se ha creado y la foto ha quedado guardada.',
       savedImageUrl 
     };
   }

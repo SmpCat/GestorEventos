@@ -153,6 +153,7 @@ export default function ExpenseList({
     <div className={styles.container}>
       <AiLoadingOverlay 
         isVisible={isUploading || (typeof loading === 'string' && loading.startsWith('rescan-exp-'))} 
+        title="Analizando Ticket"
         message={typeof loading === 'string' && loading.startsWith('rescan-exp-') ? "Re-escaneando ticket con IA..." : "Extrayendo comercio, importe y fecha con IA..."} 
       />
       

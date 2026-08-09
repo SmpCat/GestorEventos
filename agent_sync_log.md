@@ -167,9 +167,10 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-### 33. Corrección de Invalidez de Caché en Instancia Dev de Prisma (`src/lib/prisma.ts`)
-- **Causa del Error:** Durante la recarga en caliente (`next dev`), `globalThis.prisma` mantenía en memoria una instancia de `PrismaClient` creada previamente a los cambios en el esquema Prisma (lo que provocaba que `prisma.shoppingList` fuera `undefined`).
-- **Solución:** Actualizado `src/lib/prisma.ts` para verificar la existencia del nuevo modelo `shoppingList` en la instancia cacheada y reinicializar `new PrismaClient()` automáticamente si falta.
+### 34. Robustez en Fallo de IA y Personalización de Overlay de Escaneo
+- **Creación Garantizada de Lista con Foto:** Actualizado `scanShoppingListAI` en `src/actions/shopping.ts` para que, ante cualquier fallo en la llamada de red/API con Gemini, se cree siempre la tarjeta `ShoppingList` con la foto adjunta guardada.
+- **Overlay de Carga Adaptado (`AiLoadingOverlay.tsx`):** Añadido soporte para propiedad `title` personalizada en el modal de carga. Configurado el título como `"Analizando Lista"` en la vista de compras para evitar la palabra *"Ticket"*.
+
 
 
 
