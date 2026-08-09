@@ -52,7 +52,17 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
   const handleSaveListName = async () => {
     if (!listName.trim()) return;
     setLoading('save-list-name');
-    const res = await updateShoppingList(list.id, listName.trim(), list.assigneeId);
+    let res = await updateShoppingList(list.id, listName.trim(), list.assigneeId, false);
+
+    if (!res.success && res.alreadyExists) {
+      if (window.confirm(`⚠️ Ya existe una lista llamada "${res.existingListName}". ¿Deseas fusionar la lista "${list.name}" en "${res.existingListName}" y guardar todos sus productos allí?`)) {
+        res = await updateShoppingList(list.id, listName.trim(), list.assigneeId, true);
+      } else {
+        setLoading(null);
+        return;
+      }
+    }
+
     if (res.success) {
       setIsEditingListName(false);
       router.refresh();

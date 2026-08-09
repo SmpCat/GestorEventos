@@ -167,9 +167,12 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-### 41. Re-escaneo de Fotos de Listas con IA (`rescanShoppingListAI`)
-- **Acción Server-Side (`src/actions/shopping.ts`):** Implementada la función `rescanShoppingListAI(listId)` que lee el archivo de foto adjunto de una `ShoppingList` existente y re-ejecuta la extracción de productos con Gemini AI.
-- **Botón `🔄 Re-escanear`:** Añadido un botón `🔄` junto a `📷 Foto` en la tarjeta de la lista y un botón flotante `🔄 Re-escanear con IA` dentro de la vista Lightbox a pantalla completa (`ImageLightbox.tsx`) para reintentar la lectura en cualquier momento.
+### 42. Control de Nombres Duplicados y Fusión de Listas
+- **Detección Server-Side (`createShoppingList`, `updateShoppingList`, `scanShoppingListAI`):** Añadida validación para comprobar si el nombre de una lista ya existe dentro del mismo evento.
+- **Advertencia y Confirmación en Cliente (`ShoppingList.tsx` & `ShoppingListCard.tsx`):**
+  - **Al crear (manual o IA):** Si el nombre coincide con una lista existente, se solicita al usuario si desea fusionarla y guardar todos sus productos en la lista ya existente.
+  - **Al renombrar:** Si se cambia el nombre por el de otra lista existente, se solicita confirmación para fusionar ambas tarjetas trasladando todos los productos y eliminando el duplicado.
+
 
 
 

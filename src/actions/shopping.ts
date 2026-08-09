@@ -44,11 +44,46 @@ export async function getShoppingLists(eventId: string) {
 }
 
 // Crear una nueva lista (Manual o escaneada)
-export async function createShoppingList(eventId: string, name: string, assigneeId?: string | null, imageUrl?: string | null) {
+export async function createShoppingList(
+  eventId: string, 
+  name: string, 
+  assigneeId?: string | null, 
+  imageUrl?: string | null, 
+  forceMerge = false
+) {
   try {
     const trimmed = name.trim();
     if (!trimmed) {
       return { success: false, error: 'El nombre de la lista no puede estar vacío.' };
+    }
+
+    const existingList = await prisma.shoppingList.findFirst({
+      where: {
+        eventId,
+        name: { equals: trimmed }
+      }
+    });
+
+    if (existingList && !forceMerge) {
+      return { 
+        success: false, 
+        alreadyExists: true, 
+        existingListId: existingList.id, 
+        existingListName: existingList.name,
+        error: `Ya existe una lista llamada "${existingList.name}".` 
+      };
+    }
+
+    if (existingList && forceMerge) {
+      const updatedList = await prisma.shoppingList.update({
+        where: { id: existingList.id },
+        data: {
+          imageUrl: imageUrl || existingList.imageUrl,
+          assigneeId: assigneeId || existingList.assigneeId
+        }
+      });
+      try { revalidatePath('/shopping'); } catch (_) {}
+      return { success: true, data: updatedList, merged: true };
     }
 
     const newList = await prisma.shoppingList.create({
@@ -64,19 +99,66 @@ export async function createShoppingList(eventId: string, name: string, assignee
       }
     });
 
-    revalidatePath('/shopping');
-    return { success: true, data: newList };
+    try { revalidatePath('/shopping'); } catch (_) {}
+    return { success: true, data: newList, merged: false };
   } catch (error: any) {
     return { success: false, error: 'Error al crear la lista: ' + error.message };
   }
 }
 
 // Actualizar una lista (nombre y/o encargado)
-export async function updateShoppingList(listId: string, name: string, assigneeId?: string | null) {
+export async function updateShoppingList(
+  listId: string, 
+  name: string, 
+  assigneeId?: string | null, 
+  forceMerge = false
+) {
   try {
     const trimmed = name.trim();
     if (!trimmed) {
       return { success: false, error: 'El nombre de la lista no puede estar vacío.' };
+    }
+
+    const currentList = await prisma.shoppingList.findUnique({
+      where: { id: listId }
+    });
+    if (!currentList) return { success: false, error: 'Lista no encontrada.' };
+
+    const nameChanged = currentList.name.toLowerCase() !== trimmed.toLowerCase();
+
+    if (nameChanged) {
+      const existingList = await prisma.shoppingList.findFirst({
+        where: {
+          eventId: currentList.eventId,
+          name: { equals: trimmed },
+          id: { not: listId }
+        }
+      });
+
+      if (existingList && !forceMerge) {
+        return {
+          success: false,
+          alreadyExists: true,
+          existingListId: existingList.id,
+          existingListName: existingList.name,
+          error: `Ya existe una lista llamada "${existingList.name}".`
+        };
+      }
+
+      if (existingList && forceMerge) {
+        await prisma.$transaction(async (tx) => {
+          await tx.shoppingListItem.updateMany({
+            where: { listId },
+            data: { listId: existingList.id }
+          });
+          await tx.shoppingList.delete({
+            where: { id: listId }
+          });
+        });
+
+        try { revalidatePath('/shopping'); } catch (_) {}
+        return { success: true, merged: true, data: existingList };
+      }
     }
 
     const updated = await prisma.shoppingList.update({
@@ -90,8 +172,8 @@ export async function updateShoppingList(listId: string, name: string, assigneeI
       }
     });
 
-    revalidatePath('/shopping');
-    return { success: true, data: updated };
+    try { revalidatePath('/shopping'); } catch (_) {}
+    return { success: true, data: updated, merged: false };
   } catch (error: any) {
     return { success: false, error: 'Error al actualizar la lista: ' + error.message };
   }
@@ -239,7 +321,32 @@ export async function updateShoppingItem(itemId: string, name: string) {
 // IA Y ESCANEO FOTOGRÁFICO DE LISTAS
 // ---------------------------------------------------------
 
-export async function scanShoppingListAI(eventId: string, base64Image: string, mimeType: string, listName?: string) {
+export async function scanShoppingListAI(
+  eventId: string, 
+  base64Image: string, 
+  mimeType: string, 
+  listName?: string,
+  forceMerge = false
+) {
+  const finalListName = listName?.trim() || `Lista Escaneada (${new Date().toLocaleDateString('es-ES')})`;
+
+  const existingList = await prisma.shoppingList.findFirst({
+    where: {
+      eventId,
+      name: { equals: finalListName }
+    }
+  });
+
+  if (existingList && !forceMerge) {
+    return {
+      success: false,
+      alreadyExists: true,
+      existingListId: existingList.id,
+      existingListName: existingList.name,
+      error: `Ya existe una lista llamada "${existingList.name}".`
+    };
+  }
+
   let savedImageUrl = null;
   
   // 1. Guardar la imagen físicamente en public/uploads/shopping-lists
@@ -291,46 +398,13 @@ Ejemplo de salida exacta que espero de ti:
     try {
       parsedItems = JSON.parse(cleanedText);
     } catch (e) {
-      // Si la IA falla pero se guardó la imagen, creamos la lista vacía con la foto
-      const finalListName = listName?.trim() || `Lista Manuscrita (${new Date().toLocaleDateString('es-ES')})`;
-      await prisma.shoppingList.create({
-        data: {
-          name: finalListName,
-          eventId,
-          imageUrl: savedImageUrl
-        }
-      });
-      try { revalidatePath('/shopping'); } catch (_) {}
-      return { 
-        success: false, 
-        error: 'La IA no devolvió un formato válido, pero la lista con su foto se guardó.',
-        savedImageUrl 
-      };
-    }
-
-    const finalListName = listName?.trim() || `Lista Escaneada (${new Date().toLocaleDateString('es-ES')})`;
-
-    // Crear la lista con sus productos leídos
-    const newList = await prisma.shoppingList.create({
-      data: {
-        name: finalListName,
-        eventId,
-        imageUrl: savedImageUrl,
-        items: {
-          create: (Array.isArray(parsedItems) ? parsedItems : []).map(name => ({
-            name: String(name).trim()
-          }))
-        }
-      }
-    });
-
-    try { revalidatePath('/shopping'); } catch (_) {}
-    return { success: true, count: parsedItems.length, data: newList };
-
-  } catch (error: any) {
-    if (savedImageUrl) {
-      try {
-        const finalListName = listName?.trim() || `Lista Manuscrita (${new Date().toLocaleDateString('es-ES')})`;
+      // Si la IA falla pero se guardó la imagen y existe lista
+      if (existingList) {
+        await prisma.shoppingList.update({
+          where: { id: existingList.id },
+          data: { imageUrl: savedImageUrl || existingList.imageUrl }
+        });
+      } else {
         await prisma.shoppingList.create({
           data: {
             name: finalListName,
@@ -338,12 +412,70 @@ Ejemplo de salida exacta que espero de ti:
             imageUrl: savedImageUrl
           }
         });
+      }
+      try { revalidatePath('/shopping'); } catch (_) {}
+      return { 
+        success: false, 
+        error: 'La IA no devolvió un formato válido, pero la imagen se vinculó correctamente.',
+        savedImageUrl 
+      };
+    }
+
+    let targetList = existingList;
+    if (!targetList) {
+      targetList = await prisma.shoppingList.create({
+        data: {
+          name: finalListName,
+          eventId,
+          imageUrl: savedImageUrl
+        }
+      });
+    } else {
+      await prisma.shoppingList.update({
+        where: { id: existingList!.id },
+        data: { imageUrl: savedImageUrl || existingList!.imageUrl }
+      });
+    }
+
+    if (Array.isArray(parsedItems) && parsedItems.length > 0) {
+      await prisma.$transaction(
+        parsedItems.map(name =>
+          prisma.shoppingListItem.create({
+            data: {
+              listId: targetList!.id,
+              name: String(name).trim()
+            }
+          })
+        )
+      );
+    }
+
+    try { revalidatePath('/shopping'); } catch (_) {}
+    return { success: true, count: parsedItems.length, data: targetList, merged: !!existingList };
+
+  } catch (error: any) {
+    if (savedImageUrl) {
+      try {
+        if (existingList) {
+          await prisma.shoppingList.update({
+            where: { id: existingList.id },
+            data: { imageUrl: savedImageUrl || existingList.imageUrl }
+          });
+        } else {
+          await prisma.shoppingList.create({
+            data: {
+              name: finalListName,
+              eventId,
+              imageUrl: savedImageUrl
+            }
+          });
+        }
       } catch (_) {}
     }
     try { revalidatePath('/shopping'); } catch (_) {}
     return { 
       success: false, 
-      error: 'La IA no pudo interpretar los textos (' + error.message + '), pero la lista se ha creado y la foto ha quedado guardada.',
+      error: 'La IA no pudo interpretar los textos (' + error.message + '), pero la imagen ha quedado guardada.',
       savedImageUrl 
     };
   }

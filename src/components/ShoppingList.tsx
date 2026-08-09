@@ -35,11 +35,28 @@ export default function ShoppingList({ lists, eventId, users, currentUser }: Sho
     if (!newListName.trim()) return;
 
     setLoading('create-list');
-    const res = await createShoppingList(
+    let res = await createShoppingList(
       eventId, 
       newListName.trim(), 
-      newListAssignee === 'UNASSIGN' ? null : newListAssignee
+      newListAssignee === 'UNASSIGN' ? null : newListAssignee,
+      null,
+      false
     );
+
+    if (!res.success && res.alreadyExists) {
+      if (window.confirm(`⚠️ Ya existe una lista llamada "${res.existingListName}". ¿Deseas añadir y guardar los productos en la lista que ya existe?`)) {
+        res = await createShoppingList(
+          eventId, 
+          newListName.trim(), 
+          newListAssignee === 'UNASSIGN' ? null : newListAssignee,
+          null,
+          true
+        );
+      } else {
+        setLoading(null);
+        return;
+      }
+    }
 
     if (res.success) {
       setNewListName('');
@@ -104,10 +121,20 @@ export default function ShoppingList({ lists, eventId, users, currentUser }: Sho
 
     try {
       const base64Data = await compressImage(file);
-      const res = await scanShoppingListAI(eventId, base64Data, 'image/jpeg', listTitle);
+      let res = await scanShoppingListAI(eventId, base64Data, 'image/jpeg', listTitle, false);
       
+      if (!res.success && res.alreadyExists) {
+        if (window.confirm(`⚠️ Ya existe una lista llamada "${res.existingListName}". ¿Deseas guardar y añadir todos los productos leídos en la lista que ya existe?`)) {
+          setLoading('scanning');
+          res = await scanShoppingListAI(eventId, base64Data, 'image/jpeg', listTitle, true);
+        } else {
+          setLoading(null);
+          return;
+        }
+      }
+
       if (res.success) {
-        alert(`¡Éxito! Se ha creado la lista "${listTitle}" con ${res.count} productos extraídos por la IA.`);
+        alert(res.merged ? `¡Fusión completada! Se han añadido los ${res.count} productos a la lista "${res.existingListName || listTitle}".` : `¡Éxito! Se ha creado la lista "${listTitle}" con ${res.count} productos extraídos por la IA.`);
         router.refresh();
       } else {
         alert(`Aviso: ${res.error}`);
