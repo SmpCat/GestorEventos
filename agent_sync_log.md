@@ -167,9 +167,10 @@
 - **Modelo de Datos `ShoppingList` (`prisma/schema.prisma`):** Añadido modelo `ShoppingList` para representar listas independientes con su nombre, evento, encargado asignado a la lista completa (`assigneeId`) y foto adjunta (`imageUrl`). Actualizado `ShoppingListItem` para pertenecer a `ShoppingList` (`listId`) con borrado en cascada.
 - **Acciones Server-Side (`src/actions/shopping.ts`):** Creadas funciones `getShoppingLists`, `createShoppingList`, `updateShoppingList`, `deleteShoppingList`, `addShoppingItemToList` y adaptado `scanShoppingListAI` para solicitar título y asociar los ítems leídos a la nueva lista.
 - **Componente Desplegable (`ShoppingListCard.tsx`):** Creada la tarjeta acordeón con flecha 🔽/🔼 para expandir/plegar productos, cambiar el asistente encargado de la lista completa, renombrar/borrar lista, ver foto en lightbox y gestionar sus productos.
-### 37. Visor Lightbox a Pantalla Completa con React Portal (`ImageLightbox.tsx`)
-- **Renderizado en `document.body` (`createPortal`):** Actualizado `ImageLightbox.tsx` para renderizar el modal flotante mediante un Portal directo en el `document.body`.
-- **Resultado Estético:** Elimina cualquier restricción de apilamiento o recortes de contenedor padre (`glass-panel`), permitiendo mostrar la foto de la lista en su proporción completa y vertical nativa a pantalla completa con fondo negro translúcido y botón único `✕` arriba a la derecha.
+### 38. Reubicación de Papelera y Eliminación de Log de Historial (`ShoppingListCard.tsx`)
+- **Papelera en Fila de Título:** Reubicado el botón de borrar lista (papelera blanca) en la primera fila, posicionado directamente entre el icono de edición del título y la flecha desplegable `[Título] [✏️] [🗑️] [🔽]`.
+- **Simplificación Visual de Productos:** Eliminado el micro-texto de auditoría (`item.history`) debajo de cada producto para una interfaz limpia, legible y sin distracciones.
+
 
 
 

@@ -144,7 +144,7 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
         {/* Cabecera de la Lista */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingBottom: isExpanded ? '0.75rem' : '0', borderBottom: isExpanded ? '1px solid rgba(255, 255, 255, 0.1)' : 'none' }}>
           
-          {/* Fila 1: Título de la lista a la izquierda + Flecha Desplegable a la DERECHA */}
+          {/* Fila 1: Título de la lista + Edición + Papelera + Flecha Desplegable a la DERECHA */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '0.5rem' }}>
             {isEditingListName ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flex: 1 }}>
@@ -178,26 +178,48 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
               </div>
             )}
 
-            {/* Flecha Desplegable 🔽 / 🔼 (A la DERECHA del título) */}
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="btn"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff',
-                padding: '0.35rem 0.65rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-              title={isExpanded ? 'Plegar lista' : 'Desplegar lista'}
-            >
-              {isExpanded ? '🔼' : '🔽'}
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {/* Botón Borrar Lista (entre lápiz de edición y flecha) */}
+              <button
+                onClick={handleDeleteList}
+                disabled={loading === 'delete-list'}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#ffffff',
+                  opacity: 0.9,
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                title="Borrar esta lista"
+              >
+                <TrashIcon />
+              </button>
+
+              {/* Botón Flecha Desplegable 🔽 / 🔼 */}
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="btn"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#ffffff',
+                  padding: '0.35rem 0.65rem',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+                title={isExpanded ? 'Plegar lista' : 'Desplegar lista'}
+              >
+                {isExpanded ? '🔼' : '🔽'}
+              </button>
+            </div>
           </div>
 
-          {/* Fila 2: Controles abajo (Compra hecha en blanco, Foto en blanco, Encargado, Borrar) */}
+          {/* Fila 2: Controles abajo (Compra hecha, Foto, Encargado) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
             
             {/* Botón Compra hecha (estilo blanco glassmorphism) */}
@@ -257,26 +279,6 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                 disabled={loading === 'assign-list'}
               />
             </div>
-
-            {/* Botón Borrar Lista (Icono Papelera en blanco) */}
-            <button
-              onClick={handleDeleteList}
-              disabled={loading === 'delete-list'}
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                color: '#ffffff',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                padding: '0.35rem 0.65rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              title="Borrar esta lista"
-            >
-              <TrashIcon />
-            </button>
           </div>
 
         </div>
@@ -362,20 +364,6 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                             <span style={{ textDecoration: item.isPurchased ? 'line-through' : 'none', fontWeight: item.isPurchased ? 'normal' : '500' }}>
                               {item.name}
                             </span>
-                            {item.history && item.history.length > 0 && (
-                              <div style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '2px' }}>
-                                {item.history.map((h: any, idx: number) => {
-                                  const dateStr = new Date(h.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                                  const actionText = h.action === 'CREATED' ? 'Añadido' : h.action === 'PURCHASED' ? 'Comprado' : 'Desmarcado';
-                                  return (
-                                    <span key={h.id}>
-                                      {actionText} por @{h.user?.username || '?'} ({dateStr})
-                                      {idx < item.history.length - 1 ? ' • ' : ''}
-                                    </span>
-                                  );
-                                })}
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>
