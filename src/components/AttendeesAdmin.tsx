@@ -39,7 +39,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     setNewDays(att.daysAttending);
   };
 
-  const handleUpdateDays = async (attId: string, newVal: number, currentDrinks?: boolean) => {
+  const handleUpdateDays = async (attId: string, newVal: number) => {
     const label = newVal === 0 ? 'No lo sé aún' : `${newVal} días`;
     const confirmed = window.confirm(`¿Seguro que quieres cambiar la asistencia a "${label}"?`);
     if (!confirmed) {
@@ -49,8 +49,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
 
     setLoading(`att-${attId}`);
     const attendee = attendees.find(a => a.id === attId);
-    const drinks = currentDrinks !== undefined ? currentDrinks : (attendee?.drinksAlcohol ?? true);
-    const res = await updateAttendeeDays(attId, newVal, drinks);
+    const drinkOpt = attendee?.drinkOption ?? 'CON_ALCOHOL';
+    const eatFoodVal = attendee?.eatFood ?? true;
+    const res = await updateAttendeeDays(attId, newVal, drinkOpt, eatFoodVal);
     if (res.success) {
       setNewDays(newVal);
     } else {
@@ -59,15 +60,23 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     setLoading(null);
   };
 
-  const handleUpdateAlcohol = async (attId: string, currentDays: number, drinks: boolean) => {
+  const handleUpdateDrinkOption = async (attId: string, currentDays: number, drinkOption: string, currentEatFood: boolean) => {
     setLoading(`att-${attId}`);
-    const res = await updateAttendeeDays(attId, currentDays, drinks);
+    const res = await updateAttendeeDays(attId, currentDays, drinkOption, currentEatFood);
     if (!res.success) {
-      alert(res.error || 'Error al actualizar preferencia de alcohol.');
+      alert(res.error || 'Error al actualizar preferencia de bebida.');
     }
     setLoading(null);
   };
 
+  const handleUpdateEatFood = async (attId: string, currentDays: number, currentDrinkOption: string, eatFood: boolean) => {
+    setLoading(`att-${attId}`);
+    const res = await updateAttendeeDays(attId, currentDays, currentDrinkOption, eatFood);
+    if (!res.success) {
+      alert(res.error || 'Error al actualizar preferencia de comida.');
+    }
+    setLoading(null);
+  };
 
 
   const handleAddPayment = async (attId: string) => {
@@ -240,8 +249,12 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                             <strong className="text-white">{att.daysAttending > 0 ? `${att.daysAttending} ${att.daysAttending === 1 ? 'día' : 'días'}` : 'Sin confirmar'}</strong>
                           </div>
                           <div>
-                            <span className="text-secondary block mb-0.5">Consumo Alcohol:</span>
-                            <strong className="text-white">{att.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}</strong>
+                            <span className="text-secondary block mb-0.5">Bebida:</span>
+                            <strong className="text-white">{att.drinkOption === 'CON_ALCOHOL' ? '🍺 Con Alcohol' : att.drinkOption === 'SIN_ALCOHOL' ? '🥤 Sin Alcohol' : '🚫 No Bebida'}</strong>
+                          </div>
+                          <div>
+                            <span className="text-secondary block mb-0.5">Comida:</span>
+                            <strong className="text-white">{att.eatFood ? '🍽️ Sí Comida' : '🚫 No Comida'}</strong>
                           </div>
                         </div>
                       </div>
@@ -269,17 +282,34 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                             </div>
 
                             <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
-                              <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Alcohol:</span>
+                              <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Bebida:</span>
                               <div style={{ flex: 1, maxWidth: '250px' }}>
                                 <SelectField
-                                  value={att.drinksAlcohol ? 'true' : 'false'}
-                                  onChange={e => handleUpdateAlcohol(att.id, att.daysAttending, e.target.value === 'true')}
+                                  value={att.drinkOption ?? 'CON_ALCOHOL'}
+                                  onChange={e => handleUpdateDrinkOption(att.id, att.daysAttending, e.target.value, att.eatFood ?? true)}
                                   disabled={isProcessing}
                                   containerStyle={{ width: '100%', marginBottom: 0 }}
                                   style={{ opacity: isProcessing ? 0.6 : 1 }}
                                 >
-                                  <option value="true">🍺 Con Alcohol</option>
-                                  <option value="false">🥤 Sin Alcohol</option>
+                                  <option value="CON_ALCOHOL">🍺 Con Alcohol</option>
+                                  <option value="SIN_ALCOHOL">🥤 Sin Alcohol</option>
+                                  <option value="NO_BEBIDA">🚫 No Bebida</option>
+                                </SelectField>
+                              </div>
+                            </div>
+
+                            <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
+                              <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Comida:</span>
+                              <div style={{ flex: 1, maxWidth: '250px' }}>
+                                <SelectField
+                                  value={att.eatFood ? 'true' : 'false'}
+                                  onChange={e => handleUpdateEatFood(att.id, att.daysAttending, att.drinkOption ?? 'CON_ALCOHOL', e.target.value === 'true')}
+                                  disabled={isProcessing}
+                                  containerStyle={{ width: '100%', marginBottom: 0 }}
+                                  style={{ opacity: isProcessing ? 0.6 : 1 }}
+                                >
+                                  <option value="true">🍽️ Sí, Comida</option>
+                                  <option value="false">🚫 No Comida</option>
                                 </SelectField>
                               </div>
                             </div>
@@ -444,8 +474,12 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                   <strong className="text-white">{att.daysAttending > 0 ? `${att.daysAttending} ${att.daysAttending === 1 ? 'día' : 'días'}` : 'Sin confirmar'}</strong>
                                 </div>
                                 <div>
-                                  <span className="text-secondary block mb-0.5">Consumo Alcohol:</span>
-                                  <strong className="text-white">{att.drinksAlcohol ? '🍺 Con Alcohol' : '🥤 Sin Alcohol'}</strong>
+                                  <span className="text-secondary block mb-0.5">Bebida:</span>
+                                  <strong className="text-white">{att.drinkOption === 'CON_ALCOHOL' ? '🍺 Con Alcohol' : att.drinkOption === 'SIN_ALCOHOL' ? '🥤 Sin Alcohol' : '🚫 No Bebida'}</strong>
+                                </div>
+                                <div>
+                                  <span className="text-secondary block mb-0.5">Comida:</span>
+                                  <strong className="text-white">{att.eatFood ? '🍽️ Sí Comida' : '🚫 No Comida'}</strong>
                                 </div>
                               </div>
                             </div>
@@ -473,16 +507,32 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                     </div>
 
                                     <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
-                                      <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Alcohol:</span>
+                                      <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Bebida:</span>
                                       <div style={{ flex: 1 }}>
                                         <SelectField
-                                          value={att.drinksAlcohol ? 'true' : 'false'}
-                                          onChange={e => handleUpdateAlcohol(att.id, att.daysAttending, e.target.value === 'true')}
+                                          value={att.drinkOption ?? 'CON_ALCOHOL'}
+                                          onChange={e => handleUpdateDrinkOption(att.id, att.daysAttending, e.target.value, att.eatFood ?? true)}
                                           disabled={isProcessing}
                                           containerStyle={{ width: '100%', marginBottom: 0 }}
                                         >
-                                          <option value="true">🍺 Con Alcohol</option>
-                                          <option value="false">🥤 Sin Alcohol</option>
+                                          <option value="CON_ALCOHOL">🍺 Con Alcohol</option>
+                                          <option value="SIN_ALCOHOL">🥤 Sin Alcohol</option>
+                                          <option value="NO_BEBIDA">🚫 No Bebida</option>
+                                        </SelectField>
+                                      </div>
+                                    </div>
+
+                                    <div className={styles.addPaymentRow} style={{ alignItems: 'center' }}>
+                                      <span className={styles.infoLabel} style={{ minWidth: '70px' }}>Comida:</span>
+                                      <div style={{ flex: 1 }}>
+                                        <SelectField
+                                          value={att.eatFood ? 'true' : 'false'}
+                                          onChange={e => handleUpdateEatFood(att.id, att.daysAttending, att.drinkOption ?? 'CON_ALCOHOL', e.target.value === 'true')}
+                                          disabled={isProcessing}
+                                          containerStyle={{ width: '100%', marginBottom: 0 }}
+                                        >
+                                          <option value="true">🍽️ Sí, Comida</option>
+                                          <option value="false">🚫 No Comida</option>
                                         </SelectField>
                                       </div>
                                     </div>

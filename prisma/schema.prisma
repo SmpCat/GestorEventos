@@ -66,7 +66,8 @@ model EventAttendee {
   daysAttending Int      @default(0)
   balance       Float    @default(0.0) // Saldo a favor en ESTE evento
   
-  drinksAlcohol Boolean  @default(true) // ¿Beberá alcohol en ESTE evento?
+  drinkOption   String   @default("CON_ALCOHOL") // "CON_ALCOHOL" | "SIN_ALCOHOL" | "NO_BEBIDA"
+  eatFood       Boolean  @default(true)           // true = Sí Comida, false = No Comida
 
   // Custom Pricing (Nuevos campos)
   expectedPayment Float?   // Lo que tiene que pagar. Nulo = automático según tabla.
@@ -122,7 +123,8 @@ model PricingRule {
   isMember      Boolean? // true = solo socios, false = solo no socios, null = todos
   minAge        Int?     // edad mínima (inclusive)
   maxAge        Int?     // edad máxima (inclusive)
-  drinksAlcohol Boolean? // true = solo con alcohol, false = solo sin alcohol, null = todos
+  drinkOption   String?  // "CON_ALCOHOL" | "SIN_ALCOHOL" | "NO_BEBIDA" | null = todos
+  eatFood       Boolean? // true = solo come, false = solo no come, null = todos
   
   // Relaciones
   eventId       String

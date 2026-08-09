@@ -60,7 +60,8 @@ async function main() {
       if (!rules || rules.length === 0) continue;
       const isMember = att.user.isMember ?? true;
       const age = att.user.age ?? 18;
-      const drinksAlcohol = att.drinksAlcohol ?? true;
+      const drinkOption = att.drinkOption ?? 'CON_ALCOHOL';
+      const eatFood = att.eatFood ?? true;
       const daysAttending = att.daysAttending;
 
       const matchingRules = rules.filter(rule => {
@@ -69,14 +70,15 @@ async function main() {
         if (rule.isMember !== null && rule.isMember !== isMember) return false;
         if (rule.minAge !== null && age < rule.minAge) return false;
         if (rule.maxAge !== null && age > rule.maxAge) return false;
-        if (rule.drinksAlcohol !== null && rule.drinksAlcohol !== drinksAlcohol) return false;
+        if (rule.drinkOption !== null && rule.drinkOption !== undefined && rule.drinkOption !== drinkOption) return false;
+        if (rule.eatFood !== null && rule.eatFood !== undefined && rule.eatFood !== eatFood) return false;
         return true;
       });
 
       if (matchingRules.length > 0) {
         matchingRules.sort((a, b) => {
-          const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinksAlcohol !== null ? 1 : 0);
-          const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinksAlcohol !== null ? 1 : 0);
+          const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinkOption !== null ? 1 : 0) + (a.eatFood !== null ? 1 : 0);
+          const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinkOption !== null ? 1 : 0) + (b.eatFood !== null ? 1 : 0);
           return scoreB - scoreA;
         });
         await prisma.eventAttendee.update({

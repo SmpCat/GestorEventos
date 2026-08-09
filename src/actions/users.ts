@@ -101,7 +101,7 @@ export async function updateUser(id: string, data: any) {
       where: { userId: id, daysAttending: { gt: 0 } }
     });
     for (const att of attendees) {
-      const calc = await calculateExpectedPayment(att.eventId, id, att.daysAttending, att.drinksAlcohol);
+      const calc = await calculateExpectedPayment(att.eventId, id, att.daysAttending, (att as any).drinkOption ?? 'CON_ALCOHOL', (att as any).eatFood ?? true);
       if (calc.price !== null) {
         await prisma.eventAttendee.update({
           where: { id: att.id },
@@ -420,7 +420,7 @@ export async function updateMyProfile(data: {
       where: { userId: session.id, daysAttending: { gt: 0 } }
     });
     for (const att of attendees) {
-      const calc = await calculateExpectedPayment(att.eventId, session.id, att.daysAttending, att.drinksAlcohol);
+      const calc = await calculateExpectedPayment(att.eventId, session.id, att.daysAttending, (att as any).drinkOption ?? 'CON_ALCOHOL', (att as any).eatFood ?? true);
       if (calc.price !== null) {
         await prisma.eventAttendee.update({
           where: { id: att.id },

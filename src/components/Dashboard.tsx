@@ -45,12 +45,12 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
     }
   };
 
-  const handleChangeDays = async (newVal: number, newDrinks?: boolean) => {
+  const handleChangeDays = async (newVal: number, newDrinkOption?: string, newEatFood?: boolean) => {
     if (!activeEvent) return;
     setLoadingDays(true);
 
     if (!attendee) {
-      const res = await joinEvent(activeEvent.id, session.id, newVal, newDrinks ?? true);
+      const res = await joinEvent(activeEvent.id, session.id, newVal, newDrinkOption ?? 'CON_ALCOHOL', newEatFood ?? true);
       if (!res.success) {
         alert(res.error || 'Error al unirse al evento');
       } else {
@@ -60,13 +60,14 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
       return;
     }
 
-    const drinks = newDrinks !== undefined ? newDrinks : (attendee.drinksAlcohol ?? true);
-    if (newVal === attendee.daysAttending && drinks === attendee.drinksAlcohol) {
+    const drinkOpt = newDrinkOption !== undefined ? newDrinkOption : (attendee.drinkOption ?? 'CON_ALCOHOL');
+    const eatFoodVal = newEatFood !== undefined ? newEatFood : (attendee.eatFood ?? true);
+    if (newVal === attendee.daysAttending && drinkOpt === attendee.drinkOption && eatFoodVal === attendee.eatFood) {
       setLoadingDays(false);
       return;
     }
 
-    const res = await updateAttendeeDays(attendee.id, newVal, drinks);
+    const res = await updateAttendeeDays(attendee.id, newVal, drinkOpt, eatFoodVal);
     if (!res.success) alert(res.error || 'Error al actualizar asistencia');
     setLoadingDays(false);
   };
@@ -109,15 +110,28 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
                   </SelectField>
 
                   <SelectField
-                    label="Consumo de Alcohol"
-                    value={attendee.drinksAlcohol ? 'true' : 'false'}
-                    onChange={e => handleChangeDays(attendee.daysAttending, e.target.value === 'true')}
+                    label="Consumo de Bebida"
+                    value={attendee.drinkOption ?? 'CON_ALCOHOL'}
+                    onChange={e => handleChangeDays(attendee.daysAttending, e.target.value, attendee.eatFood ?? true)}
                     disabled={loadingDays}
                     containerStyle={{ width: '100%', maxWidth: '240px', margin: 0 }}
                     style={{ opacity: loadingDays ? 0.6 : 1 }}
                   >
-                    <option value="true">🍺 Con Alcohol</option>
-                    <option value="false">🥤 Sin Alcohol</option>
+                    <option value="CON_ALCOHOL">🍺 Con Alcohol</option>
+                    <option value="SIN_ALCOHOL">🥤 Sin Alcohol</option>
+                    <option value="NO_BEBIDA">🚫 No Bebida</option>
+                  </SelectField>
+
+                  <SelectField
+                    label="¿Comes?"
+                    value={attendee.eatFood ? 'true' : 'false'}
+                    onChange={e => handleChangeDays(attendee.daysAttending, attendee.drinkOption ?? 'CON_ALCOHOL', e.target.value === 'true')}
+                    disabled={loadingDays}
+                    containerStyle={{ width: '100%', maxWidth: '240px', margin: 0 }}
+                    style={{ opacity: loadingDays ? 0.6 : 1 }}
+                  >
+                    <option value="true">🍽️ Sí, Comida</option>
+                    <option value="false">🚫 No Comida</option>
                   </SelectField>
                 </div>
 

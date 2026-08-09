@@ -27,7 +27,8 @@ export interface PricingRuleInput {
   isMember?: boolean | null;
   minAge?: number | null;
   maxAge?: number | null;
-  drinksAlcohol?: boolean | null;
+  drinkOption?: string | null; // "CON_ALCOHOL" | "SIN_ALCOHOL" | "NO_BEBIDA" | null = todos
+  eatFood?: boolean | null;    // true = solo con comida, false = solo sin comida, null = todos
 }
 
 export async function savePricingRules(eventId: string, rules: PricingRuleInput[]) {
@@ -52,7 +53,8 @@ export async function savePricingRules(eventId: string, rules: PricingRuleInput[
             isMember: r.isMember !== undefined ? r.isMember : null,
             minAge: r.minAge !== undefined ? r.minAge : null,
             maxAge: r.maxAge !== undefined ? r.maxAge : null,
-            drinksAlcohol: r.drinksAlcohol !== undefined ? r.drinksAlcohol : null,
+            drinkOption: r.drinkOption !== undefined ? r.drinkOption : null,
+            eatFood: r.eatFood !== undefined ? r.eatFood : null,
             eventId
           })),
         });
@@ -71,7 +73,6 @@ export async function savePricingRules(eventId: string, rules: PricingRuleInput[
 
 export async function getAttendees(eventId: string) {
   try {
-    // Obtener los asistentes del evento (excluyendo la cuenta técnica admin)
     const attendees = await prisma.eventAttendee.findMany({
       where: { 
         eventId,
@@ -112,12 +113,13 @@ export async function checkAttendance(eventId: string, userId: string) {
   }
 }
 
-// Helper para calcular la tarifa esperada basada en Socio, Edad, Alcohol y Días
+// Helper para calcular la tarifa esperada basada en Socio, Edad, Bebida, Comida y Días
 export async function calculateExpectedPayment(
   eventId: string,
   userId: string,
   daysAttending: number,
-  overrideDrinksAlcohol: boolean = true
+  drinkOption: string = 'CON_ALCOHOL',
+  eatFood: boolean = true
 ): Promise<{ price: number | null, error?: string }> {
   if (daysAttending <= 0) return { price: 0 };
 
@@ -126,7 +128,6 @@ export async function calculateExpectedPayment(
 
   const isMember = user.isMember ?? false;
   const age = user.age ?? 18;
-  const drinksAlcohol = overrideDrinksAlcohol;
 
   const rules = await prisma.pricingRule.findMany({
     where: { eventId },
@@ -137,7 +138,7 @@ export async function calculateExpectedPayment(
   }
 
   // Filtrar reglas compatibles
-  const matchingRules = rules.filter(rule => {
+  const matchingRules = rules.filter((rule: any) => {
     // Días: coincide dentro del rango [rule.days, rule.maxDays]
     const daysMatch = daysAttending >= rule.days && (rule.maxDays === null || rule.maxDays === undefined || daysAttending <= rule.maxDays) || (daysAttending === rule.days);
     if (!daysMatch) return false;
@@ -149,36 +150,39 @@ export async function calculateExpectedPayment(
     if (rule.minAge !== null && age < rule.minAge) return false;
     if (rule.maxAge !== null && age > rule.maxAge) return false;
 
-    // Filtro Alcohol
-    if (rule.drinksAlcohol !== null && rule.drinksAlcohol !== drinksAlcohol) return false;
+    // Filtro Bebida (null = aplica a todos)
+    if (rule.drinkOption !== null && rule.drinkOption !== undefined && rule.drinkOption !== drinkOption) return false;
+
+    // Filtro Comida (null = aplica a todos)
+    if (rule.eatFood !== null && rule.eatFood !== undefined && rule.eatFood !== eatFood) return false;
 
     return true;
   });
 
   if (matchingRules.length > 0) {
     // Ordenar por especificidad (la regla con más criterios definidos gana)
-    matchingRules.sort((a, b) => {
-      const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinksAlcohol !== null ? 1 : 0);
-      const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinksAlcohol !== null ? 1 : 0);
+    matchingRules.sort((a: any, b: any) => {
+      const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinkOption !== null ? 1 : 0) + (a.eatFood !== null ? 1 : 0);
+      const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinkOption !== null ? 1 : 0) + (b.eatFood !== null ? 1 : 0);
       return scoreB - scoreA;
     });
     return { price: matchingRules[0].price };
   }
 
   // Fallback: coincidencia por días si existe alguna regla general
-  const fallbackDaysRule = rules.find(r => r.days === daysAttending || (daysAttending >= 3 && r.days === 3));
-  if (fallbackDaysRule) return { price: fallbackDaysRule.price };
+  const fallbackDaysRule = rules.find((r: any) => r.days === daysAttending || (daysAttending >= 3 && r.days === 3));
+  if (fallbackDaysRule) return { price: (fallbackDaysRule as any).price };
 
   return { price: null, error: `No hay una tarifa configurada para ${daysAttending} días con las características del usuario.` };
 }
 
 // Cuando un usuario se une al evento
-export async function joinEvent(eventId: string, userId: string, daysAttending: number, drinksAlcohol: boolean = true) {
+export async function joinEvent(eventId: string, userId: string, daysAttending: number, drinkOption: string = 'CON_ALCOHOL', eatFood: boolean = true) {
   try {
     let expectedPayment = 0;
 
     if (daysAttending > 0) {
-      const calc = await calculateExpectedPayment(eventId, userId, daysAttending, drinksAlcohol);
+      const calc = await calculateExpectedPayment(eventId, userId, daysAttending, drinkOption, eatFood);
       if (calc.price === null) {
         return { success: false, error: calc.error || `No hay una tarifa aplicable.` };
       }
@@ -190,7 +194,8 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
         userId,
         eventId,
         daysAttending,
-        drinksAlcohol,
+        drinkOption,
+        eatFood,
         expectedPayment
       }
     });
@@ -203,7 +208,7 @@ export async function joinEvent(eventId: string, userId: string, daysAttending: 
 }
 
 
-export async function updateAttendeeDays(attendeeId: string, newDays: number, drinksAlcohol?: boolean) {
+export async function updateAttendeeDays(attendeeId: string, newDays: number, drinkOption?: string, eatFood?: boolean) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: 'No autorizado' };
@@ -212,19 +217,20 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number, dr
     if (!attendee) return { success: false, error: 'Asistente no encontrado' };
 
     // Solo el propio usuario o un admin puede cambiar sus días
-    if (attendee.userId !== session.id && !session.isAdmin) {
+    if ((attendee as any).userId !== session.id && !session.isAdmin) {
       return { success: false, error: 'No tienes permiso para modificar a este asistente' };
     }
 
-    const updatedDrinks = drinksAlcohol !== undefined ? drinksAlcohol : attendee.drinksAlcohol;
+    const updatedDrink = drinkOption !== undefined ? drinkOption : (attendee as any).drinkOption ?? 'CON_ALCOHOL';
+    const updatedFood = eatFood !== undefined ? eatFood : (attendee as any).eatFood ?? true;
 
-    if (attendee.daysAttending === newDays && attendee.drinksAlcohol === updatedDrinks) {
+    if ((attendee as any).daysAttending === newDays && (attendee as any).drinkOption === updatedDrink && (attendee as any).eatFood === updatedFood) {
       return { success: true }; // Nada que cambiar
     }
 
     let expectedPayment = 0;
     if (newDays > 0) {
-      const calc = await calculateExpectedPayment(attendee.eventId, attendee.userId, newDays, updatedDrinks);
+      const calc = await calculateExpectedPayment((attendee as any).eventId, (attendee as any).userId, newDays, updatedDrink, updatedFood);
       if (calc.price === null) {
         return { success: false, error: calc.error || `No hay una tarifa aplicable.` };
       }
@@ -235,7 +241,8 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number, dr
       where: { id: attendeeId },
       data: {
         daysAttending: newDays,
-        drinksAlcohol: updatedDrinks,
+        drinkOption: updatedDrink,
+        eatFood: updatedFood,
         expectedPayment
       }
     });
@@ -316,7 +323,7 @@ export async function deleteAttendee(attId: string) {
     }
 
     const expensesCount = await prisma.expense.count({
-      where: { purchaserId: attendee.userId, eventId: attendee.eventId }
+      where: { purchaserId: (attendee as any).userId, eventId: (attendee as any).eventId }
     });
     if (expensesCount > 0) {
       return { success: false, error: 'No se puede expulsar porque tiene tickets registrados. Borra o reasigna sus tickets primero.' };
@@ -361,9 +368,9 @@ export async function expelAllNonAdminAttendees(eventId: string) {
     let skippedCount = 0;
 
     for (const att of attendees) {
-      const hasExpenses = att.user.expenses.length > 0;
+      const hasExpenses = (att as any).user.expenses.length > 0;
       const hasPayments = att.payments.length > 0;
-      const hasShoppingLists = att.user.assignedShoppingLists && att.user.assignedShoppingLists.length > 0;
+      const hasShoppingLists = (att as any).user.assignedShoppingLists && (att as any).user.assignedShoppingLists.length > 0;
 
       if (!hasExpenses && !hasPayments && !hasShoppingLists) {
         await prisma.eventAttendee.delete({ where: { id: att.id } });

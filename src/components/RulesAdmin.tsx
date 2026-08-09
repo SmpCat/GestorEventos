@@ -16,10 +16,10 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, isSupe
     const newRules = [...rules] as any[];
     if (field === 'days' || field === 'price' || field === 'minAge' || field === 'maxAge') {
       newRules[index][field] = value === '' ? '' : Number(value);
-    } else if (field === 'isMember' || field === 'drinksAlcohol') {
+    } else if (field === 'isMember' || field === 'eatFood') {
       newRules[index][field] = value === 'null' ? null : value === 'true';
     } else {
-      newRules[index][field] = value;
+      newRules[index][field] = value === 'null' ? null : value;
     }
     setRules(newRules);
   };
@@ -84,23 +84,24 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, isSupe
         return;
       }
       setSavedRulesJSON(JSON.stringify(validRules));
-      setRules([...validRules, { name: '', days: 1, price: 0, isMember: true, minAge: null, maxAge: null, drinksAlcohol: null }]);
+      setRules([...validRules, { name: '', days: 1, price: 0, isMember: true, minAge: null, maxAge: null, drinkOption: null, eatFood: null }]);
     } else {
-      setRules(prev => [...prev, { name: '', days: 1, price: 0, isMember: true, minAge: null, maxAge: null, drinksAlcohol: null }]);
+      setRules(prev => [...prev, { name: '', days: 1, price: 0, isMember: true, minAge: null, maxAge: null, drinkOption: null, eatFood: null }]);
     }
   };
 
   const handleLoadPenaPreset = () => {
     if (window.confirm('¿Quieres cargar la tabla estándar de tarifas de la Peña? Reemplazará las reglas actuales.')) {
       const penaRules: any[] = [
-        { name: 'Socio 1 día', days: 1, maxDays: 1, price: 25, isMember: true, minAge: 14, maxAge: null, drinksAlcohol: null },
-        { name: 'Socio 2 días', days: 2, maxDays: 2, price: 45, isMember: true, minAge: 14, maxAge: null, drinksAlcohol: null },
-        { name: 'Socio 3+ días', days: 3, maxDays: null, price: 60, isMember: true, minAge: 14, maxAge: null, drinksAlcohol: null },
-        { name: 'Socio 14-17 Sin Alcohol', days: 1, maxDays: null, price: 15, isMember: true, minAge: 14, maxAge: 17, drinksAlcohol: false },
-        { name: 'No Socio 1 día', days: 1, maxDays: 1, price: 30, isMember: false, minAge: 14, maxAge: null, drinksAlcohol: null },
-        { name: 'No Socio 2 días', days: 2, maxDays: 2, price: 50, isMember: false, minAge: 14, maxAge: null, drinksAlcohol: null },
-        { name: 'No Socio 3+ días', days: 3, maxDays: null, price: 70, isMember: false, minAge: 14, maxAge: null, drinksAlcohol: null },
-        { name: 'No Socio 14-17 Sin Alcohol', days: 1, maxDays: null, price: 20, isMember: false, minAge: 14, maxAge: 17, drinksAlcohol: false },
+        { name: 'Socio 1 día', days: 1, maxDays: 1, price: 25, isMember: true, minAge: 14, maxAge: null, drinkOption: null, eatFood: null },
+        { name: 'Socio 2 días', days: 2, maxDays: 2, price: 45, isMember: true, minAge: 14, maxAge: null, drinkOption: null, eatFood: null },
+        { name: 'Socio 3+ días', days: 3, maxDays: null, price: 60, isMember: true, minAge: 14, maxAge: null, drinkOption: null, eatFood: null },
+        { name: 'Socio 14-17 Sin Alcohol', days: 1, maxDays: null, price: 15, isMember: true, minAge: 14, maxAge: 17, drinkOption: 'SIN_ALCOHOL', eatFood: null },
+        { name: 'No Socio 1 día', days: 1, maxDays: 1, price: 30, isMember: false, minAge: 14, maxAge: null, drinkOption: null, eatFood: null },
+        { name: 'No Socio 2 días', days: 2, maxDays: 2, price: 50, isMember: false, minAge: 14, maxAge: null, drinkOption: null, eatFood: null },
+        { name: 'No Socio 3+ días', days: 3, maxDays: null, price: 70, isMember: false, minAge: 14, maxAge: null, drinkOption: null, eatFood: null },
+        { name: 'No Socio 14-17 Sin Alcohol', days: 1, maxDays: null, price: 20, isMember: false, minAge: 14, maxAge: 17, drinkOption: 'SIN_ALCOHOL', eatFood: null },
+        { name: 'Mayor 18 No Bebida Sí Comida', days: 1, maxDays: null, price: 100, isMember: null, minAge: 18, maxAge: null, drinkOption: 'NO_BEBIDA', eatFood: true },
       ];
       setRules(penaRules);
     }
@@ -190,8 +191,8 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, isSupe
                 )}
               </div>
 
-              {/* Fila 2: Criterios principales (Socio, Edad, Alcohol) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+              {/* Fila 2: Criterios principales (Socio, Edad, Bebida, Comida) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
                 
                 {/* Socio */}
                 <div className="w-full">
@@ -241,22 +242,46 @@ export default function RulesAdmin({ eventId, initialRules = [], isAdmin, isSupe
                   )}
                 </div>
 
-                {/* Alcohol */}
+                {/* Bebida */}
                 <div className="w-full">
-                  <label className="text-secondary text-xs font-bold block mb-1">Consumo Alcohol</label>
+                  <label className="text-secondary text-xs font-bold block mb-1">Bebida</label>
                   {isAdmin ? (
                     <select
                       className="input-field w-full text-sm text-white"
                       style={{ padding: '0.45rem 0.5rem', boxSizing: 'border-box' }}
-                      value={rule.drinksAlcohol === true ? 'true' : rule.drinksAlcohol === false ? 'false' : 'null'}
-                      onChange={e => handleRuleChange(idx, 'drinksAlcohol', e.target.value)}
+                      value={rule.drinkOption === null || rule.drinkOption === undefined ? 'null' : rule.drinkOption}
+                      onChange={e => handleRuleChange(idx, 'drinkOption', e.target.value)}
                     >
                       <option value="null">Todos</option>
-                      <option value="true">Con Alcohol</option>
-                      <option value="false">Sin Alcohol</option>
+                      <option value="CON_ALCOHOL">🍺 Con Alcohol</option>
+                      <option value="SIN_ALCOHOL">🥤 Sin Alcohol</option>
+                      <option value="NO_BEBIDA">🚫 No Bebida</option>
                     </select>
                   ) : (
-                    <span className="text-sm font-medium text-white">{rule.drinksAlcohol === true ? 'Con Alcohol' : rule.drinksAlcohol === false ? 'Sin Alcohol' : 'Todos'}</span>
+                    <span className="text-sm font-medium text-white">
+                      {rule.drinkOption === 'CON_ALCOHOL' ? '🍺 Con Alcohol' : rule.drinkOption === 'SIN_ALCOHOL' ? '🥤 Sin Alcohol' : rule.drinkOption === 'NO_BEBIDA' ? '🚫 No Bebida' : 'Todos'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Comida */}
+                <div className="w-full">
+                  <label className="text-secondary text-xs font-bold block mb-1">Comida</label>
+                  {isAdmin ? (
+                    <select
+                      className="input-field w-full text-sm text-white"
+                      style={{ padding: '0.45rem 0.5rem', boxSizing: 'border-box' }}
+                      value={rule.eatFood === null || rule.eatFood === undefined ? 'null' : String(rule.eatFood)}
+                      onChange={e => handleRuleChange(idx, 'eatFood', e.target.value)}
+                    >
+                      <option value="null">Todos</option>
+                      <option value="true">🍽️ Sí, Comida</option>
+                      <option value="false">🚫 No Comida</option>
+                    </select>
+                  ) : (
+                    <span className="text-sm font-medium text-white">
+                      {rule.eatFood === true ? '🍽️ Sí Comida' : rule.eatFood === false ? '🚫 No Comida' : 'Todos'}
+                    </span>
                   )}
                 </div>
               </div>
