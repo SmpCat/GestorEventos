@@ -33,13 +33,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
   const [editingUser, setEditingUser] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
-  const [isSelectAll, setIsSelectAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>('ALL');
-  const [selectedAction, setSelectedAction] = useState<BulkActionType>('SET_NON_MEMBER');
-
-  const isSuperAdmin = session?.username === 'admin';
 
   const filteredUsers = users.filter((user: any) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,34 +67,6 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
     }
   };
 
-  const handleExecuteFilteredBulk = async () => {
-    const filterText = FILTER_LABELS[selectedFilter];
-    const actionText = ACTION_LABELS[selectedAction];
-
-    const confirmMessage = selectedAction === 'DELETE_CLEAN'
-      ? `🚨 ¿SÚPER SEGURO? Se van a BORRAR permanentemente los usuarios coincidentes con "${filterText}" que no tengan pagos ni tickets asociados.`
-      : `¿Estás seguro de aplicar la acción "${actionText}" a los usuarios coincidentes con "${filterText}"?\n(La cuenta Superadmin nunca se verá afectada).`;
-
-    if (!window.confirm(confirmMessage)) return;
-
-    setActionLoading('bulk_filtered');
-    const res = await bulkUpdateUsersFiltered(selectedFilter, selectedAction);
-    setActionLoading(null);
-
-    if (!res.success) {
-      alert(res.error || 'Error al ejecutar la acción masiva.');
-      return;
-    }
-
-    if (res.isDelete) {
-      alert(`¡Borrado masivo completado! Se han eliminado ${res.deletedCount} usuarios limpios (${res.skippedCount} conservados por tener historial).`);
-    } else if (res.isExpel) {
-      alert(`¡Expulsión masiva completada! Se han retirado del evento ${res.deletedCount} asistentes limpios (${res.skippedCount} conservados por tener pagos o tickets).`);
-    } else {
-      alert(`¡Actualización masiva completada! Se han modificado ${res.count} usuarios.`);
-    }
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
@@ -110,103 +76,10 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
         </div>
       </div>
 
-      <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '0.75rem' }}>
-        <button onClick={handleCreate} className={`btn ${styles.addBtn}`} style={{ padding: '1rem', borderRadius: '1rem' }}>
+      <div className="glass-panel" style={{ marginBottom: '0.75rem' }}>
+        <button onClick={handleCreate} className={`btn ${styles.addBtn}`} style={{ padding: '1rem', borderRadius: '1rem', width: '100%' }}>
           + Añadir Usuario
         </button>
-
-        {isSuperAdmin && (
-          <div 
-            className={styles.userCard} 
-            style={{ 
-              padding: '1.25rem', 
-              border: '1px solid rgba(255, 255, 255, 0.15)', 
-              background: 'rgba(15, 23, 42, 0.65)', 
-              backdropFilter: 'blur(10px)',
-              borderRadius: '16px' 
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <input 
-                type="checkbox"
-                checked={isSelectAll}
-                onChange={(e) => setIsSelectAll(e.target.checked)}
-                style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', flexShrink: 0 }}
-                title="Edición Masiva Personalizada por Filtro"
-              />
-              <span style={{ color: '#ffffff', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setIsSelectAll(!isSelectAll)}>
-                👑 Edición Masiva Personalizada (Superadmin)
-              </span>
-            </div>
-
-            {isSelectAll && (
-              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 'bold' }}>
-                      1. Filtrar Usuarios Objetivo:
-                    </label>
-                    <SelectField
-                      value={selectedFilter}
-                      onChange={(e) => setSelectedFilter(e.target.value as FilterType)}
-                      disabled={actionLoading !== null}
-                      containerStyle={{ marginBottom: 0 }}
-                    >
-                      <option value="ALL">👥 Todos los usuarios</option>
-                      <option value="UNDER_18">👶 Menores de 18 años (&lt; 18)</option>
-                      <option value="OVER_18">👴 Mayores de 18 años (18+)</option>
-                      <option value="MEMBERS">🎗️ Solo Socios</option>
-                      <option value="NON_MEMBERS">👤 Solo No Socios</option>
-                      <option value="ADMINS">🛡️ Solo Administradores</option>
-                      <option value="NON_ADMINS">👤 Solo Usuarios Normales</option>
-                    </SelectField>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 'bold' }}>
-                      2. Acción Masiva a Ejecutar:
-                    </label>
-                    <SelectField
-                      value={selectedAction}
-                      onChange={(e) => setSelectedAction(e.target.value as BulkActionType)}
-                      disabled={actionLoading !== null}
-                      containerStyle={{ marginBottom: 0 }}
-                    >
-                      <option value="SET_MEMBER">🎗️ Marcar como Socio/a (isMember: Sí)</option>
-                      <option value="SET_NON_MEMBER">👤 Marcar como No Socio/a (isMember: No)</option>
-                      <option value="GRANT_ADMIN">👑 Otorgar rol de Administrador</option>
-                      <option value="REVOKE_ADMIN">🛡️ Quitar rol de Administrador</option>
-                      <option value="SET_AGE_18">🎂 Fijar Edad en 18 años</option>
-                      <option value="EXPEL_CLEAN_ATTENDEES">🧹 Borrar asistentes limpios (sin historial del evento)</option>
-                      <option value="DELETE_CLEAN">🗑️ Borrar usuarios limpios (sin historial de cuenta)</option>
-                    </SelectField>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleExecuteFilteredBulk}
-                  disabled={actionLoading !== null}
-                  className="btn"
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.75rem', 
-                    fontSize: '0.9rem', 
-                    fontWeight: 'bold',
-                    backgroundColor: selectedAction === 'DELETE_CLEAN' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-                    border: selectedAction === 'DELETE_CLEAN' ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.2)',
-                    color: selectedAction === 'DELETE_CLEAN' ? '#fca5a5' : '#ffffff',
-                    borderRadius: '10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {actionLoading === 'bulk_filtered' ? '⏳ Aplicando cambios masivos...' : '⚡ Aplicar Cambio Masivo'}
-                </button>
-
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

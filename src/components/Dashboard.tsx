@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { logout } from '@/actions/auth';
 import { updateAttendeeDays, joinEvent } from '@/actions/attendance';
 import { getSystemConfig, toggleMaintenanceMode } from '@/actions/system';
+import BulkUserEditCard from './BulkUserEditCard';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard({ session, activeEvent, attendee, pricingRules }: { session: any, activeEvent: any, attendee?: any, pricingRules?: any[] }) {
@@ -303,6 +304,8 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
               </div>
             </div>
           </div>
+
+          <BulkUserEditCard isSuperAdmin={isSuperAdmin} />
         </div>
       )}
 

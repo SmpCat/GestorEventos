@@ -139,3 +139,10 @@
   - Implementada la server action `toggleTicketUpload` y bloqueadas `processReceiptAction` y `saveManualExpenseAction` en el servidor cuando la subida está desactivada.
   - Añadido un botón de control exclusivo para el Superadmin en la vista de Gastos (`/expenses`) para activar/desactivar la subida de tickets en cualquier momento, mostrando un cartel informativo `🚫 Subida de Tickets Deshabilitada` cuando está activa la restricción.
 
+### 26. Traslado de Edición Masiva Personalizada a Zona de Administración
+- **Modularización del Componente:** Creado `BulkUserEditCard.tsx` para encapsular las acciones masivas personalizadas del Superadmin por filtro (rol socio/no socio, admin, fijar edad a 18, borrado de usuarios o asistentes limpios).
+- **Limpieza en Vista Usuarios (`/admin/users`):** Retirada la tarjeta de edición masiva del panel superior de `/admin/users`, dejando exclusivamente la acción `+ Añadir Usuario`.
+- **Integración en Dashboard (`Dashboard.tsx`):** Añadido `BulkUserEditCard` directamente dentro del bloque `👑 Zona de Administración` del Dashboard para un acceso centralizado.
+
+
+
