@@ -132,7 +132,10 @@
 ### 24. Relocalización del Buscador de Usuarios (`/admin/users`)
 - **Diseño Mejorado:** Movido el campo de búsqueda `🔍 Buscar usuario por nombre o nick...` desde el panel superior hacia el interior del segundo panel (justo encima de la rejilla de tarjetas de usuario).
 - **Separación de Responsabilidades:** El primer panel superior queda reservado en exclusiva para las funciones de acción: `+ Añadir Usuario` y `👑 Edición Masiva Personalizada (Superadmin)`.
-
-
-
+### 25. Borrado de Asistentes Limpios del Evento y Deshabilitación de Subida de Tickets
+- **Acción Masiva "Borrar asistentes limpios (sin historial del evento)":** Añadida la opción `EXPEL_CLEAN_ATTENDEES` al desplegable de edición masiva del Superadmin (`/admin/users`). Permite expulsar del evento activo a todos los asistentes que no tengan pagos, tickets o productos asignados, sin eliminar sus cuentas globales de usuario.
+- **Deshabilitar Subida de Tickets (Manual y Fotográfica):**
+  - Añadido el campo `disableTicketUpload` a `SystemConfig` en el esquema de la base de datos (Prisma).
+  - Implementada la server action `toggleTicketUpload` y bloqueadas `processReceiptAction` y `saveManualExpenseAction` en el servidor cuando la subida está desactivada.
+  - Añadido un botón de control exclusivo para el Superadmin en la vista de Gastos (`/expenses`) para activar/desactivar la subida de tickets en cualquier momento, mostrando un cartel informativo `🚫 Subida de Tickets Deshabilitada` cuando está activa la restricción.
 

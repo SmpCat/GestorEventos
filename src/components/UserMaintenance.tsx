@@ -24,7 +24,8 @@ const ACTION_LABELS: Record<BulkActionType, string> = {
   GRANT_ADMIN: 'Otorgar rol de Administrador',
   REVOKE_ADMIN: 'Quitar rol de Administrador',
   SET_AGE_18: 'Establecer Edad en 18 años',
-  DELETE_CLEAN: 'Borrar usuarios limpios (sin pagos/tickets)'
+  DELETE_CLEAN: 'Borrar usuarios limpios (sin pagos/tickets)',
+  EXPEL_CLEAN_ATTENDEES: 'Borrar asistentes limpios (sin historial del evento)'
 };
 
 export default function UserMaintenance({ users, session }: { users: any[], session: any }) {
@@ -93,6 +94,8 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
 
     if (res.isDelete) {
       alert(`¡Borrado masivo completado! Se han eliminado ${res.deletedCount} usuarios limpios (${res.skippedCount} conservados por tener historial).`);
+    } else if (res.isExpel) {
+      alert(`¡Expulsión masiva completada! Se han retirado del evento ${res.deletedCount} asistentes limpios (${res.skippedCount} conservados por tener pagos o tickets).`);
     } else {
       alert(`¡Actualización masiva completada! Se han modificado ${res.count} usuarios.`);
     }
@@ -175,7 +178,8 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
                       <option value="GRANT_ADMIN">👑 Otorgar rol de Administrador</option>
                       <option value="REVOKE_ADMIN">🛡️ Quitar rol de Administrador</option>
                       <option value="SET_AGE_18">🎂 Fijar Edad en 18 años</option>
-                      <option value="DELETE_CLEAN">🗑️ Borrar usuarios limpios (sin historial)</option>
+                      <option value="EXPEL_CLEAN_ATTENDEES">🧹 Borrar asistentes limpios (sin historial del evento)</option>
+                      <option value="DELETE_CLEAN">🗑️ Borrar usuarios limpios (sin historial de cuenta)</option>
                     </SelectField>
                   </div>
                 </div>

@@ -190,7 +190,7 @@ export async function deleteAllNonAdminUsers() {
 
 // Modificaciones masivas de usuarios con filtro personalizado (Exclusivo Superadmin)
 export type FilterType = 'ALL' | 'UNDER_18' | 'OVER_18' | 'MEMBERS' | 'NON_MEMBERS' | 'ADMINS' | 'NON_ADMINS';
-export type BulkActionType = 'SET_MEMBER' | 'SET_NON_MEMBER' | 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_AGE_18' | 'DELETE_CLEAN';
+export type BulkActionType = 'SET_MEMBER' | 'SET_NON_MEMBER' | 'GRANT_ADMIN' | 'REVOKE_ADMIN' | 'SET_AGE_18' | 'DELETE_CLEAN' | 'EXPEL_CLEAN_ATTENDEES';
 
 export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType: BulkActionType) {
   try {
@@ -215,6 +215,51 @@ export async function bulkUpdateUsersFiltered(filterType: FilterType, actionType
       baseWhere.isAdmin = true;
     } else if (filterType === 'NON_ADMINS') {
       baseWhere.isAdmin = false;
+    }
+
+    // Si la acción es expulsar asistentes limpios del evento activo (sin borrar sus cuentas)
+    if (actionType === 'EXPEL_CLEAN_ATTENDEES') {
+      const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
+      if (!activeEvent) {
+        return { success: false, error: 'No hay ningún evento activo actualmente.' };
+      }
+
+      const attendees = await prisma.eventAttendee.findMany({
+        where: {
+          eventId: activeEvent.id,
+          user: baseWhere
+        },
+        include: {
+          payments: true,
+          user: {
+            include: {
+              expenses: { where: { eventId: activeEvent.id } },
+              shoppingTasks: { where: { eventId: activeEvent.id } }
+            }
+          }
+        }
+      });
+
+      let deletedCount = 0;
+      let skippedCount = 0;
+
+      for (const att of attendees) {
+        const hasExpenses = att.user.expenses.length > 0;
+        const hasPayments = att.payments.length > 0;
+        const hasShoppingItems = att.user.shoppingTasks && att.user.shoppingTasks.length > 0;
+
+        if (!hasExpenses && !hasPayments && !hasShoppingItems) {
+          await prisma.eventAttendee.delete({ where: { id: att.id } });
+          deletedCount++;
+        } else {
+          skippedCount++;
+        }
+      }
+
+      revalidatePath('/admin/users');
+      revalidatePath('/pricing/attendees');
+      revalidatePath('/pricing/results');
+      return { success: true, isExpel: true, deletedCount, skippedCount };
     }
 
     // Si la acción es borrado masivo de limpios

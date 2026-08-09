@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { saveReceiptImage } from "@/lib/storage";
 import { scanReceiptWithAI } from "@/lib/ai-scanner";
+import { prisma } from "@/lib/prisma";
+import { getSession } from "@/actions/auth";
 
 export type ReceiptData = {
   store: string;
@@ -15,6 +17,11 @@ export type ReceiptData = {
 
 export async function processReceiptAction(formData: FormData) {
   try {
+    const config = await prisma.systemConfig.findUnique({ where: { id: "global" } });
+    if (config?.disableTicketUpload) {
+      return { success: false, error: "La subida de tickets (fotográficos y manuales) está actualmente deshabilitada por la administración." };
+    }
+
     const file = formData.get("receipt") as File | null;
     if (!file) {
       return { success: false, error: "No se ha proporcionado ninguna imagen." };
@@ -93,9 +100,6 @@ export async function processReceiptAction(formData: FormData) {
     return { success: false, error: error.message || "Error desconocido procesando el ticket." };
   }
 }
-
-import { prisma } from "@/lib/prisma";
-import { getSession } from "@/actions/auth";
 
 export async function saveExpenseAction(data: ReceiptData) {
   try {
@@ -183,6 +187,11 @@ export async function deleteExpenseEvidence(evidenceId: string) {
 
 export async function saveManualExpenseAction(data: { store: string; amount: number; description: string; date: string }) {
   try {
+    const config = await prisma.systemConfig.findUnique({ where: { id: "global" } });
+    if (config?.disableTicketUpload) {
+      return { success: false, error: "La subida de tickets (fotográficos y manuales) está actualmente deshabilitada por la administración." };
+    }
+
     const session = await getSession();
     if (!session) return { success: false, error: "No autorizado" };
 

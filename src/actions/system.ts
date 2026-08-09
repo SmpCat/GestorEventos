@@ -51,3 +51,30 @@ export async function toggleMaintenanceMode(enabled: boolean) {
     return { success: false, error: 'Error al actualizar modo mantenimiento: ' + error.message };
   }
 }
+
+export async function toggleTicketUpload(disabled: boolean) {
+  try {
+    const session = await getSession();
+    if (!session || session.username !== 'admin') {
+      return { success: false, error: 'Solo el Superadministrador (admin) puede cambiar la configuración de tickets.' };
+    }
+
+    const config = await prisma.systemConfig.upsert({
+      where: { id: 'global' },
+      update: { disableTicketUpload: disabled },
+      create: {
+        id: 'global',
+        disableTicketUpload: disabled,
+        maintenanceMode: false,
+        maintenanceMessage: 'Estamos realizando labores de mantenimiento y optimización en la plataforma. Volveremos muy pronto.'
+      }
+    });
+
+    revalidatePath('/');
+    revalidatePath('/expenses');
+    revalidatePath('/finances');
+    return { success: true, data: config };
+  } catch (error: any) {
+    return { success: false, error: 'Error al actualizar configuración de tickets: ' + error.message };
+  }
+}

@@ -1,9 +1,9 @@
 import { getSession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
 import ExpenseList from '@/components/ExpenseList';
 import { getActiveEventCached } from '@/lib/cache';
+import { getSystemConfig } from '@/actions/system';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +14,13 @@ export default async function ExpensesPage() {
     redirect('/');
   }
 
-  // Buscar Evento Activo
-  const activeEvent = await getActiveEventCached();
+  // Buscar Evento Activo y Configuración Global
+  const [activeEvent, configRes] = await Promise.all([
+    getActiveEventCached(),
+    getSystemConfig()
+  ]);
+
+  const disableTicketUpload = configRes.data?.disableTicketUpload ?? false;
 
   if (!activeEvent) {
     return (
@@ -40,12 +45,12 @@ export default async function ExpensesPage() {
 
   return (
     <div>
-
-
       <ExpenseList 
         expenses={expenses} 
         isAdmin={session.isAdmin} 
+        isSuperAdmin={session.username === 'admin'}
         currentUserId={session.id} 
+        disableTicketUpload={disableTicketUpload}
       />
     </div>
   );
