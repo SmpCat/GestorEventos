@@ -158,3 +158,7 @@
 ### 29. Creación de la Pantalla Exclusiva para Edición Masiva (`/admin/bulk-edit`)
 - **Navegación por Página Completa:** Convertido el botón de **Edición Masiva** en la *Zona de Administración* del Dashboard en un enlace de navegación directa hacia `/admin/bulk-edit`.
 - **Nueva Vista (`BulkUserEditPage.tsx` & `page.tsx`):** Creada la pantalla dedicada con su cabecera, botón de retorno al Dashboard y contenedor Glassmorphism independiente para ejecutar las acciones y filtros masivos de forma cómoda y limpia.
+
+### 30. Replicación de Datos y Fotos de Producción a Desarrollo (`pull_from_nas.sh`)
+- **Script de Replicación Automática (`pull_from_nas.sh`):** Creado script ejecutable para descargar la base de datos real de producción (`prod.db`) desde el NAS QNAP y reemplazar limpiamente `dev.db` en local (haciendo un backup `dev.db.bak`), además de sincronizar con `rsync` todas las imágenes reales de la carpeta `/public/uploads` (tickets y listas de la compra).
+- **Ejecución y Verificación:** Ejecutada la réplica exitosamente; descargadas 25 fotos de tickets, 5 imágenes de listas de la compra y la base de datos real con todas sus relaciones sincronizadas.
