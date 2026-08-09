@@ -63,4 +63,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Startup script to push db changes and start server
-CMD ["sh", "-c", "(npx prisma@5.15.0 db push --schema=./prisma/schema.prisma --accept-data-loss --skip-generate || true) && node prisma/seed.js && node server.js"]
+CMD ["sh", "-c", "(npx prisma@5.15.0 db push --schema=./prisma/schema.prisma --accept-data-loss --skip-generate || true) && (node prisma/seed.js || true) && node server.js"]
