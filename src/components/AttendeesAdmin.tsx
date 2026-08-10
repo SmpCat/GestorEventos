@@ -213,7 +213,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                       <div className={styles.infoRow}>
                         <span className={styles.infoValue}>Pendiente Bote:</span>
                         <span className={`${styles.infoValue} ${balance > 0 ? styles.infoDanger : balance < 0 ? styles.infoSuccess : styles.infoLabel}`}>
-                          {balance > 0 ? `${balance}€` : balance < 0 ? `Bote te debe ${Math.abs(balance)}€` : '0€'}
+                          {balance > 0 ? `${balance.toFixed(2)}€` : balance < 0 ? `Bote te debe ${Math.abs(balance).toFixed(2)}€` : '0€'}
                         </span>
                       </div>
                     </div>
@@ -423,7 +423,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                   const balance = currentQuota - amountPaid - contributed + reimbursed;
 
                   const balanceClass = balance > 0 ? styles.balanceNegative : balance < 0 ? styles.balancePositive : styles.balanceNeutral;
-                  const balanceText = balance > 0 ? `Debe ${balance}€` : balance < 0 ? `Bote debe ${Math.abs(balance)}€` : 'Pagado';
+                  const balanceText = balance > 0 ? `Debe ${balance.toFixed(2)}€` : balance < 0 ? `Bote debe ${Math.abs(balance).toFixed(2)}€` : 'Pagado';
 
                   return (
                     <tr key={att.id} className={styles.tableRow}>
