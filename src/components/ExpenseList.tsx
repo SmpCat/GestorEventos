@@ -574,7 +574,7 @@ export default function ExpenseList({
                                   <div className={styles.expenseMeta}>
                                     <div className={styles.expenseMetaInfo}>
                                       <div className={styles.expenseDateUser}>
-                                        {dateStr} <span style={{ margin: '0 0.25rem' }}>•</span> <strong className={styles.expenseUser}>{expense.purchaser.name}</strong>
+                                        {dateStr}
                                         {!expense.isScanned && (
                                           <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', backgroundColor: 'rgba(234, 179, 8, 0.15)', color: '#fef08a', fontSize: '0.75rem', fontWeight: 'bold' }}>
                                             ⚠️ No digitalizado
