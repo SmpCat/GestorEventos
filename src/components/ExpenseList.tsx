@@ -28,6 +28,7 @@ export default function ExpenseList({
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [lightboxExpense, setLightboxExpense] = useState<{ id: string; isScanned: boolean } | null>(null);
   
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -477,7 +478,10 @@ export default function ExpenseList({
                                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                      {expense.images.length > 0 && (
                                        <button
-                                         onClick={() => setLightboxImage(`/api${expense.images[0].url}`)}
+                                         onClick={() => {
+                                           setLightboxImage(`/api${expense.images[0].url}`);
+                                           setLightboxExpense({ id: expense.id, isScanned: expense.isScanned });
+                                         }}
                                          title="Ver foto del ticket"
                                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', opacity: 0.85, padding: '0' }}
                                        >📷</button>
@@ -582,7 +586,12 @@ export default function ExpenseList({
         </div>
       </div>
     )}
-    <ImageLightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />
+    <ImageLightbox
+      imageUrl={lightboxImage}
+      onClose={() => { setLightboxImage(null); setLightboxExpense(null); }}
+      onRescan={lightboxExpense && !lightboxExpense.isScanned ? () => handleReScan(lightboxExpense.id) : undefined}
+      isRescanning={!!lightboxExpense && loading === `rescan-exp-${lightboxExpense.id}`}
+    />
     </div>
   );
 }
