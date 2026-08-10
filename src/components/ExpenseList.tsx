@@ -43,6 +43,7 @@ export default function ExpenseList({
   const [editModalDate, setEditModalDate] = useState('');
   const [editModalDesc, setEditModalDesc] = useState('');
   const [editModalContributor, setEditModalContributor] = useState('');
+  const [editModalContributorSearch, setEditModalContributorSearch] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const openEditModal = (expense: any) => {
@@ -52,6 +53,7 @@ export default function ExpenseList({
     setEditModalDate(expense.date ? new Date(expense.date).toISOString().split('T')[0] : '');
     setEditModalDesc(expense.description || '...');
     setEditModalContributor(expense.contributorAttendeeId || '');
+    setEditModalContributorSearch('');
   };
 
   const handleSaveEdit = async () => {
@@ -711,10 +713,33 @@ export default function ExpenseList({
             </div>
             <div>
               <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Pagado de su bolsillo por</label>
-              <select className="input-field" value={editModalContributor} onChange={e => setEditModalContributor(e.target.value)} style={{ width: '100%' }}>
-                <option value="">Del bote (nadie en concreto)</option>
-                {attendees.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
-              </select>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <input
+                    type="text"
+                    className="input-field"
+                    placeholder="🔍 Filtrar asistentes..."
+                    value={editModalContributorSearch}
+                    onChange={e => setEditModalContributorSearch(e.target.value)}
+                    style={{ width: '100%', paddingRight: '2rem' }}
+                  />
+                  {editModalContributorSearch && (
+                    <button onClick={() => setEditModalContributorSearch('')}
+                      style={{ position: 'absolute', right: '0.4rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem' }}
+                      title="Limpiar búsqueda">✕</button>
+                  )}
+                </div>
+                <select className="input-field" value={editModalContributor} onChange={e => setEditModalContributor(e.target.value)} style={{ width: '100%' }}>
+                  <option value="">Ninguno (del bote)</option>
+                  {attendees
+                    .filter((a: any) => !editModalContributorSearch ||
+                      (a.user?.name || '').toLowerCase().includes(editModalContributorSearch.toLowerCase()) ||
+                      (a.user?.username || '').toLowerCase().includes(editModalContributorSearch.toLowerCase())
+                    )
+                    .map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)
+                  }
+                </select>
+              </div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', justifyContent: 'flex-end' }}>
