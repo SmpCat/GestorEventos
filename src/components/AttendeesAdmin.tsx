@@ -584,24 +584,37 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                 </>
                               )}
                               <div style={{ marginTop: '0.75rem' }}>
-                                <div className={styles.actionBoxTitleAlt}>Historial de Pagos</div>
+                                <div className={styles.actionBoxTitleAlt}>Historial de Movimientos</div>
                                 <div className={styles.paymentsList}>
                                   {att.payments?.map((p: any) => (
                                     <div key={p.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
-                                      <span className={styles.paymentDate}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })} <span style={{opacity: 0.6}}>(@{p.registeredBy?.username || '?'})</span></span>
+                                      <span className={styles.paymentDate}>
+                                        {new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        <span style={{opacity: 0.6}}> {p.type === 'INCOME' ? '💶' : '💸'} (@{p.registeredBy?.username || '?'})</span>
+                                      </span>
                                       <span className={styles.paymentAmount} style={{ color: p.type === 'INCOME' ? '#4ade80' : '#f87171' }}>{p.type === 'INCOME' ? '+' : '-'}{p.amount}€</span>
                                       {isAdmin && (
-                                        <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
+                                        <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Movimiento">
                                           <TrashIcon />
                                         </button>
                                       )}
                                     </div>
                                   ))}
+                                  {att.contributedExpenses?.map((exp: any) => (
+                                    <div key={`exp-${exp.id}`} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
+                                      <span className={styles.paymentDate}>
+                                        {new Date(exp.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        <span style={{opacity: 0.6}}> 🧾 {exp.store}</span>
+                                      </span>
+                                      <span className={styles.paymentAmount} style={{ color: '#38bdf8' }}>+{exp.amount}€</span>
+                                    </div>
+                                  ))}
                                 </div>
-                                {(!att.payments || att.payments.length === 0) && (
-                                  <div className={styles.noPayments}>Ningún pago.</div>
+                                {((!att.payments || att.payments.length === 0) && (!att.contributedExpenses || att.contributedExpenses.length === 0)) && (
+                                  <div className={styles.noPayments}>Ningún movimiento.</div>
                                 )}
                               </div>
+
                             </div>
                             {isAdmin && (
                               <div className={styles.deleteAttendeeContainer} style={{ marginTop: "0.25rem" }}>
