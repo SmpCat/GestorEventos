@@ -56,6 +56,7 @@ model Event {
   attendees       EventAttendee[]
   pricingRules    PricingRule[]
   expenses        Expense[]
+  expenseGroups   ExpenseGroup[]
   shoppingLists   ShoppingList[]
   shoppingEvidences ShoppingListEvidence[]
   payments        Payment[]
@@ -206,6 +207,8 @@ model Expense {
   purchaser    User     @relation(fields: [purchaserId], references: [id])
   eventId      String
   event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  groupId      String?
+  group        ExpenseGroup? @relation(fields: [groupId], references: [id])
   
   // Soporte para tickets muy largos e inventario de productos (Extraídos por IA)
   images       ExpenseImage[]
@@ -216,6 +219,20 @@ model Expense {
 
   @@index([eventId])
   @@index([purchaserId])
+  @@index([groupId])
+}
+
+model ExpenseGroup {
+  id        String    @id @default(uuid())
+  name      String
+  eventId   String
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([name, eventId])
+  @@index([eventId])
 }
 
 model ExpenseImage {

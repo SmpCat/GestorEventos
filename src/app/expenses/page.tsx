@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ExpenseList from '@/components/ExpenseList';
 import { getActiveEventCached } from '@/lib/cache';
-import { getSystemConfig } from '@/actions/system';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,13 +13,10 @@ export default async function ExpensesPage() {
     redirect('/');
   }
 
-  // Buscar Evento Activo y Datos del Usuario Actual
-  const [activeEvent, currentUser] = await Promise.all([
-    getActiveEventCached(),
-    prisma.user.findUnique({ where: { id: session.id }, select: { canUploadTickets: true } })
-  ]);
-
+  const activeEvent = await getActiveEventCached();
   const isSuperAdmin = session.username === 'admin';
+
+  const currentUser = await prisma.user.findUnique({ where: { id: session.id }, select: { canUploadTickets: true } });
   const canUploadTickets = isSuperAdmin ? true : (currentUser?.canUploadTickets ?? true);
 
   if (!activeEvent) {
@@ -33,24 +29,31 @@ export default async function ExpensesPage() {
     );
   }
 
-  // Cargar Gastos
-  const expenses = await prisma.expense.findMany({
-    where: { eventId: activeEvent.id },
-    include: {
-      purchaser: { select: { name: true } },
-      items: true,
-      images: true,
-    },
-    orderBy: { date: 'desc' }
-  });
+  const [expenses, groups] = await Promise.all([
+    prisma.expense.findMany({
+      where: { eventId: activeEvent.id },
+      include: {
+        purchaser: { select: { name: true } },
+        items: true,
+        images: true,
+        group: true,
+      },
+      orderBy: { date: 'desc' }
+    }),
+    prisma.expenseGroup.findMany({
+      where: { eventId: activeEvent.id },
+      orderBy: { createdAt: 'asc' },
+    }),
+  ]);
 
   return (
     <div>
-      <ExpenseList 
-        expenses={expenses} 
-        isAdmin={session.isAdmin} 
-        isSuperAdmin={session.username === 'admin'}
-        currentUserId={session.id} 
+      <ExpenseList
+        expenses={expenses}
+        groups={groups}
+        isAdmin={session.isAdmin}
+        isSuperAdmin={isSuperAdmin}
+        currentUserId={session.id}
         canUploadTickets={canUploadTickets}
       />
     </div>

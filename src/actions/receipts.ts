@@ -11,9 +11,29 @@ export type ReceiptData = {
   amount: number;
   date: string;
   items: Array<{ name: string; price: number; quantity: number }>;
-  imageUrl: string; // The saved URL of the image
+  imageUrl: string;
   isScanned?: boolean;
+  groupId?: string;
 };
+
+// Obtener o crear un grupo por nombre para el evento activo
+async function getOrCreateGroup(name: string, eventId: string): Promise<string> {
+  const groupName = name?.trim() || 'Restos';
+  const group = await prisma.expenseGroup.upsert({
+    where: { name_eventId: { name: groupName, eventId } },
+    update: {},
+    create: { name: groupName, eventId },
+  });
+  return group.id;
+}
+
+// Obtener todos los grupos del evento activo
+export async function getExpenseGroups(eventId: string) {
+  return prisma.expenseGroup.findMany({
+    where: { eventId },
+    orderBy: { createdAt: 'asc' },
+  });
+}
 
 export async function processReceiptAction(formData: FormData) {
   try {
@@ -21,7 +41,7 @@ export async function processReceiptAction(formData: FormData) {
     if (!session) return { success: false, error: "No autorizado" };
 
     const currentUser = await prisma.user.findUnique({ where: { id: session.id } });
-    if (currentUser && currentUser.canUploadTickets === false) {
+    if (currentUser && currentUser.canUploadTickets === false && session.username !== 'admin') {
       return { success: false, error: "Tu usuario tiene deshabilitada la subida de tickets." };
     }
 
@@ -29,6 +49,8 @@ export async function processReceiptAction(formData: FormData) {
     if (!file) {
       return { success: false, error: "No se ha proporcionado ninguna imagen." };
     }
+
+    const groupName = (formData.get("groupName") as string) || 'Restos';
 
     // --- MOCK E2E PARA TEST ---
     if (file.name === "E2E_TEST_TICKET.png") {
@@ -42,7 +64,8 @@ export async function processReceiptAction(formData: FormData) {
             { name: "Pan de molde automático", price: 2.50, quantity: 1 },
             { name: "Hielo de prueba", price: 3.00, quantity: 1 }
           ],
-          imageUrl: "/placeholder.png" // Usamos una imagen genérica para la previsualización
+          imageUrl: "/placeholder.png",
+          groupId: undefined,
         } as ReceiptData,
       };
     }
@@ -52,9 +75,13 @@ export async function processReceiptAction(formData: FormData) {
     const imageUrl = await saveReceiptImage(file);
 
     // 2. Analizar con Gemini AI
-    // Escaneamos la imagen guardada. La función ya la convierte a base64
     try {
       const aiData = await scanReceiptWithAI(imageUrl, file.type);
+
+      const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
+      if (!activeEvent) return { success: false, error: "No hay evento activo" };
+      const groupId = await getOrCreateGroup(groupName, activeEvent.id);
+
       return {
         success: true,
         isScanned: true,
@@ -62,18 +89,17 @@ export async function processReceiptAction(formData: FormData) {
           ...aiData,
           imageUrl,
           isScanned: true,
+          groupId,
         } as ReceiptData,
       };
     } catch (err: any) {
       console.error("Error al escanear con IA (guardado directo a 0 activo):", err);
-      
-      const session = await getSession();
-      if (!session) return { success: false, error: "No autorizado" };
 
       const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
       if (!activeEvent) return { success: false, error: "No hay evento activo" };
+      const groupId = await getOrCreateGroup(groupName, activeEvent.id);
 
-      // Creamos el gasto a 0€ directamente vinculando la imagen (se ocultará arriba pero saldrá en galería)
+      // Creamos el gasto a 0€ vinculando la imagen (re-escaneable)
       await prisma.expense.create({
         data: {
           description: `Compra en Comercio desconocido (Sin digitalizar)`,
@@ -83,6 +109,7 @@ export async function processReceiptAction(formData: FormData) {
           isScanned: false,
           eventId: activeEvent.id,
           purchaserId: session.id,
+          groupId,
           images: {
             create: [{ url: imageUrl }]
           }
@@ -95,10 +122,10 @@ export async function processReceiptAction(formData: FormData) {
       return {
         success: true,
         isScanned: false,
-        message: "La IA no pudo leer el ticket, pero se ha guardado correctamente en la galería inferior de Tickets Originales."
+        message: "La IA no pudo leer el ticket, pero se ha guardado correctamente. Puedes re-escanearlo desde la galería."
       };
     }
-} catch (error: any) {
+  } catch (error: any) {
     console.error("Error en processReceiptAction:", error);
     return { success: false, error: error.message || "Error desconocido procesando el ticket." };
   }
@@ -112,6 +139,9 @@ export async function saveExpenseAction(data: ReceiptData) {
     const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
     if (!activeEvent) return { success: false, error: "No hay evento activo" };
 
+    // Si viene groupId ya resuelto lo usamos; si no, usamos 'Restos'
+    const groupId = data.groupId || await getOrCreateGroup('Restos', activeEvent.id);
+
     await prisma.expense.create({
       data: {
         description: `Compra en ${data.store}`,
@@ -121,6 +151,7 @@ export async function saveExpenseAction(data: ReceiptData) {
         isScanned: data.isScanned !== undefined ? data.isScanned : true,
         eventId: activeEvent.id,
         purchaserId: session.id,
+        groupId,
         images: {
           create: [{ url: data.imageUrl }]
         },
@@ -133,7 +164,7 @@ export async function saveExpenseAction(data: ReceiptData) {
         }
       }
     });
-    
+
     revalidatePath('/expenses');
     revalidatePath('/pricing/results');
     return { success: true };
@@ -155,13 +186,12 @@ export async function deleteExpenseAction(expenseId: string) {
 
     if (!expense) return { success: false, error: "Gasto no encontrado" };
 
-    // Permitir borrar si es Admin o si es el creador del gasto
     if (!session.isAdmin && expense.purchaserId !== session.id) {
       return { success: false, error: "No tienes permiso para borrar este gasto" };
     }
 
     await prisma.expense.delete({ where: { id: expenseId } });
-    
+
     revalidatePath('/expenses');
     revalidatePath('/pricing/results');
     return { success: true };
@@ -188,18 +218,20 @@ export async function deleteExpenseEvidence(evidenceId: string) {
   }
 }
 
-export async function saveManualExpenseAction(data: { store: string; amount: number; description: string; date: string }) {
+export async function saveManualExpenseAction(data: { store: string; amount: number; description: string; date: string; groupName?: string }) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: "No autorizado" };
 
     const currentUser = await prisma.user.findUnique({ where: { id: session.id } });
-    if (currentUser && currentUser.canUploadTickets === false) {
+    if (currentUser && currentUser.canUploadTickets === false && session.username !== 'admin') {
       return { success: false, error: "Tu usuario tiene deshabilitada la subida de tickets." };
     }
 
     const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
     if (!activeEvent) return { success: false, error: "No hay evento activo" };
+
+    const groupId = await getOrCreateGroup(data.groupName || 'Restos', activeEvent.id);
 
     await prisma.expense.create({
       data: {
@@ -209,15 +241,38 @@ export async function saveManualExpenseAction(data: { store: string; amount: num
         date: new Date(data.date),
         eventId: activeEvent.id,
         purchaserId: session.id,
+        groupId,
       }
     });
-    
+
     revalidatePath('/expenses');
     revalidatePath('/pricing/results');
     return { success: true };
   } catch (err: any) {
     console.error("Error en saveManualExpenseAction:", err);
     return { success: false, error: err.message || "Error al guardar el gasto manual." };
+  }
+}
+
+export async function moveExpenseToGroup(expenseId: string, groupName: string) {
+  try {
+    const session = await getSession();
+    if (!session || !session.isAdmin) return { success: false, error: "No autorizado" };
+
+    const expense = await prisma.expense.findUnique({ where: { id: expenseId } });
+    if (!expense) return { success: false, error: "Gasto no encontrado" };
+
+    const groupId = await getOrCreateGroup(groupName, expense.eventId);
+
+    await prisma.expense.update({
+      where: { id: expenseId },
+      data: { groupId }
+    });
+
+    revalidatePath('/expenses');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
   }
 }
 
@@ -235,18 +290,10 @@ export async function reScanExpenseAI(expenseId: string) {
     if (expense.images.length === 0) return { success: false, error: "No hay imagen asociada a este gasto" };
 
     const image = expense.images[0];
-    
-    // Escanear con la utilidad de IA (recibe ruta relativa)
     const aiData = await scanReceiptWithAI(image.url);
 
-    // Actualizar el gasto con los nuevos datos de la IA
     await prisma.$transaction(async (tx) => {
-      // 1. Borrar items manuales antiguos
-      await tx.expenseItem.deleteMany({
-        where: { expenseId }
-      });
-
-      // 2. Actualizar gasto principal
+      await tx.expenseItem.deleteMany({ where: { expenseId } });
       await tx.expense.update({
         where: { id: expenseId },
         data: {
@@ -254,7 +301,7 @@ export async function reScanExpenseAI(expenseId: string) {
           description: `Compra en ${aiData.store}`,
           amount: aiData.amount,
           date: new Date(aiData.date),
-          isScanned: true, // Marcar como escaneado con éxito
+          isScanned: true,
           items: {
             create: aiData.items.map((item: any) => ({
               name: item.name,
