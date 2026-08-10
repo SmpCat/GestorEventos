@@ -77,9 +77,26 @@ export default function ExpenseList({
   // Estado para categoría seleccionada (vacío = "General" por defecto al guardar)
   const [selectedGroupName, setSelectedGroupName] = useState('');
   const [manualGroupName, setManualGroupName] = useState('');
-  // Contribuidor (pagado de su bolsillo)
+  const [manualGroupIsNew, setManualGroupIsNew] = useState(false);
+  const [manualGroupNewName, setManualGroupNewName] = useState('');
+  const [selectedGroupIsNew, setSelectedGroupIsNew] = useState(false);
+  const [selectedGroupNewName, setSelectedGroupNewName] = useState('');
+  // Contribuidor (pagado de su bolsillo) + buscador
   const [selectedContributor, setSelectedContributor] = useState('');
+  const [selectedContributorSearch, setSelectedContributorSearch] = useState('');
   const [manualContributor, setManualContributor] = useState('');
+  const [manualContributorSearch, setManualContributorSearch] = useState('');
+
+  const filteredAttendeesForPhoto = attendees.filter((a: any) =>
+    !selectedContributorSearch ||
+    (a.user?.name || '').toLowerCase().includes(selectedContributorSearch.toLowerCase()) ||
+    (a.user?.username || '').toLowerCase().includes(selectedContributorSearch.toLowerCase())
+  );
+  const filteredAttendeesForManual = attendees.filter((a: any) =>
+    !manualContributorSearch ||
+    (a.user?.name || '').toLowerCase().includes(manualContributorSearch.toLowerCase()) ||
+    (a.user?.username || '').toLowerCase().includes(manualContributorSearch.toLowerCase())
+  );
 
   // Descripción al subir tickets (default: '...')
   const [ticketDescription, setTicketDescription] = useState('...');
@@ -150,7 +167,7 @@ export default function ExpenseList({
       amount: Number(manualAmount),
       description: manualDescription.trim() || '...',
       date: dateStr,
-      groupName: manualGroupName || 'General',
+      groupName: (manualGroupIsNew ? manualGroupNewName : manualGroupName) || 'General',
       contributorAttendeeId: manualContributor || undefined,
     });
     
@@ -161,6 +178,9 @@ export default function ExpenseList({
       setManualAmount('');
       setManualDescription('...');
       setManualContributor('');
+      setManualContributorSearch('');
+      setManualGroupIsNew(false);
+      setManualGroupNewName('');
     }
     setIsManualLoading(false);
   };
@@ -174,7 +194,7 @@ export default function ExpenseList({
 
     const formData = new FormData();
     formData.append("receipt", file);
-    formData.append("groupName", selectedGroupName || 'General');
+    formData.append("groupName", (selectedGroupIsNew ? selectedGroupNewName : selectedGroupName) || 'General');
     formData.append("description", ticketDescription.trim() || '...');
     if (selectedContributor) formData.append("contributorAttendeeId", selectedContributor);
 
@@ -287,33 +307,55 @@ export default function ExpenseList({
               </div>
               <div className={styles.inputRow} style={{ marginTop: '-0.5rem' }}>
                 <span className={styles.rowLabel} style={{ fontSize: '0.8rem', opacity: 0.7 }}>Categoría</span>
-                <div style={{ flex: 1 }}>
-                  <input
-                    list="manual-groups-list"
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <select
                     className={`input-field ${styles.addInput}`}
-                    placeholder="Despliega las categorías o escribe una nueva"
-                    value={manualGroupName}
-                    onChange={e => setManualGroupName(e.target.value)}
+                    value={manualGroupIsNew ? '__new__' : manualGroupName}
+                    onChange={e => { if (e.target.value === '__new__') { setManualGroupIsNew(true); setManualGroupName(''); } else { setManualGroupIsNew(false); setManualGroupName(e.target.value); } }}
                     disabled={isManualLoading || isUploading}
                     style={{ maxWidth: '280px' }}
-                  />
-                  <datalist id="manual-groups-list">
-                    {[...new Set([...groups.map((g: any) => g.name), ...shoppingListNames])].map((name: string) => <option key={name} value={name} />)}
-                  </datalist>
+                  >
+                    <option value="">General (por defecto)</option>
+                    {[...new Set([...groups.map((g: any) => g.name), ...shoppingListNames])].map((name: string) => <option key={name} value={name}>{name}</option>)}
+                    <option value="__new__">+ Nueva categoría...</option>
+                  </select>
+                  {manualGroupIsNew && (
+                    <input
+                      type="text"
+                      className={`input-field ${styles.addInput}`}
+                      placeholder="Nombre de la nueva categoría"
+                      value={manualGroupNewName}
+                      onChange={e => setManualGroupNewName(e.target.value)}
+                      disabled={isManualLoading || isUploading}
+                      style={{ maxWidth: '280px' }}
+                      autoFocus
+                    />
+                  )}
                 </div>
               </div>
               <div className={styles.inputRow} style={{ marginTop: '-0.5rem' }}>
                 <span className={styles.rowLabel} style={{ fontSize: '0.8rem', opacity: 0.7 }}>Pagado por</span>
-                <select
-                  className={`input-field ${styles.addInput}`}
-                  value={manualContributor}
-                  onChange={e => setManualContributor(e.target.value)}
-                  disabled={isManualLoading || isUploading}
-                  style={{ maxWidth: '280px' }}
-                >
-                  <option value="">Del bote (nadie en concreto)</option>
-                  {attendees.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
-                </select>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <input
+                    type="text"
+                    className={`input-field ${styles.addInput}`}
+                    placeholder="🔍 Buscar asistente..."
+                    value={manualContributorSearch}
+                    onChange={e => setManualContributorSearch(e.target.value)}
+                    disabled={isManualLoading || isUploading}
+                    style={{ maxWidth: '280px', fontSize: '0.85rem' }}
+                  />
+                  <select
+                    className={`input-field ${styles.addInput}`}
+                    value={manualContributor}
+                    onChange={e => setManualContributor(e.target.value)}
+                    disabled={isManualLoading || isUploading}
+                    style={{ maxWidth: '280px' }}
+                  >
+                    <option value="">Del bote (nadie en concreto)</option>
+                    {filteredAttendeesForManual.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
+                  </select>
+                </div>
               </div>
               <div className={styles.inputRow} style={{ marginTop: '-0.5rem' }}>
                 <span className={styles.rowLabel} style={{ fontSize: '0.8rem', opacity: 0.7 }}>Descripción</span>
@@ -357,22 +399,33 @@ export default function ExpenseList({
                       </>
                     )}
                   </button>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.8rem', opacity: 0.7, whiteSpace: 'nowrap' }}>Categoría:</span>
-                    <input
-                      list="photo-groups-list"
+                    <select
                       className="input-field"
-                      placeholder="Despliega las categorías o escribe una nueva"
-                      value={selectedGroupName}
-                      onChange={e => setSelectedGroupName(e.target.value)}
+                      value={selectedGroupIsNew ? '__new__' : selectedGroupName}
+                      onChange={e => { if (e.target.value === '__new__') { setSelectedGroupIsNew(true); setSelectedGroupName(''); } else { setSelectedGroupIsNew(false); setSelectedGroupName(e.target.value); } }}
                       disabled={isUploading || isManualLoading}
                       style={{ maxWidth: '200px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
-                    />
-                    <datalist id="photo-groups-list">
-                      {[...new Set([...groups.map((g: any) => g.name), ...shoppingListNames])].map((name: string) => <option key={name} value={name} />)}
-                    </datalist>
+                    >
+                      <option value="">General (por defecto)</option>
+                      {[...new Set([...groups.map((g: any) => g.name), ...shoppingListNames])].map((name: string) => <option key={name} value={name}>{name}</option>)}
+                      <option value="__new__">+ Nueva categoría...</option>
+                    </select>
+                    {selectedGroupIsNew && (
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="Nombre de la nueva categoría"
+                        value={selectedGroupNewName}
+                        onChange={e => setSelectedGroupNewName(e.target.value)}
+                        disabled={isUploading || isManualLoading}
+                        style={{ maxWidth: '200px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
+                        autoFocus
+                      />
+                    )}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.8rem', opacity: 0.7, whiteSpace: 'nowrap' }}>Descripción:</span>
                     <input
                       type="text"
@@ -384,8 +437,17 @@ export default function ExpenseList({
                       style={{ maxWidth: '240px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
                     />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.8rem', opacity: 0.7, whiteSpace: 'nowrap' }}>Pagado por:</span>
+                    <input
+                      type="text"
+                      className="input-field"
+                      placeholder="🔍 Buscar asistente..."
+                      value={selectedContributorSearch}
+                      onChange={e => setSelectedContributorSearch(e.target.value)}
+                      disabled={isUploading || isManualLoading}
+                      style={{ maxWidth: '180px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
+                    />
                     <select
                       className="input-field"
                       value={selectedContributor}
@@ -394,7 +456,7 @@ export default function ExpenseList({
                       style={{ maxWidth: '200px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
                     >
                       <option value="">Del bote</option>
-                      {attendees.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
+                      {filteredAttendeesForPhoto.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
                     </select>
                   </div>
                 </div>

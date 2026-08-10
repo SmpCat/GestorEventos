@@ -43,23 +43,47 @@ export default async function ResultsPage() {
   let totalBoteEsperado = 0;
   let deudaRezagados = 0;
   let personasRezagadas = 0;
-  
+
   attendees.forEach((att: any) => {
     const amountPaid = att.payments?.reduce((acc: number, p: any) => {
       return p.type === 'INCOME' ? acc + p.amount : acc;
     }, 0) || 0;
     const expected = att.expectedPayment !== null ? att.expectedPayment : 0;
-    
     totalRecaudado += amountPaid;
     totalBoteEsperado += expected;
-
     if (expected > amountPaid) {
       deudaRezagados += (expected - amountPaid);
       personasRezagadas++;
     }
   });
-  
-  const saldoFisico = totalRecaudado - totalGastado;
+
+  // Pagos globales del flujo de caja (sin asistente vinculado, ej: sobrante año anterior)
+  const globalIncomeAgg = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: { eventId: activeEvent.id, attendeeId: null, type: 'INCOME' }
+  });
+  const globalExpenseAgg = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: { eventId: activeEvent.id, attendeeId: null, type: 'EXPENSE' }
+  });
+  totalRecaudado += globalIncomeAgg._sum.amount || 0;
+  const totalSalidasGlobales = globalExpenseAgg._sum.amount || 0;
+
+  // Restar también las devoluciones a asistentes (salidas físicas del bote)
+  const attendeeExpenseAgg = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: { eventId: activeEvent.id, attendeeId: { not: null }, type: 'EXPENSE' }
+  });
+  const totalDevoluciones = attendeeExpenseAgg._sum.amount || 0;
+
+  // Tickets pagados de bolsillo propio NO salen del bote → excluirlos de totalGastado
+  const pocketExpensesAgg = await prisma.expense.aggregate({
+    _sum: { amount: true },
+    where: { eventId: activeEvent.id, contributorAttendeeId: { not: null } }
+  });
+  const totalGastadoBote = totalGastado - (pocketExpensesAgg._sum.amount || 0);
+
+  const saldoFisico = totalRecaudado - totalGastadoBote - totalSalidasGlobales - totalDevoluciones;
   const dineroPorCobrar = totalBoteEsperado - totalRecaudado;
 
   return (
