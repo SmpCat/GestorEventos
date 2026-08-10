@@ -19,7 +19,7 @@ export type ReceiptData = {
 
 // Obtener o crear un grupo por nombre para el evento activo
 async function getOrCreateGroup(name: string, eventId: string): Promise<string> {
-  const groupName = name?.trim() || 'Restos';
+  const groupName = name?.trim() || 'General';
   const group = await prisma.expenseGroup.upsert({
     where: { name_eventId: { name: groupName, eventId } },
     update: {},
@@ -51,7 +51,7 @@ export async function processReceiptAction(formData: FormData) {
       return { success: false, error: "No se ha proporcionado ninguna imagen." };
     }
 
-    const groupName = (formData.get("groupName") as string) || 'Restos';
+    const groupName = (formData.get("groupName") as string) || 'General';
     const description = (formData.get("description") as string) || '';
 
     // --- MOCK E2E PARA TEST ---
@@ -143,7 +143,7 @@ export async function saveExpenseAction(data: ReceiptData) {
     if (!activeEvent) return { success: false, error: "No hay evento activo" };
 
     // Si viene groupId ya resuelto lo usamos; si no, usamos 'Restos'
-    const groupId = data.groupId || await getOrCreateGroup('Restos', activeEvent.id);
+    const groupId = data.groupId || await getOrCreateGroup('General', activeEvent.id);
 
     await prisma.expense.create({
       data: {
@@ -234,7 +234,7 @@ export async function saveManualExpenseAction(data: { store: string; amount: num
     const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
     if (!activeEvent) return { success: false, error: "No hay evento activo" };
 
-    const groupId = await getOrCreateGroup(data.groupName || 'Restos', activeEvent.id);
+    const groupId = await getOrCreateGroup(data.groupName || 'General', activeEvent.id);
 
     await prisma.expense.create({
       data: {
