@@ -20,7 +20,8 @@ export default async function ExpensesPage() {
     prisma.user.findUnique({ where: { id: session.id }, select: { canUploadTickets: true } })
   ]);
 
-  const canUploadTickets = currentUser?.canUploadTickets ?? true;
+  const isSuperAdmin = session.username === 'admin';
+  const canUploadTickets = isSuperAdmin ? true : (currentUser?.canUploadTickets ?? true);
 
   if (!activeEvent) {
     return (
