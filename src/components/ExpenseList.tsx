@@ -581,7 +581,7 @@ export default function ExpenseList({
                                           </span>
                                         )}
                                       </div>
-                                      {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && (
+                                      {expense.store !== 'Desconocido' && expense.store !== 'Gasto general' && expense.store !== 'Comercio desconocido' && (
                                         <div className={styles.expenseStore}>{expense.store}</div>
                                       )}
                                     </div>
