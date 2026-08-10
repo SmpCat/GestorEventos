@@ -69,9 +69,9 @@ export default function ExpenseList({
   const [manualAmount, setManualAmount] = useState<number | ''>('');
   const [isManualLoading, setIsManualLoading] = useState(false);
 
-  // Estado para categoría seleccionada
-  const [selectedGroupName, setSelectedGroupName] = useState('Restos');
-  const [manualGroupName, setManualGroupName] = useState('Restos');
+  // Estado para categoría seleccionada (vacío = "Restos" por defecto al guardar)
+  const [selectedGroupName, setSelectedGroupName] = useState('');
+  const [manualGroupName, setManualGroupName] = useState('');
 
   // Descripción al subir tickets (default: '...')
   const [ticketDescription, setTicketDescription] = useState('...');
@@ -263,7 +263,7 @@ export default function ExpenseList({
                   <input
                     list="manual-groups-list"
                     className={`input-field ${styles.addInput}`}
-                    placeholder="Restos"
+                    placeholder="Restos (por defecto)"
                     value={manualGroupName}
                     onChange={e => setManualGroupName(e.target.value)}
                     disabled={isManualLoading || isUploading}
@@ -321,7 +321,7 @@ export default function ExpenseList({
                     <input
                       list="photo-groups-list"
                       className="input-field"
-                      placeholder="Restos"
+                      placeholder="Restos (por defecto)"
                       value={selectedGroupName}
                       onChange={e => setSelectedGroupName(e.target.value)}
                       disabled={isUploading || isManualLoading}
