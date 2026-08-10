@@ -335,24 +335,31 @@ export default function ExpenseList({
               </div>
               <div className={styles.inputRow} style={{ marginTop: '-0.5rem' }}>
                 <span className={styles.rowLabel} style={{ fontSize: '0.8rem', opacity: 0.7 }}>Pagado por</span>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                  <input
-                    type="text"
-                    className={`input-field ${styles.addInput}`}
-                    placeholder="🔍 Buscar asistente..."
-                    value={manualContributorSearch}
-                    onChange={e => setManualContributorSearch(e.target.value)}
-                    disabled={isManualLoading || isUploading}
-                    style={{ maxWidth: '280px', fontSize: '0.85rem' }}
-                  />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
+                    <input
+                      type="text"
+                      className={`input-field ${styles.addInput}`}
+                      placeholder="🔍 Filtrar asistentes..."
+                      value={manualContributorSearch}
+                      onChange={e => setManualContributorSearch(e.target.value)}
+                      disabled={isManualLoading || isUploading}
+                      style={{ width: '100%', fontSize: '0.85rem', paddingRight: '2rem' }}
+                    />
+                    {manualContributorSearch && (
+                      <button onClick={() => setManualContributorSearch('')}
+                        style={{ position: 'absolute', right: '0.4rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem' }}
+                        title="Limpiar búsqueda">✕</button>
+                    )}
+                  </div>
                   <select
                     className={`input-field ${styles.addInput}`}
                     value={manualContributor}
                     onChange={e => setManualContributor(e.target.value)}
                     disabled={isManualLoading || isUploading}
-                    style={{ maxWidth: '280px' }}
+                    style={{ width: '100%', maxWidth: '280px' }}
                   >
-                    <option value="">Del bote (nadie en concreto)</option>
+                    <option value="">Ninguno (del bote)</option>
                     {filteredAttendeesForManual.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
                   </select>
                 </div>
@@ -437,25 +444,32 @@ export default function ExpenseList({
                       style={{ maxWidth: '240px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
                     />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '0.8rem', opacity: 0.7, whiteSpace: 'nowrap' }}>Pagado por:</span>
-                    <input
-                      type="text"
-                      className="input-field"
-                      placeholder="🔍 Buscar asistente..."
-                      value={selectedContributorSearch}
-                      onChange={e => setSelectedContributorSearch(e.target.value)}
-                      disabled={isUploading || isManualLoading}
-                      style={{ maxWidth: '180px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
-                    />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Pagado por:</span>
+                    <div style={{ position: 'relative', width: '100%' }}>
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="🔍 Filtrar asistentes..."
+                        value={selectedContributorSearch}
+                        onChange={e => setSelectedContributorSearch(e.target.value)}
+                        disabled={isUploading || isManualLoading}
+                        style={{ width: '100%', padding: '0.4rem 2rem 0.4rem 0.75rem', fontSize: '0.85rem' }}
+                      />
+                      {selectedContributorSearch && (
+                        <button onClick={() => setSelectedContributorSearch('')}
+                          style={{ position: 'absolute', right: '0.4rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem' }}
+                          title="Limpiar búsqueda">✕</button>
+                      )}
+                    </div>
                     <select
                       className="input-field"
                       value={selectedContributor}
                       onChange={e => setSelectedContributor(e.target.value)}
                       disabled={isUploading || isManualLoading}
-                      style={{ maxWidth: '200px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
+                      style={{ width: '100%', padding: '0.4rem 0.6rem', fontSize: '0.85rem' }}
                     >
-                      <option value="">Del bote</option>
+                      <option value="">Ninguno (del bote)</option>
                       {filteredAttendeesForPhoto.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
                     </select>
                   </div>

@@ -147,7 +147,7 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
                 containerStyle={{ width: '100%', marginBottom: 0 }}
                 style={{ opacity: isProcessing ? 0.6 : 1 }}
               >
-                <option value="">--- Ninguno (Movimiento Externo) ---</option>
+                <option value="">Ninguno</option>
                 {filteredAttendees.map(a => (
                   <option key={a.id} value={a.id}>{a.user.name} (@{a.user.username})</option>
                 ))}
