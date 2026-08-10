@@ -250,7 +250,7 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
             {activeEvent ? (
               <Link href="/expenses" className={styles.menuItem}>
                 <div>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Gastos Registrados</h3>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Tickets de Compra</h3>
                   <p className={styles.menuItemSubtitle}>Ver listado y añadir tickets</p>
                 </div>
                 <div style={{ fontSize: '2rem' }}>📸</div>

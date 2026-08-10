@@ -210,7 +210,7 @@ export default function ExpenseList({
       
       <div className={styles.headerRow}>
         <div>
-          <h1>Gastos Registrados</h1>
+          <h1>Tickets de Compra</h1>
           <p className="subtitle">Gestiona y revisa los tickets escaneados del evento activo.</p>
         </div>
       </div>
