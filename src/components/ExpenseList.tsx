@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup } from '@/actions/receipts';
+import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup, renameExpenseGroup } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
 import AiLoadingOverlay from './AiLoadingOverlay';
@@ -50,6 +50,18 @@ export default function ExpenseList({
   // Estado para categoría seleccionada
   const [selectedGroupName, setSelectedGroupName] = useState('Restos');
   const [manualGroupName, setManualGroupName] = useState('Restos');
+
+  // Estado para edición inline de nombre de grupo
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+  const [editingGroupName, setEditingGroupName] = useState('');
+
+  const handleRenameGroup = async (groupId: string) => {
+    if (!editingGroupName.trim()) { setEditingGroupId(null); return; }
+    const res = await renameExpenseGroup(groupId, editingGroupName);
+    if (!res.success) alert(`Error: ${res.error}`);
+    else router.refresh();
+    setEditingGroupId(null);
+  };
 
   const handleDelete = async (expenseId: string) => {
     if (window.confirm('¿Seguro que quieres borrar este gasto y su ticket asociado?')) {
@@ -454,9 +466,39 @@ export default function ExpenseList({
                       background: 'rgba(255,255,255,0.06)', borderRadius: '10px',
                       border: '1px solid rgba(255,255,255,0.1)'
                     }}>
-                      <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#e2e8f0' }}>
-                        📦 {gName} <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.85rem' }}>({groupExpenses.length} ticket{groupExpenses.length !== 1 ? 's' : ''})</span>
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
+                        {editingGroupId === (grouped[gName][0]?.groupId || null) ? (
+                          <input
+                            autoFocus
+                            value={editingGroupName}
+                            onChange={e => setEditingGroupName(e.target.value)}
+                            onBlur={() => handleRenameGroup(editingGroupId!)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') handleRenameGroup(editingGroupId!);
+                              if (e.key === 'Escape') setEditingGroupId(null);
+                            }}
+                            style={{
+                              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(56,189,248,0.5)',
+                              borderRadius: '6px', color: '#e2e8f0', padding: '0.2rem 0.5rem',
+                              fontSize: '0.95rem', fontWeight: 700, width: '200px'
+                            }}
+                          />
+                        ) : (
+                          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#e2e8f0' }}>
+                            📦 {gName} <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.85rem' }}>({groupExpenses.length} ticket{groupExpenses.length !== 1 ? 's' : ''})</span>
+                          </span>
+                        )}
+                        {isAdmin && editingGroupId !== (grouped[gName][0]?.groupId || null) && (
+                          <button
+                            onClick={() => {
+                              const grp = groups.find((g: any) => g.name === gName);
+                              if (grp) { setEditingGroupId(grp.id); setEditingGroupName(grp.name); }
+                            }}
+                            title="Renombrar categoría"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: 0.6, padding: '0 0.25rem' }}
+                          >✏️</button>
+                        )}
+                      </div>
                       <span style={{ fontWeight: 700, color: '#38bdf8', fontSize: '1rem' }}>
                         {groupTotal.toFixed(2)}&nbsp;€
                       </span>

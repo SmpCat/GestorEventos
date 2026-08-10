@@ -276,6 +276,25 @@ export async function moveExpenseToGroup(expenseId: string, groupName: string) {
   }
 }
 
+export async function renameExpenseGroup(groupId: string, newName: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+    const trimmed = newName.trim();
+    if (!trimmed) return { success: false, error: "El nombre no puede estar vacío" };
+
+    await prisma.expenseGroup.update({
+      where: { id: groupId },
+      data: { name: trimmed }
+    });
+
+    revalidatePath('/expenses');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
 export async function reScanExpenseAI(expenseId: string) {
   try {
     const session = await getSession();
