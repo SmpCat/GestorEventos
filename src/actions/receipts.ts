@@ -15,6 +15,7 @@ export type ReceiptData = {
   isScanned?: boolean;
   groupId?: string;
   description?: string;
+  contributorAttendeeId?: string;
 };
 
 // Obtener o crear un grupo por nombre para el evento activo
@@ -53,6 +54,7 @@ export async function processReceiptAction(formData: FormData) {
 
     const groupName = (formData.get("groupName") as string) || 'General';
     const description = (formData.get("description") as string) || '';
+    const contributorAttendeeId = (formData.get("contributorAttendeeId") as string) || undefined;
 
     // --- MOCK E2E PARA TEST ---
     if (file.name === "E2E_TEST_TICKET.png") {
@@ -113,6 +115,7 @@ export async function processReceiptAction(formData: FormData) {
           eventId: activeEvent.id,
           purchaserId: session.id,
           groupId,
+          contributorAttendeeId: contributorAttendeeId || undefined,
           images: {
             create: [{ url: imageUrl }]
           }
@@ -155,6 +158,7 @@ export async function saveExpenseAction(data: ReceiptData) {
         eventId: activeEvent.id,
         purchaserId: session.id,
         groupId,
+        contributorAttendeeId: data.contributorAttendeeId || undefined,
         images: {
           create: [{ url: data.imageUrl }]
         },
@@ -221,7 +225,7 @@ export async function deleteExpenseEvidence(evidenceId: string) {
   }
 }
 
-export async function saveManualExpenseAction(data: { store: string; amount: number; description: string; date: string; groupName?: string }) {
+export async function saveManualExpenseAction(data: { store: string; amount: number; description: string; date: string; groupName?: string; contributorAttendeeId?: string }) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: "No autorizado" };
@@ -245,6 +249,7 @@ export async function saveManualExpenseAction(data: { store: string; amount: num
         eventId: activeEvent.id,
         purchaserId: session.id,
         groupId,
+        contributorAttendeeId: data.contributorAttendeeId || undefined,
       }
     });
 
@@ -376,7 +381,7 @@ export async function updateExpenseDescription(expenseId: string, description: s
   }
 }
 
-export async function updateExpenseDetails(expenseId: string, data: { store?: string; amount?: number; date?: string; description?: string }) {
+export async function updateExpenseDetails(expenseId: string, data: { store?: string; amount?: number; date?: string; description?: string; contributorAttendeeId?: string | null }) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: "No autorizado" };
@@ -394,11 +399,13 @@ export async function updateExpenseDetails(expenseId: string, data: { store?: st
         ...(data.amount !== undefined && { amount: data.amount }),
         ...(data.date !== undefined && { date: new Date(data.date) }),
         ...(data.description !== undefined && { description: data.description.trim() }),
+        ...(data.contributorAttendeeId !== undefined && { contributorAttendeeId: data.contributorAttendeeId || null }),
       }
     });
 
     revalidatePath('/expenses');
     revalidatePath('/pricing/results');
+    revalidatePath('/pricing/attendees');
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message };

@@ -92,6 +92,10 @@ export async function getAttendees(eventId: string) {
         payments: { 
           orderBy: { date: 'desc' },
           include: { registeredBy: { select: { name: true, username: true } } }
+        },
+        contributedExpenses: {
+          where: { eventId },
+          select: { id: true, store: true, amount: true, date: true, description: true }
         }
       },
       orderBy: { user: { name: 'asc' } },

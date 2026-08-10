@@ -180,8 +180,11 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
               const isEditing = editingAttendee === att.id;
               const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
               const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
+              const reimbursed = att.payments?.reduce((acc: number, p: any) => p.type === 'EXPENSE' ? acc + p.amount : acc, 0) || 0;
+              const contributed = att.contributedExpenses?.reduce((acc: number, e: any) => acc + e.amount, 0) || 0;
               const currentQuota = att.expectedPayment !== null ? att.expectedPayment : 0; 
-              const balance = currentQuota - amountPaid;
+              // balance > 0: asistente debe al bote | balance < 0: bote debe al asistente
+              const balance = currentQuota - amountPaid - contributed + reimbursed;
 
               return (
                 <div key={`mobile-${att.id}`} className={styles.mobileCard}>
@@ -340,22 +343,38 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                       )}
 
                       <div className={styles.paymentsSection} style={{ marginTop: '0.75rem' }}>
-                        <div className={styles.paymentsTitle}>Historial de Pagos</div>
+                        <div className={styles.paymentsTitle}>Historial de Movimientos</div>
                         <div className={styles.paymentsList}>
+                          {/* Pagos de cuota */}
                           {att.payments?.map((p: any) => (
                             <div key={p.id} className={styles.paymentRow}>
-                              <span className={styles.paymentDate}>{new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })} <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>(por @{p.registeredBy?.username || '?'})</span></span>
+                              <span className={styles.paymentDate}>
+                                {new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}
+                                <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>
+                                  {p.type === 'INCOME' ? '💶 Cuota' : '💸 Devolución'} (por @{p.registeredBy?.username || '?'})
+                                </span>
+                              </span>
                               <span className={styles.paymentAmount} style={{ color: p.type === 'INCOME' ? '#4ade80' : '#f87171' }}>{p.type === 'INCOME' ? '+' : '-'}{p.amount}€</span>
                               {isAdmin && (
-                                <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Pago">
+                                <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Movimiento">
                                   <TrashIcon />
                                 </button>
                               )}
                             </div>
                           ))}
+                          {/* Tickets aportados de su bolsillo */}
+                          {att.contributedExpenses?.map((exp: any) => (
+                            <div key={`exp-${exp.id}`} className={styles.paymentRow}>
+                              <span className={styles.paymentDate}>
+                                {new Date(exp.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}
+                                <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>🧾 Ticket: {exp.store}</span>
+                              </span>
+                              <span className={styles.paymentAmount} style={{ color: '#38bdf8' }}>+{exp.amount}€</span>
+                            </div>
+                          ))}
                         </div>
-                        {(!att.payments || att.payments.length === 0) && (
-                          <div className={styles.noPayments}>Ningún pago registrado.</div>
+                        {((!att.payments || att.payments.length === 0) && (!att.contributedExpenses || att.contributedExpenses.length === 0)) && (
+                          <div className={styles.noPayments}>Ningún movimiento registrado.</div>
                         )}
                       </div>
                       {isAdmin && (

@@ -12,6 +12,7 @@ export default function ExpenseList({
   expenses, 
   groups = [],
   shoppingListNames = [],
+  attendees = [],
   isAdmin, 
   isSuperAdmin,
   currentUserId,
@@ -20,6 +21,7 @@ export default function ExpenseList({
   expenses: any[]; 
   groups?: any[];
   shoppingListNames?: string[];
+  attendees?: any[];
   isAdmin: boolean; 
   isSuperAdmin?: boolean;
   currentUserId: string;
@@ -40,6 +42,7 @@ export default function ExpenseList({
   const [editModalAmount, setEditModalAmount] = useState('');
   const [editModalDate, setEditModalDate] = useState('');
   const [editModalDesc, setEditModalDesc] = useState('');
+  const [editModalContributor, setEditModalContributor] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const openEditModal = (expense: any) => {
@@ -48,6 +51,7 @@ export default function ExpenseList({
     setEditModalAmount(expense.amount?.toString() || '');
     setEditModalDate(expense.date ? new Date(expense.date).toISOString().split('T')[0] : '');
     setEditModalDesc(expense.description || '...');
+    setEditModalContributor(expense.contributorAttendeeId || '');
   };
 
   const handleSaveEdit = async () => {
@@ -58,6 +62,7 @@ export default function ExpenseList({
       amount: parseFloat(editModalAmount) || 0,
       date: editModalDate,
       description: editModalDesc,
+      contributorAttendeeId: editModalContributor || null,
     });
     setIsSavingEdit(false);
     if (!res.success) alert(`Error: ${res.error}`);
@@ -72,6 +77,9 @@ export default function ExpenseList({
   // Estado para categoría seleccionada (vacío = "General" por defecto al guardar)
   const [selectedGroupName, setSelectedGroupName] = useState('');
   const [manualGroupName, setManualGroupName] = useState('');
+  // Contribuidor (pagado de su bolsillo)
+  const [selectedContributor, setSelectedContributor] = useState('');
+  const [manualContributor, setManualContributor] = useState('');
 
   // Descripción al subir tickets (default: '...')
   const [ticketDescription, setTicketDescription] = useState('...');
@@ -143,6 +151,7 @@ export default function ExpenseList({
       description: manualDescription.trim() || '...',
       date: dateStr,
       groupName: manualGroupName || 'General',
+      contributorAttendeeId: manualContributor || undefined,
     });
     
     if (!res.success) {
@@ -151,6 +160,7 @@ export default function ExpenseList({
       setManualStore('');
       setManualAmount('');
       setManualDescription('...');
+      setManualContributor('');
     }
     setIsManualLoading(false);
   };
@@ -166,6 +176,7 @@ export default function ExpenseList({
     formData.append("receipt", file);
     formData.append("groupName", selectedGroupName || 'General');
     formData.append("description", ticketDescription.trim() || '...');
+    if (selectedContributor) formData.append("contributorAttendeeId", selectedContributor);
 
     try {
       const res = await processReceiptAction(formData);
@@ -292,6 +303,19 @@ export default function ExpenseList({
                 </div>
               </div>
               <div className={styles.inputRow} style={{ marginTop: '-0.5rem' }}>
+                <span className={styles.rowLabel} style={{ fontSize: '0.8rem', opacity: 0.7 }}>Pagado por</span>
+                <select
+                  className={`input-field ${styles.addInput}`}
+                  value={manualContributor}
+                  onChange={e => setManualContributor(e.target.value)}
+                  disabled={isManualLoading || isUploading}
+                  style={{ maxWidth: '280px' }}
+                >
+                  <option value="">Del bote (nadie en concreto)</option>
+                  {attendees.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
+                </select>
+              </div>
+              <div className={styles.inputRow} style={{ marginTop: '-0.5rem' }}>
                 <span className={styles.rowLabel} style={{ fontSize: '0.8rem', opacity: 0.7 }}>Descripción</span>
                 <input
                   type="text"
@@ -359,6 +383,19 @@ export default function ExpenseList({
                       disabled={isUploading || isManualLoading}
                       style={{ maxWidth: '240px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
                     />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.7, whiteSpace: 'nowrap' }}>Pagado por:</span>
+                    <select
+                      className="input-field"
+                      value={selectedContributor}
+                      onChange={e => setSelectedContributor(e.target.value)}
+                      disabled={isUploading || isManualLoading}
+                      style={{ maxWidth: '200px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
+                    >
+                      <option value="">Del bote</option>
+                      {attendees.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -523,11 +560,16 @@ export default function ExpenseList({
                                      )}
                                    </div>
                                 </div>
-                                {/* Descripción */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
+                                {/* Descripción + contribuidor */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem', flexWrap: 'wrap' }}>
                                   <span className={styles.expenseDescription} style={{ flex: 1, opacity: expense.description === '...' ? 0.4 : 1 }}>
                                     {expense.description || '...'}
                                   </span>
+                                  {expense.contributorAttendee && (
+                                    <span style={{ fontSize: '0.72rem', background: 'rgba(56,189,248,0.15)', color: '#38bdf8', borderRadius: '999px', padding: '0.1rem 0.5rem', whiteSpace: 'nowrap' }}>
+                                      💸 {expense.contributorAttendee.user?.name || expense.contributorAttendee.user?.username}
+                                    </span>
+                                  )}
                                 </div>
                                 <div className={styles.expenseItemsContainer}>
                                   <div className={styles.expenseItemsList}>
@@ -590,6 +632,13 @@ export default function ExpenseList({
               <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Descripción</label>
               <input type="text" className="input-field" value={editModalDesc} onChange={e => setEditModalDesc(e.target.value)}
                 style={{ width: '100%' }} placeholder="..." />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Pagado de su bolsillo por</label>
+              <select className="input-field" value={editModalContributor} onChange={e => setEditModalContributor(e.target.value)} style={{ width: '100%' }}>
+                <option value="">Del bote (nadie en concreto)</option>
+                {attendees.map((att: any) => <option key={att.id} value={att.id}>{att.user?.name || att.user?.username}</option>)}
+              </select>
             </div>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', justifyContent: 'flex-end' }}>

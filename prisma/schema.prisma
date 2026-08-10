@@ -87,6 +87,8 @@ model EventAttendee {
 
   // Pagos realizados por el asistente
   payments      Payment[]
+  // Tickets aportados de su bolsillo
+  contributedExpenses Expense[] @relation("ContributedExpenses")
 }
 
 model Payment {
@@ -214,12 +216,17 @@ model Expense {
   images       ExpenseImage[]
   items        ExpenseItem[]
 
+  // Asistente que pagó este ticket de su propio bolsillo (opcional)
+  contributorAttendeeId String?
+  contributorAttendee   EventAttendee? @relation("ContributedExpenses", fields: [contributorAttendeeId], references: [id], onDelete: SetNull)
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@index([eventId])
   @@index([purchaserId])
   @@index([groupId])
+  @@index([contributorAttendeeId])
 }
 
 model ExpenseGroup {
