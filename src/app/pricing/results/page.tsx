@@ -40,6 +40,7 @@ export default async function ResultsPage() {
 
   // Calcular lo recaudado y lo pendiente en base a los asistentes
   let totalRecaudado = 0;
+  let totalRecaudadoCuotas = 0; // solo pagos de asistentes, para calcular pendiente de cuota
   let totalBoteEsperado = 0;
   let deudaRezagados = 0;
   let personasRezagadas = 0;
@@ -50,6 +51,7 @@ export default async function ResultsPage() {
     }, 0) || 0;
     const expected = att.expectedPayment !== null ? att.expectedPayment : 0;
     totalRecaudado += amountPaid;
+    totalRecaudadoCuotas += amountPaid;
     totalBoteEsperado += expected;
     if (expected > amountPaid) {
       deudaRezagados += (expected - amountPaid);
@@ -84,7 +86,8 @@ export default async function ResultsPage() {
   const totalGastadoBote = totalGastado - (pocketExpensesAgg._sum.amount || 0);
 
   const saldoFisico = totalRecaudado - totalGastadoBote - totalSalidasGlobales - totalDevoluciones;
-  const dineroPorCobrar = totalBoteEsperado - totalRecaudado;
+  // Pendiente de pago = solo cuotas (los ingresos globales no son cuotas de asistentes)
+  const dineroPorCobrar = Math.max(0, totalBoteEsperado - totalRecaudadoCuotas);
 
   // Pendiente de reembolso: lo que el bote debe a asistentes (balances negativos)
   let pendienteReembolso = 0;
