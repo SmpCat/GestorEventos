@@ -23,6 +23,9 @@ RUN npx prisma generate
 # Next.js telemetry disable
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Pre-crear directorio standalone para evitar ENOENT en mkdir durante el build
+RUN mkdir -p .next/standalone/node_modules
+
 RUN npm run build
 
 # Production image, copy all the files and run next
