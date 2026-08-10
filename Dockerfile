@@ -51,6 +51,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
+# sharp excluido del tracing → copiar manualmente desde deps
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/sharp ./node_modules/sharp
+
 # Carpeta de datos persistente para la BD
 RUN mkdir -p /app/data
 RUN chown nextjs:nodejs /app/data

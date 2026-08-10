@@ -11,7 +11,10 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: [],
+  serverExternalPackages: ['sharp'],
+  outputFileTracingExcludes: {
+    '*': ['./node_modules/sharp/**/*'],
+  },
   allowedDevOrigins: ['192.168.178.73', '192.168.178.73:3000', '192.168.178.22', '192.168.178.22:3000', 'eventos-dev.duckdns.org'],
   experimental: {
     serverActions: {
