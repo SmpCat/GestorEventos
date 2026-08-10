@@ -86,7 +86,7 @@ export default function ExpenseList({
   };
 
   const handleDelete = async (expenseId: string) => {
-    if (window.confirm('¿Seguro que quieres borrar este gasto y su ticket asociado?')) {
+    if (window.confirm('¿Seguro que quieres borrar este ticket?')) {
       setLoading(expenseId);
       await deleteExpenseAction(expenseId);
       setLoading(null);
@@ -146,7 +146,7 @@ export default function ExpenseList({
       if (res.success) {
         if (res.isScanned && res.data) {
           setReceiptData(res.data);
-          alert("¡Magia! La IA ha leído el ticket. Revisa los datos y pulsa en 'Confirmar Gasto' abajo.");
+          alert("¡Magia! La IA ha leído el ticket. Revisa los datos y pulsa en 'Confirmar Ticket' abajo.");
         } else {
           alert(res.message || "La IA no pudo leer el ticket, pero se ha guardado en la galería. Puedes re-escanearlo.");
           router.refresh();
@@ -215,7 +215,7 @@ export default function ExpenseList({
         </div>
       </div>
 
-      <h3 className={styles.sectionTitle} style={{ marginBottom: '0.75rem' }}>🧾 Añadir Gasto</h3>
+      <h3 className={styles.sectionTitle} style={{ marginBottom: '0.75rem' }}>🧾 Añadir Ticket</h3>
 
       <div className="glass-panel" style={{ marginBottom: '4rem' }}>
         <div className={styles.innerBlackBox}>
@@ -374,7 +374,7 @@ export default function ExpenseList({
             <p className={styles.previewSubtitle}>
               {scanWarning 
                 ? "La IA no pudo procesar la imagen, pero se ha guardado. Introduce los detalles a continuación:" 
-                : "Revisa y confirma los detalles antes de guardar el gasto."}
+                : "Revisa y confirma los detalles antes de guardar el ticket."}
             </p>
           </div>
           
@@ -465,7 +465,7 @@ export default function ExpenseList({
                 disabled={isUploading || !receiptData.store.trim() || receiptData.amount <= 0} 
                 className={`btn ${styles.confirmBtn}`}
               >
-                {isUploading ? '⏳ Guardando...' : '✅ Confirmar y Guardar Gasto'}
+                {isUploading ? '⏳ Guardando...' : '✅ Confirmar y Guardar Ticket'}
               </button>
             </div>
           </div>
@@ -489,7 +489,7 @@ export default function ExpenseList({
         return (
           <>
             <div className={styles.listHeader}>
-              <h3 className={styles.listHeaderTitle}>📊 Lista de Gastos</h3>
+              <h3 className={styles.listHeaderTitle}>📊 Lista de Tickets</h3>
               <div className={styles.listHeaderTotal}>
                 {totalAll.toFixed(2)}&nbsp;€
               </div>
@@ -498,7 +498,7 @@ export default function ExpenseList({
             {visibleExpenses.length === 0 ? (
               <div className="glass-panel" style={{ marginBottom: '2rem' }}>
                 <div className={styles.innerBlackBox}>
-                  <p className={styles.emptyState}>Aún no se ha registrado ningún gasto.</p>
+                  <p className={styles.emptyState}>Aún no se ha registrado ningún ticket.</p>
                 </div>
               </div>
             ) : (
@@ -596,7 +596,7 @@ export default function ExpenseList({
                                     )}
                                     {canDelete && (
                                       <button onClick={() => handleDelete(expense.id)} disabled={loading === expense.id}
-                                        className={styles.expenseDeleteBtn} title="Eliminar gasto">
+                                        className={styles.expenseDeleteBtn} title="Eliminar ticket">
                                         {loading === expense.id ? '⏳' : <TrashIcon />}
                                       </button>
                                     )}
