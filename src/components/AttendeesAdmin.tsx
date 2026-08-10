@@ -417,8 +417,10 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                   const isEditing = editingAttendee === att.id;
                   const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
                   const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
+                  const reimbursed = att.payments?.reduce((acc: number, p: any) => p.type === 'EXPENSE' ? acc + p.amount : acc, 0) || 0;
+                  const contributed = att.contributedExpenses?.reduce((acc: number, e: any) => acc + e.amount, 0) || 0;
                   const currentQuota = att.expectedPayment !== null ? att.expectedPayment : 0;
-                  const balance = currentQuota - amountPaid;
+                  const balance = currentQuota - amountPaid - contributed + reimbursed;
 
                   const balanceClass = balance > 0 ? styles.balanceNegative : balance < 0 ? styles.balancePositive : styles.balanceNeutral;
                   const balanceText = balance > 0 ? `Debe ${balance}€` : balance < 0 ? `Bote debe ${Math.abs(balance)}€` : 'Pagado';
