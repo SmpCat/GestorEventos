@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup, renameExpenseGroup } from '@/actions/receipts';
+import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup, renameExpenseGroup, deleteExpenseGroup, updateExpenseDescription } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
 import AiLoadingOverlay from './AiLoadingOverlay';
@@ -55,12 +55,34 @@ export default function ExpenseList({
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [editingGroupName, setEditingGroupName] = useState('');
 
+  // Estado para edición inline de descripción de ticket
+  const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
+  const [editingExpenseDesc, setEditingExpenseDesc] = useState('');
+
+  // Descripción al subir tickets
+  const [ticketDescription, setTicketDescription] = useState('');
+  const [manualDescription, setManualDescription] = useState('');
+
   const handleRenameGroup = async (groupId: string) => {
     if (!editingGroupName.trim()) { setEditingGroupId(null); return; }
     const res = await renameExpenseGroup(groupId, editingGroupName);
     if (!res.success) alert(`Error: ${res.error}`);
     else router.refresh();
     setEditingGroupId(null);
+  };
+
+  const handleDeleteGroup = async (groupId: string, groupName: string) => {
+    if (!window.confirm(`¿Borrar la categoría "${groupName}" y TODOS sus tickets? Esta acción no se puede deshacer.`)) return;
+    const res = await deleteExpenseGroup(groupId);
+    if (!res.success) alert(`Error: ${res.error}`);
+    else router.refresh();
+  };
+
+  const handleUpdateDescription = async (expenseId: string) => {
+    const res = await updateExpenseDescription(expenseId, editingExpenseDesc);
+    if (!res.success) alert(`Error: ${res.error}`);
+    else router.refresh();
+    setEditingExpenseId(null);
   };
 
   const handleDelete = async (expenseId: string) => {
@@ -90,7 +112,7 @@ export default function ExpenseList({
     const res = await saveManualExpenseAction({
       store: manualStore,
       amount: Number(manualAmount),
-      description: `Compra manual en ${manualStore}`,
+      description: manualDescription.trim() || `Compra manual en ${manualStore}`,
       date: dateStr,
       groupName: manualGroupName || 'Restos',
     });
@@ -100,6 +122,7 @@ export default function ExpenseList({
     } else {
       setManualStore('');
       setManualAmount('');
+      setManualDescription('');
     }
     setIsManualLoading(false);
   };
@@ -116,6 +139,7 @@ export default function ExpenseList({
     const formData = new FormData();
     formData.append("receipt", file);
     formData.append("groupName", selectedGroupName || 'Restos');
+    formData.append("description", ticketDescription.trim());
 
     try {
       const res = await processReceiptAction(formData);
@@ -250,6 +274,18 @@ export default function ExpenseList({
                   </datalist>
                 </div>
               </div>
+              <div className={styles.inputRow} style={{ marginTop: '-0.5rem' }}>
+                <span className={styles.rowLabel} style={{ fontSize: '0.8rem', opacity: 0.7 }}>Descripción</span>
+                <input
+                  type="text"
+                  className={`input-field ${styles.addInput}`}
+                  placeholder="Ej: Ticket de Felipe (opcional)"
+                  value={manualDescription}
+                  onChange={e => setManualDescription(e.target.value)}
+                  disabled={isManualLoading || isUploading}
+                  style={{ maxWidth: '320px' }}
+                />
+              </div>
 
               <div className={styles.orDivider}>
                 <span className={styles.orText}>o alternativamente...</span>
@@ -289,11 +325,23 @@ export default function ExpenseList({
                       value={selectedGroupName}
                       onChange={e => setSelectedGroupName(e.target.value)}
                       disabled={isUploading || isManualLoading}
-                      style={{ maxWidth: '240px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
+                      style={{ maxWidth: '200px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
                     />
                     <datalist id="photo-groups-list">
                       {groups.map((g: any) => <option key={g.id} value={g.name} />)}
                     </datalist>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.7, whiteSpace: 'nowrap' }}>Descripción:</span>
+                    <input
+                      type="text"
+                      className="input-field"
+                      placeholder="Ej: Ticket de Felipe (opcional)"
+                      value={ticketDescription}
+                      onChange={e => setTicketDescription(e.target.value)}
+                      disabled={isUploading || isManualLoading}
+                      style={{ maxWidth: '240px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
+                    />
                   </div>
                 </div>
               </div>
@@ -502,6 +550,13 @@ export default function ExpenseList({
                       <span style={{ fontWeight: 700, color: '#38bdf8', fontSize: '1rem' }}>
                         {groupTotal.toFixed(2)}&nbsp;€
                       </span>
+                      {isAdmin && (() => { const grp = groups.find((g: any) => g.name === gName); return grp ? (
+                        <button
+                          onClick={() => handleDeleteGroup(grp.id, grp.name)}
+                          title="Borrar categoría y todos sus tickets"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: 0.5, padding: '0 0.25rem', marginLeft: '0.25rem' }}
+                        >🗑️</button>
+                      ) : null; })()}
                     </div>
 
                     <div className="glass-panel">
@@ -547,9 +602,38 @@ export default function ExpenseList({
                                     )}
                                   </div>
                                 </div>
-                                {expense.description && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
-                                  <div className={styles.expenseDescription}>{expense.description}</div>
-                                )}
+                                {/* Descripción editable */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
+                                  {editingExpenseId === expense.id ? (
+                                    <input
+                                      autoFocus
+                                      value={editingExpenseDesc}
+                                      onChange={e => setEditingExpenseDesc(e.target.value)}
+                                      onBlur={() => handleUpdateDescription(expense.id)}
+                                      onKeyDown={e => {
+                                        if (e.key === 'Enter') handleUpdateDescription(expense.id);
+                                        if (e.key === 'Escape') setEditingExpenseId(null);
+                                      }}
+                                      placeholder="Añadir descripción..."
+                                      style={{
+                                        background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(56,189,248,0.4)',
+                                        borderRadius: '6px', color: '#e2e8f0', padding: '0.15rem 0.5rem',
+                                        fontSize: '0.85rem', width: '220px'
+                                      }}
+                                    />
+                                  ) : (
+                                    <>
+                                      {expense.description && expense.description !== `Compra en ${expense.store}` && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
+                                        <span className={styles.expenseDescription} style={{ flex: 1 }}>{expense.description}</span>
+                                      )}
+                                      <button
+                                        onClick={() => { setEditingExpenseId(expense.id); setEditingExpenseDesc(expense.description || ''); }}
+                                        title="Editar descripción"
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', opacity: 0.4, padding: '0' }}
+                                      >✏️</button>
+                                    </>
+                                  )}
+                                </div>
                                 <div className={styles.expenseItemsContainer}>
                                   <div className={styles.expenseItemsList}>
                                     {expense.items.map((item: any, idx: number) => (

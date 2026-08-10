@@ -14,6 +14,7 @@ export type ReceiptData = {
   imageUrl: string;
   isScanned?: boolean;
   groupId?: string;
+  description?: string;
 };
 
 // Obtener o crear un grupo por nombre para el evento activo
@@ -51,6 +52,7 @@ export async function processReceiptAction(formData: FormData) {
     }
 
     const groupName = (formData.get("groupName") as string) || 'Restos';
+    const description = (formData.get("description") as string) || '';
 
     // --- MOCK E2E PARA TEST ---
     if (file.name === "E2E_TEST_TICKET.png") {
@@ -90,6 +92,7 @@ export async function processReceiptAction(formData: FormData) {
           imageUrl,
           isScanned: true,
           groupId,
+          description: description || undefined,
         } as ReceiptData,
       };
     } catch (err: any) {
@@ -102,7 +105,7 @@ export async function processReceiptAction(formData: FormData) {
       // Creamos el gasto a 0€ vinculando la imagen (re-escaneable)
       await prisma.expense.create({
         data: {
-          description: `Compra en Comercio desconocido (Sin digitalizar)`,
+          description: description || 'Compra en Comercio desconocido (Sin digitalizar)',
           store: "Comercio desconocido",
           amount: 0,
           date: new Date(),
@@ -144,7 +147,7 @@ export async function saveExpenseAction(data: ReceiptData) {
 
     await prisma.expense.create({
       data: {
-        description: `Compra en ${data.store}`,
+        description: data.description || `Compra en ${data.store}`,
         store: data.store,
         amount: data.amount,
         date: new Date(data.date),
@@ -286,6 +289,49 @@ export async function renameExpenseGroup(groupId: string, newName: string) {
     await prisma.expenseGroup.update({
       where: { id: groupId },
       data: { name: trimmed }
+    });
+
+    revalidatePath('/expenses');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteExpenseGroup(groupId: string) {
+  try {
+    const session = await getSession();
+    if (!session || !session.isAdmin) return { success: false, error: "No autorizado" };
+
+    // Borrar todos los gastos del grupo primero (cascade manual por si acaso)
+    const expenses = await prisma.expense.findMany({ where: { groupId }, select: { id: true } });
+    for (const exp of expenses) {
+      await prisma.expense.delete({ where: { id: exp.id } });
+    }
+    await prisma.expenseGroup.delete({ where: { id: groupId } });
+
+    revalidatePath('/expenses');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateExpenseDescription(expenseId: string, description: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+
+    const expense = await prisma.expense.findUnique({ where: { id: expenseId } });
+    if (!expense) return { success: false, error: "Gasto no encontrado" };
+    if (!session.isAdmin && expense.purchaserId !== session.id) {
+      return { success: false, error: "No tienes permiso" };
+    }
+
+    await prisma.expense.update({
+      where: { id: expenseId },
+      data: { description: description.trim() }
     });
 
     revalidatePath('/expenses');
