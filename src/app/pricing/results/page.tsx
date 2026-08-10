@@ -86,6 +86,18 @@ export default async function ResultsPage() {
   const saldoFisico = totalRecaudado - totalGastadoBote - totalSalidasGlobales - totalDevoluciones;
   const dineroPorCobrar = totalBoteEsperado - totalRecaudado;
 
+  // Pendiente de reembolso: lo que el bote debe a asistentes (balances negativos)
+  let pendienteReembolso = 0;
+  attendees.forEach((att: any) => {
+    const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
+    const reimbursed = att.payments?.reduce((acc: number, p: any) => p.type === 'EXPENSE' ? acc + p.amount : acc, 0) || 0;
+    const contributed = att.contributedExpenses?.reduce((acc: number, e: any) => acc + e.amount, 0) || 0;
+    const quota = att.expectedPayment !== null ? att.expectedPayment : 0;
+    const balance = quota - amountPaid - contributed + reimbursed;
+    if (balance < 0) pendienteReembolso += Math.abs(balance);
+  });
+  const pendienteReembolsoRounded = Math.round(pendienteReembolso * 100) / 100;
+
   return (
     <>
       <style>{`
@@ -179,38 +191,32 @@ export default async function ResultsPage() {
           <div className="inner-black-box">
             <div className="results-grid">
               <div className="results-card">
-                <p className="results-card-title">Bote teórico</p>
-                <p className="results-card-value">{totalBoteEsperado}€</p>
-                <p className="results-card-subtitle">Si todos pagan sus días</p>
-              </div>
-              
-              <div className="results-card">
                 <p className="results-card-title">Dinero en Caja</p>
-                <p className="results-card-value" style={{ color: 'var(--accent-success)' }}>{totalRecaudado}€</p>
-                <p className="results-card-subtitle">Bote físico real disponible</p>
+                <p className="results-card-value" style={{ color: saldoFisico >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
+                  {saldoFisico >= 0 ? `+${saldoFisico.toFixed(2)}` : saldoFisico.toFixed(2)}€
+                </p>
+                <p className="results-card-subtitle">Saldo físico actual del bote</p>
               </div>
 
-              <div className="results-card" style={{ borderColor: deudaRezagados > 0 ? 'rgba(239, 68, 68, 0.5)' : 'inherit', backgroundColor: deudaRezagados > 0 ? 'rgba(239, 68, 68, 0.1)' : 'inherit' }}>
-                <p className="results-card-title" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>Pendiente Pago</p>
-                <p className="results-card-value" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'inherit' }}>{deudaRezagados}€</p>
-                <p className="results-card-subtitle" style={{ color: deudaRezagados > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
-                  {deudaRezagados > 0 ? `Deuda de ${personasRezagadas} ${personasRezagadas === 1 ? 'persona' : 'personas'}` : 'Todos están al día'}
-                </p>
-              </div>
-              
               <div className="results-card">
                 <p className="results-card-title">Total Gastado</p>
-                <p className="results-card-value">{totalGastado}€</p>
+                <p className="results-card-value">{totalGastado.toFixed(2)}€</p>
                 <p className="results-card-subtitle">Suma de todos los tickets</p>
               </div>
-              
-              <div className="results-card">
-                <p className="results-card-title">Saldo Final</p>
-                <p className="results-card-value" style={{ color: saldoFisico >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
-                  {saldoFisico >= 0 ? `+${saldoFisico}€` : `${saldoFisico}€`}
+
+              <div className="results-card" style={{ borderColor: dineroPorCobrar > 0 ? 'rgba(239,68,68,0.5)' : 'inherit', backgroundColor: dineroPorCobrar > 0 ? 'rgba(239,68,68,0.1)' : 'inherit' }}>
+                <p className="results-card-title" style={{ color: dineroPorCobrar > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>Pendiente de Pago</p>
+                <p className="results-card-value" style={{ color: dineroPorCobrar > 0 ? 'var(--accent-danger)' : 'inherit' }}>{dineroPorCobrar.toFixed(2)}€</p>
+                <p className="results-card-subtitle" style={{ color: dineroPorCobrar > 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
+                  {dineroPorCobrar > 0 ? `Cuotas por cobrar` : 'Todos al día'}
                 </p>
-                <p className="results-card-subtitle" style={{ color: saldoFisico < 0 ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
-                  {saldoFisico < 0 ? '¡ALERTA! Bote en rojo.' : 'Físicamente sobrante'}
+              </div>
+
+              <div className="results-card" style={{ borderColor: pendienteReembolsoRounded > 0 ? 'rgba(251,191,36,0.5)' : 'inherit', backgroundColor: pendienteReembolsoRounded > 0 ? 'rgba(251,191,36,0.07)' : 'inherit' }}>
+                <p className="results-card-title" style={{ color: pendienteReembolsoRounded > 0 ? '#fbbf24' : 'var(--text-secondary)' }}>Pendiente de Reembolso</p>
+                <p className="results-card-value" style={{ color: pendienteReembolsoRounded > 0 ? '#fbbf24' : 'inherit' }}>{pendienteReembolsoRounded.toFixed(2)}€</p>
+                <p className="results-card-subtitle" style={{ color: pendienteReembolsoRounded > 0 ? '#fbbf24' : 'var(--text-secondary)' }}>
+                  {pendienteReembolsoRounded > 0 ? 'El bote debe a asistentes' : 'Sin reembolsos pendientes'}
                 </p>
               </div>
             </div>
