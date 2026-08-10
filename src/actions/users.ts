@@ -51,7 +51,20 @@ export async function createUser(data: any) {
         canUploadTickets: data.canUploadTickets !== undefined ? Boolean(data.canUploadTickets) : true,
       },
     });
+
+    // Añadir automáticamente como asistente al evento activo
+    const activeEvent = await prisma.event.findFirst({ where: { isActive: true } });
+    if (activeEvent) {
+      await prisma.eventAttendee.create({
+        data: {
+          userId: user.id,
+          eventId: activeEvent.id,
+        },
+      });
+    }
+
     revalidatePath('/admin/users');
+    revalidatePath('/pricing/attendees');
     return { success: true, data: user };
   } catch (error: any) {
     if (error.code === 'P2002') {
