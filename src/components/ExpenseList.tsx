@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup, renameExpenseGroup, deleteExpenseGroup, updateExpenseDescription, updateExpenseDetails } from '@/actions/receipts';
+import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup, renameExpenseGroup, deleteExpenseGroup, updateExpenseDescription, updateExpenseDetails, mergeExpenseGroups } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
 import AiLoadingOverlay from './AiLoadingOverlay';
@@ -84,8 +84,25 @@ export default function ExpenseList({
   const handleRenameGroup = async (groupId: string) => {
     if (!editingGroupName.trim()) { setEditingGroupId(null); return; }
     const res = await renameExpenseGroup(groupId, editingGroupName);
-    if (!res.success) alert(`Error: ${res.error}`);
-    else router.refresh();
+    if (!res.success) {
+      if ((res as any).conflict) {
+        // Ya existe una categoría con ese nombre—preguntar si fusionar
+        const targetName = (res as any).targetName;
+        const targetGroupId = (res as any).targetGroupId;
+        const confirm = window.confirm(
+          `Ya existe la categoría "${targetName}". ¿Quieres fusionar todos los tickets de esta categoría en "${targetName}"?\n\nEsta acción no se puede deshacer.`
+        );
+        if (confirm) {
+          const mergeRes = await mergeExpenseGroups(groupId, targetGroupId);
+          if (!mergeRes.success) alert(`Error al fusionar: ${mergeRes.error}`);
+          else router.refresh();
+        }
+      } else {
+        alert(`Error: ${res.error}`);
+      }
+    } else {
+      router.refresh();
+    }
     setEditingGroupId(null);
   };
 

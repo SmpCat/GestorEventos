@@ -286,12 +286,47 @@ export async function renameExpenseGroup(groupId: string, newName: string) {
     const trimmed = newName.trim();
     if (!trimmed) return { success: false, error: "El nombre no puede estar vacío" };
 
+    // Comprobar si ya existe una categoría con ese nombre en el mismo evento
+    const current = await prisma.expenseGroup.findUnique({ where: { id: groupId } });
+    if (!current) return { success: false, error: "Categoría no encontrada" };
+
+    const existing = await prisma.expenseGroup.findUnique({
+      where: { name_eventId: { name: trimmed, eventId: current.eventId } }
+    });
+
+    if (existing && existing.id !== groupId) {
+      // Conflicto: ya existe una categoría con ese nombre → indicar para fusionar
+      return { success: false, conflict: true, targetGroupId: existing.id, targetName: trimmed };
+    }
+
     await prisma.expenseGroup.update({
       where: { id: groupId },
       data: { name: trimmed }
     });
 
     revalidatePath('/expenses');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function mergeExpenseGroups(sourceGroupId: string, targetGroupId: string) {
+  try {
+    const session = await getSession();
+    if (!session || !session.isAdmin) return { success: false, error: "No autorizado" };
+
+    // Mover todos los tickets del grupo origen al grupo destino
+    await prisma.expense.updateMany({
+      where: { groupId: sourceGroupId },
+      data: { groupId: targetGroupId }
+    });
+
+    // Borrar el grupo origen (ya vacío)
+    await prisma.expenseGroup.delete({ where: { id: sourceGroupId } });
+
+    revalidatePath('/expenses');
+    revalidatePath('/pricing/results');
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message };
