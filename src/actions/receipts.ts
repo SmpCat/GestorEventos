@@ -341,6 +341,35 @@ export async function updateExpenseDescription(expenseId: string, description: s
   }
 }
 
+export async function updateExpenseDetails(expenseId: string, data: { store?: string; amount?: number; date?: string; description?: string }) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No autorizado" };
+
+    const expense = await prisma.expense.findUnique({ where: { id: expenseId } });
+    if (!expense) return { success: false, error: "Ticket no encontrado" };
+    if (!session.isAdmin && expense.purchaserId !== session.id) {
+      return { success: false, error: "No tienes permiso" };
+    }
+
+    await prisma.expense.update({
+      where: { id: expenseId },
+      data: {
+        ...(data.store !== undefined && { store: data.store.trim() }),
+        ...(data.amount !== undefined && { amount: data.amount }),
+        ...(data.date !== undefined && { date: new Date(data.date) }),
+        ...(data.description !== undefined && { description: data.description.trim() }),
+      }
+    });
+
+    revalidatePath('/expenses');
+    revalidatePath('/pricing/results');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
 export async function reScanExpenseAI(expenseId: string) {
   try {
     const session = await getSession();

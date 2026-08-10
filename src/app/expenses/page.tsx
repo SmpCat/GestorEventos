@@ -29,7 +29,7 @@ export default async function ExpensesPage() {
     );
   }
 
-  const [expenses, groups] = await Promise.all([
+  const [expenses, groups, shoppingLists] = await Promise.all([
     prisma.expense.findMany({
       where: { eventId: activeEvent.id },
       include: {
@@ -44,13 +44,20 @@ export default async function ExpensesPage() {
       where: { eventId: activeEvent.id },
       orderBy: { createdAt: 'asc' },
     }),
+    prisma.shoppingList.findMany({
+      where: { eventId: activeEvent.id },
+      select: { name: true },
+      orderBy: { createdAt: 'asc' },
+    }),
   ]);
+  const shoppingListNames = shoppingLists.map((l: any) => l.name);
 
   return (
     <div>
       <ExpenseList
         expenses={expenses}
         groups={groups}
+        shoppingListNames={shoppingListNames}
         isAdmin={session.isAdmin}
         isSuperAdmin={isSuperAdmin}
         currentUserId={session.id}

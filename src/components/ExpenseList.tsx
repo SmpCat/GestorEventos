@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup, renameExpenseGroup, deleteExpenseGroup, updateExpenseDescription } from '@/actions/receipts';
+import { deleteExpenseAction, processReceiptAction, saveExpenseAction, saveManualExpenseAction, deleteExpenseEvidence, ReceiptData, reScanExpenseAI, moveExpenseToGroup, renameExpenseGroup, deleteExpenseGroup, updateExpenseDescription, updateExpenseDetails } from '@/actions/receipts';
 import TrashIcon from './TrashIcon';
 import styles from './ExpenseList.module.css';
 import AiLoadingOverlay from './AiLoadingOverlay';
@@ -11,6 +11,7 @@ import ImageLightbox from './ImageLightbox';
 export default function ExpenseList({ 
   expenses, 
   groups = [],
+  shoppingListNames = [],
   isAdmin, 
   isSuperAdmin,
   currentUserId,
@@ -18,6 +19,7 @@ export default function ExpenseList({
 }: { 
   expenses: any[]; 
   groups?: any[];
+  shoppingListNames?: string[];
   isAdmin: boolean; 
   isSuperAdmin?: boolean;
   currentUserId: string;
@@ -29,18 +31,37 @@ export default function ExpenseList({
   
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scanWarning, setScanWarning] = useState<string | null>(null);
-  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (receiptData) {
-      setTimeout(() => {
-        previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  }, [receiptData]);
+  // Modal de edición de ticket
+  const [editingTicket, setEditingTicket] = useState<any | null>(null);
+  const [editModalStore, setEditModalStore] = useState('');
+  const [editModalAmount, setEditModalAmount] = useState('');
+  const [editModalDate, setEditModalDate] = useState('');
+  const [editModalDesc, setEditModalDesc] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const openEditModal = (expense: any) => {
+    setEditingTicket(expense);
+    setEditModalStore(expense.store || '');
+    setEditModalAmount(expense.amount?.toString() || '');
+    setEditModalDate(expense.date ? new Date(expense.date).toISOString().split('T')[0] : '');
+    setEditModalDesc(expense.description || '...');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingTicket) return;
+    setIsSavingEdit(true);
+    const res = await updateExpenseDetails(editingTicket.id, {
+      store: editModalStore,
+      amount: parseFloat(editModalAmount) || 0,
+      date: editModalDate,
+      description: editModalDesc,
+    });
+    setIsSavingEdit(false);
+    if (!res.success) alert(`Error: ${res.error}`);
+    else { setEditingTicket(null); router.refresh(); }
+  };
 
   // Estados para entrada manual
   const [manualStore, setManualStore] = useState('');
@@ -51,17 +72,13 @@ export default function ExpenseList({
   const [selectedGroupName, setSelectedGroupName] = useState('Restos');
   const [manualGroupName, setManualGroupName] = useState('Restos');
 
+  // Descripción al subir tickets (default: '...')
+  const [ticketDescription, setTicketDescription] = useState('...');
+  const [manualDescription, setManualDescription] = useState('...');
+
   // Estado para edición inline de nombre de grupo
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [editingGroupName, setEditingGroupName] = useState('');
-
-  // Estado para edición inline de descripción de ticket
-  const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
-  const [editingExpenseDesc, setEditingExpenseDesc] = useState('');
-
-  // Descripción al subir tickets
-  const [ticketDescription, setTicketDescription] = useState('');
-  const [manualDescription, setManualDescription] = useState('');
 
   const handleRenameGroup = async (groupId: string) => {
     if (!editingGroupName.trim()) { setEditingGroupId(null); return; }
@@ -76,13 +93,6 @@ export default function ExpenseList({
     const res = await deleteExpenseGroup(groupId);
     if (!res.success) alert(`Error: ${res.error}`);
     else router.refresh();
-  };
-
-  const handleUpdateDescription = async (expenseId: string) => {
-    const res = await updateExpenseDescription(expenseId, editingExpenseDesc);
-    if (!res.success) alert(`Error: ${res.error}`);
-    else router.refresh();
-    setEditingExpenseId(null);
   };
 
   const handleDelete = async (expenseId: string) => {
@@ -112,17 +122,17 @@ export default function ExpenseList({
     const res = await saveManualExpenseAction({
       store: manualStore,
       amount: Number(manualAmount),
-      description: manualDescription.trim() || `Compra manual en ${manualStore}`,
+      description: manualDescription.trim() || '...',
       date: dateStr,
       groupName: manualGroupName || 'Restos',
     });
     
     if (!res.success) {
-      setError(res.error || 'Error al guardar gasto manual.');
+      setError(res.error || 'Error al guardar el ticket.');
     } else {
       setManualStore('');
       setManualAmount('');
-      setManualDescription('');
+      setManualDescription('...');
     }
     setIsManualLoading(false);
   };
@@ -133,22 +143,25 @@ export default function ExpenseList({
 
     setIsUploading(true);
     setError(null);
-    setScanWarning(null);
-    setReceiptData(null);
 
     const formData = new FormData();
     formData.append("receipt", file);
     formData.append("groupName", selectedGroupName || 'Restos');
-    formData.append("description", ticketDescription.trim());
+    formData.append("description", ticketDescription.trim() || '...');
 
     try {
       const res = await processReceiptAction(formData);
       if (res.success) {
         if (res.isScanned && res.data) {
-          setReceiptData(res.data);
-          alert("¡Magia! La IA ha leído el ticket. Revisa los datos y pulsa en 'Confirmar Ticket' abajo.");
+          // Auto-guardar directamente sin confirmación
+          const saveRes = await saveExpenseAction(res.data);
+          if (!saveRes.success) {
+            setError(saveRes.error || 'Error al guardar el ticket.');
+          } else {
+            router.refresh();
+          }
         } else {
-          alert(res.message || "La IA no pudo leer el ticket, pero se ha guardado en la galería. Puedes re-escanearlo.");
+          // IA falló pero se guardó la imagen
           router.refresh();
         }
       } else {
@@ -159,20 +172,6 @@ export default function ExpenseList({
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const confirmReceipt = async () => {
-    if (!receiptData) return;
-    setIsUploading(true);
-    const res = await saveExpenseAction(receiptData);
-    if (!res.success) {
-      alert(res.error);
-      setIsUploading(false);
-    } else {
-      setReceiptData(null);
-      setScanWarning(null);
-      setIsUploading(false);
     }
   };
 
@@ -270,7 +269,7 @@ export default function ExpenseList({
                     style={{ maxWidth: '280px' }}
                   />
                   <datalist id="manual-groups-list">
-                    {groups.map((g: any) => <option key={g.id} value={g.name} />)}
+                    {[...new Set([...groups.map((g: any) => g.name), ...shoppingListNames])].map((name: string) => <option key={name} value={name} />)}
                   </datalist>
                 </div>
               </div>
@@ -308,7 +307,7 @@ export default function ExpenseList({
                     disabled={isUploading || isManualLoading}
                     style={{ opacity: isUploading ? 0.7 : 1 }}
                   >
-                    {isUploading && !receiptData ? (
+                    {isUploading ? (
                       '⏳ Procesando con IA...'
                     ) : (
                       <>
@@ -328,7 +327,7 @@ export default function ExpenseList({
                       style={{ maxWidth: '200px', padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}
                     />
                     <datalist id="photo-groups-list">
-                      {groups.map((g: any) => <option key={g.id} value={g.name} />)}
+                      {[...new Set([...groups.map((g: any) => g.name), ...shoppingListNames])].map((name: string) => <option key={name} value={name} />)}
                     </datalist>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -360,117 +359,6 @@ export default function ExpenseList({
         </div>
       </div>
 
-      {/* Previsualización y Revisión del JSON devuelto */}
-      {receiptData && (
-        <div ref={previewRef} className={`glass-panel ${styles.previewContainer}`} style={{ marginBottom: '4rem' }}>
-          <div className={styles.previewHeader}>
-            <h3 className={styles.previewTitle}>
-              {scanWarning ? (
-                <><span>⚠️</span> Introducción Manual (IA no disponible)</>
-              ) : (
-                <><span>✨</span> Datos Extraídos con Éxito</>
-              )}
-            </h3>
-            <p className={styles.previewSubtitle}>
-              {scanWarning 
-                ? "La IA no pudo procesar la imagen, pero se ha guardado. Introduce los detalles a continuación:" 
-                : "Revisa y confirma los detalles antes de guardar el ticket."}
-            </p>
-          </div>
-          
-          <div className={styles.previewBody}>
-            {scanWarning && (
-              <div className={styles.warningBox}>
-                ⚠️ {scanWarning}
-              </div>
-            )}
-
-            <div className={styles.previewFlexRow}>
-              {/* Imagen */}
-              <div className={styles.previewImageCol}>
-                <span className={styles.previewLabel}>Ticket Original</span>
-                <div className={styles.previewImageWrapper} onClick={() => setLightboxImage(`/api${receiptData.imageUrl}`)} style={{ cursor: 'pointer' }}>
-                  <img src={`/api${receiptData.imageUrl}`} alt="Ticket" className={styles.previewImage} />
-                </div>
-              </div>
-              
-              {/* Formulario de Revisión */}
-              <div className={styles.previewFormCol}>
-                <div className={styles.previewGrid2}>
-                  <div className={styles.previewInputGroup}>
-                    <label className={styles.previewLabel}>Establecimiento</label>
-                    <input 
-                      type="text" 
-                      value={receiptData.store}
-                      onChange={(e) => setReceiptData({...receiptData, store: e.target.value})}
-                      className={`input-field ${styles.previewInput}`} 
-                      placeholder="Ej. Mercadona, Consum..."
-                    />
-                  </div>
-                  <div className={styles.previewInputGroup}>
-                    <label className={styles.previewLabel}>Fecha</label>
-                    <input 
-                      type="date" 
-                      value={receiptData.date}
-                      onChange={(e) => setReceiptData({...receiptData, date: e.target.value})}
-                      className={`input-field ${styles.previewInput}`} 
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.previewInputGroup}>
-                  <label className={styles.previewLabel}>Importe Total (€)</label>
-                  <input 
-                    type="number" 
-                    step="0.01" 
-                    value={receiptData.amount || ''} 
-                    onChange={(e) => setReceiptData({...receiptData, amount: parseFloat(e.target.value) || 0})}
-                    className={`input-field ${styles.previewInput} ${styles.previewInputAmount}`} 
-                    placeholder="0.00"
-                  />
-                </div>
-
-                <div className={styles.previewInputGroup}>
-                  <label className={`${styles.previewLabel} ${styles.previewItemsLabel}`}>
-                    Artículos Detectados ({receiptData.items?.length || 0})
-                  </label>
-                  <div className={`custom-scrollbar ${styles.previewItemsList}`}>
-                    {receiptData.items?.length === 0 ? (
-                      <p style={{ fontStyle: 'italic', opacity: 0.5, fontSize: '0.9rem', padding: '0.5rem 0' }}>Ningún artículo detectado automáticamente.</p>
-                    ) : (
-                      receiptData.items?.map((item, idx) => (
-                        <div key={idx} className={styles.previewItemRow}>
-                          <div className={styles.previewItemLeft}>
-                            <span className={styles.previewItemQty}>{item.quantity}x</span>
-                            <span className={styles.previewItemName} title={item.name}>{item.name}</span>
-                          </div>
-                          <span className={styles.previewItemPrice}>{item.price.toFixed(2)} €</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.previewActions}>
-              <button 
-                onClick={() => { setReceiptData(null); setScanWarning(null); }} 
-                className={`btn ${styles.cancelBtn}`}
-              >
-                Cancelar y Descartar
-              </button>
-              <button 
-                onClick={confirmReceipt} 
-                disabled={isUploading || !receiptData.store.trim() || receiptData.amount <= 0} 
-                className={`btn ${styles.confirmBtn}`}
-              >
-                {isUploading ? '⏳ Guardando...' : '✅ Confirmar y Guardar Ticket'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Listado agrupado por categoría */}
       {(() => {
@@ -543,7 +431,7 @@ export default function ExpenseList({
                               if (grp) { setEditingGroupId(grp.id); setEditingGroupName(grp.name); }
                             }}
                             title="Renombrar categoría"
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: 0.6, padding: '0 0.25rem' }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: 0.85, padding: '0 0.25rem' }}
                           >✏️</button>
                         )}
                       </div>
@@ -554,7 +442,7 @@ export default function ExpenseList({
                         <button
                           onClick={() => handleDeleteGroup(grp.id, grp.name)}
                           title="Borrar categoría y todos sus tickets"
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: 0.5, padding: '0 0.25rem', marginLeft: '0.25rem' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: 0.85, color: '#fff', padding: '0 0.25rem', marginLeft: '0.25rem' }}
                         >🗑️</button>
                       ) : null; })()}
                     </div>
@@ -587,52 +475,38 @@ export default function ExpenseList({
                                     </div>
                                   </div>
                                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                    {!expense.isScanned && expense.images.length > 0 && (
-                                      <button onClick={() => handleReScan(expense.id)} disabled={loading === `rescan-exp-${expense.id}`}
-                                        className={styles.expenseReScanBtn} title="Re-escanear con IA"
-                                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '0.95rem' }}>
-                                        {loading === `rescan-exp-${expense.id}` ? '⏳' : '🔄'}
-                                      </button>
-                                    )}
-                                    {canDelete && (
-                                      <button onClick={() => handleDelete(expense.id)} disabled={loading === expense.id}
-                                        className={styles.expenseDeleteBtn} title="Eliminar ticket">
-                                        {loading === expense.id ? '⏳' : <TrashIcon />}
-                                      </button>
-                                    )}
-                                  </div>
+                                     {expense.images.length > 0 && (
+                                       <button
+                                         onClick={() => setLightboxImage(`/api${expense.images[0].url}`)}
+                                         title="Ver foto del ticket"
+                                         style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', opacity: 0.85, padding: '0' }}
+                                       >📷</button>
+                                     )}
+                                     {!expense.isScanned && expense.images.length > 0 && (
+                                       <button onClick={() => handleReScan(expense.id)} disabled={loading === `rescan-exp-${expense.id}`}
+                                         className={styles.expenseReScanBtn} title="Re-escanear con IA"
+                                         style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '0.95rem' }}>
+                                         {loading === `rescan-exp-${expense.id}` ? '⏳' : '🔄'}
+                                       </button>
+                                     )}
+                                     <button
+                                       onClick={() => openEditModal(expense)}
+                                       title="Editar ticket"
+                                       style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: 0.85, padding: '0' }}
+                                     >✏️</button>
+                                     {canDelete && (
+                                       <button onClick={() => handleDelete(expense.id)} disabled={loading === expense.id}
+                                         className={styles.expenseDeleteBtn} title="Eliminar ticket">
+                                         {loading === expense.id ? '⏳' : <TrashIcon />}
+                                       </button>
+                                     )}
+                                   </div>
                                 </div>
-                                {/* Descripción editable */}
+                                {/* Descripción */}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
-                                  {editingExpenseId === expense.id ? (
-                                    <input
-                                      autoFocus
-                                      value={editingExpenseDesc}
-                                      onChange={e => setEditingExpenseDesc(e.target.value)}
-                                      onBlur={() => handleUpdateDescription(expense.id)}
-                                      onKeyDown={e => {
-                                        if (e.key === 'Enter') handleUpdateDescription(expense.id);
-                                        if (e.key === 'Escape') setEditingExpenseId(null);
-                                      }}
-                                      placeholder="Añadir descripción..."
-                                      style={{
-                                        background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(56,189,248,0.4)',
-                                        borderRadius: '6px', color: '#e2e8f0', padding: '0.15rem 0.5rem',
-                                        fontSize: '0.85rem', width: '220px'
-                                      }}
-                                    />
-                                  ) : (
-                                    <>
-                                      {expense.description && expense.description !== `Compra en ${expense.store}` && expense.description !== 'Compra en Desconocido' && expense.description !== 'Compra en Gasto general' && (
-                                        <span className={styles.expenseDescription} style={{ flex: 1 }}>{expense.description}</span>
-                                      )}
-                                      <button
-                                        onClick={() => { setEditingExpenseId(expense.id); setEditingExpenseDesc(expense.description || ''); }}
-                                        title="Editar descripción"
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', opacity: 0.4, padding: '0' }}
-                                      >✏️</button>
-                                    </>
-                                  )}
+                                  <span className={styles.expenseDescription} style={{ flex: 1, opacity: expense.description === '...' ? 0.4 : 1 }}>
+                                    {expense.description || '...'}
+                                  </span>
                                 </div>
                                 <div className={styles.expenseItemsContainer}>
                                   <div className={styles.expenseItemsList}>
@@ -662,76 +536,52 @@ export default function ExpenseList({
         );
       })()}
 
-      {/* Galería de Evidencias (Tickets Originales) */}
-      {(() => {
-        const allImages = expenses.flatMap(exp => 
-          exp.images.map((img: any) => ({
-            ...img,
-            expenseId: exp.id,
-            isScanned: exp.isScanned,
-            date: exp.date,
-            createdAt: exp.createdAt
-          }))
-        ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-        if (allImages.length === 0) return null;
-
-        return (
-          <div style={{ marginTop: '2.5rem' }}>
-            <h3 className={`${styles.sectionTitle} ${styles.sectionTitleSpaced}`}>📷 Tickets Originales</h3>
-            <div className="glass-panel" style={{ marginBottom: '2.5rem' }}>
-              <div className={styles.innerBlackBox}>
-                <div className={styles.galleryGrid}>
-                  {allImages.map((ev: any) => {
-                    const apiImageUrl = `/api${ev.url}`;
-                    const dateStr = new Date(ev.createdAt).toLocaleString('es-ES', {
-                      day: '2-digit', month: '2-digit', year: '2-digit',
-                      hour: '2-digit', minute: '2-digit'
-                    });
-                    return (
-                      <div key={ev.id} className={styles.galleryItem}>
-                        <div className={styles.galleryHeader}>
-                          <span className={styles.galleryDate} title={ev.isScanned ? "Escaneado por IA con éxito" : "No escaneado / Error IA"}>
-                            {ev.isScanned ? '✅' : '⚠️'} {dateStr}
-                          </span>
-                          <div style={{ display: 'flex', gap: '0.25rem' }}>
-                            {!ev.isScanned && (
-                              <button
-                                onClick={() => handleReScan(ev.expenseId)}
-                                disabled={loading === `rescan-exp-${ev.expenseId}` || loading === `delete-ev-${ev.id}`}
-                                className={styles.galleryReScanBtn}
-                                title="Volver a escanear con IA"
-                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#fff' }}
-                              >
-                                {loading === `rescan-exp-${ev.expenseId}` ? '⏳' : '🔄'}
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDeleteEvidence(ev.id)}
-                              disabled={loading === `delete-ev-${ev.id}`}
-                              className={styles.galleryDeleteBtn}
-                              title="Borrar foto"
-                            >
-                              {loading === `delete-ev-${ev.id}` ? '⏳' : <TrashIcon />}
-                            </button>
-                          </div>
-                        </div>
-                        <div 
-                          onClick={() => setLightboxImage(apiImageUrl)}
-                          className={styles.galleryLink}
-                          style={{ opacity: loading === `delete-ev-${ev.id}` ? 0.5 : 1, cursor: 'pointer' }}
-                        >
-                          <img src={apiImageUrl} alt="Ticket" className={styles.galleryImg} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+    {/* Modal de edición de ticket */}
+    {editingTicket && (
+      <div style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+      }} onClick={(e) => { if (e.target === e.currentTarget) setEditingTicket(null); }}>
+        <div style={{
+          background: '#1e293b', borderRadius: '16px', padding: '1.5rem',
+          width: '100%', maxWidth: '420px', border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <h3 style={{ margin: '0 0 1.25rem', color: '#e2e8f0', fontSize: '1.1rem' }}>✏️ Editar Ticket</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div>
+              <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Establecimiento</label>
+              <input type="text" className="input-field" value={editModalStore} onChange={e => setEditModalStore(e.target.value)}
+                style={{ width: '100%' }} placeholder="Ej. Mercadona" />
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Importe (€)</label>
+                <input type="number" step="0.01" className="input-field" value={editModalAmount}
+                  onChange={e => setEditModalAmount(e.target.value)} style={{ width: '100%' }} placeholder="0.00" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Fecha</label>
+                <input type="date" className="input-field" value={editModalDate}
+                  onChange={e => setEditModalDate(e.target.value)} style={{ width: '100%' }} />
               </div>
             </div>
+            <div>
+              <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Descripción</label>
+              <input type="text" className="input-field" value={editModalDesc} onChange={e => setEditModalDesc(e.target.value)}
+                style={{ width: '100%' }} placeholder="..." />
+            </div>
           </div>
-        );
-      })()}
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', justifyContent: 'flex-end' }}>
+            <button onClick={() => setEditingTicket(null)} className="btn"
+              style={{ background: 'rgba(255,255,255,0.08)', color: '#e2e8f0' }}>Cancelar</button>
+            <button onClick={handleSaveEdit} disabled={isSavingEdit} className="btn"
+              style={{ background: 'linear-gradient(135deg,#38bdf8,#818cf8)', color: '#fff', fontWeight: 700 }}>
+              {isSavingEdit ? '⏳ Guardando...' : '✅ Guardar'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     <ImageLightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />
     </div>
   );
