@@ -240,7 +240,7 @@ export default function Dashboard({ session, activeEvent, attendee, pricingRules
 
             <Link href="/shopping" className={styles.menuItem}>
               <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Lista de la Compra</h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>Listas de la Compra</h3>
                 <p className={styles.menuItemSubtitle}>Qué falta por comprar</p>
               </div>
               <div style={{ fontSize: '2rem' }}>🛒</div>
