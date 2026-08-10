@@ -53,6 +53,7 @@ export default function ImageLightbox({ imageUrl, onClose, onRescan, isRescannin
           type="button"
           onClick={(e) => {
             e.stopPropagation();
+            onClose();
             onRescan();
           }}
           disabled={isRescanning}

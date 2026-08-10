@@ -305,27 +305,6 @@ export default function ShoppingListCard({ list, users, currentUser }: ShoppingL
                   <img src={list.imageUrl} alt="Foto lista" style={{ width: '20px', height: '20px', objectFit: 'cover', borderRadius: '4px' }} />
                   <span>📷 Foto</span>
                 </button>
-
-                <button
-                  type="button"
-                  onClick={handleRescanList}
-                  disabled={loading === 'rescan-list'}
-                  className="btn"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#ffffff',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '8px',
-                    padding: '0.35rem 0.5rem',
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center'
-                  }}
-                  title="Re-escanear esta foto con IA para intentar extraer productos"
-                >
-                  {loading === 'rescan-list' ? '⏳' : '🔄'}
-                </button>
               </div>
             )}
 
