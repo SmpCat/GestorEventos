@@ -28,14 +28,11 @@ async function main() {
   }
 
   // 2. MIGRACIÓN AUTOMÁTICA DE PRODUCCIÓN:
-  // Garantizar que todos los usuarios existentes en la BBDD de producción queden configurados
-  // como Socios (isMember: true) y mayores de 18 años (age: 18) para conservar su estatus.
+  // Garantizar que todos los usuarios antiguos sin edad configurada (age: null)
+  // queden inicializados con valores por defecto.
   const updatedUsers = await prisma.user.updateMany({
     where: {
-      OR: [
-        { age: null },
-        { isMember: false }
-      ]
+      age: null
     },
     data: {
       isMember: true,
@@ -44,7 +41,7 @@ async function main() {
   });
 
   if (updatedUsers.count > 0) {
-    console.log(`✅ Migración de Producción: ${updatedUsers.count} usuarios existentes asegurados como Socios (isMember: true) y Mayores de 18 años.`);
+    console.log(`✅ Migración de Producción: ${updatedUsers.count} usuarios antiguos inicializados con edad 18.`);
   }
 
   // 3. Recalcular cuotas esperadas en producción para los asistentes de eventos activos
