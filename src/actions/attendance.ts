@@ -147,8 +147,12 @@ export async function calculateExpectedPayment(
   const targetTier = eventTiers.find(t => daysAttending >= t);
 
   // 2. Comprobar si el evento diferencia por la opción de bebida/comida seleccionada
-  const hasSpecificDrinkRule = rules.some((r: any) => r.drinkOption === drinkOption);
-  const hasSpecificFoodRule = rules.some((r: any) => r.eatFood === eatFood);
+  // (Solo aplica si el usuario selecciona una opción personalizada: bebida !== CON_ALCOHOL, o comida === false)
+  const isCustomDrink = drinkOption !== 'CON_ALCOHOL';
+  const hasSpecificDrinkRule = isCustomDrink && rules.some((r: any) => r.drinkOption === drinkOption);
+
+  const isCustomFood = eatFood === false;
+  const hasSpecificFoodRule = isCustomFood && rules.some((r: any) => r.eatFood === eatFood);
 
   // Filtrar reglas compatibles
   const matchingRules = rules.filter((rule: any) => {
