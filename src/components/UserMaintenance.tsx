@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import UserFormModal from './UserFormModal';
 import TrashIcon from './TrashIcon';
 import SelectField from './SelectField';
@@ -31,6 +32,7 @@ const ACTION_LABELS: Record<BulkActionType, string> = {
 };
 
 export default function UserMaintenance({ users, session }: { users: any[], session: any }) {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -62,6 +64,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
       const res = await deleteUser(id);
       if (res.success) {
         alert(`Usuario "${name}" eliminado correctamente.`);
+        router.refresh();
       } else {
         alert(res.error || 'Error al eliminar usuario.');
       }
@@ -196,7 +199,7 @@ export default function UserMaintenance({ users, session }: { users: any[], sess
         onClose={() => setIsModalOpen(false)} 
         user={editingUser} 
         session={session}
-        onSaved={() => {}}
+        onSaved={() => router.refresh()}
       />
     </div>
   );
