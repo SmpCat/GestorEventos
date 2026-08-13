@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './FinancesAdmin.module.css'; 
 import { addTransaction, deleteTransaction, updateTransaction } from '@/actions/finances';
 import SelectField from './SelectField';
 import TrashIcon from './TrashIcon';
 
 export default function FinancesAdmin({ attendees, payments, eventId, currentUser }: { attendees: any[], payments: any[], eventId: string, currentUser: any }) {
+  const router = useRouter();
   // Transaction state
   const [txType, setTxType] = useState<'INCOME' | 'EXPENSE'>('INCOME');
   const [txAmount, setTxAmount] = useState('');
@@ -75,6 +77,7 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
       alert(res.error);
     } else {
       resetForm();
+      router.refresh();
     }
     setIsProcessing(false);
   };
@@ -83,7 +86,11 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
     if (confirm('¿Seguro que quieres borrar este movimiento?')) {
       setIsProcessing(true);
       const res = await deleteTransaction(txId);
-      if (!res.success) alert(res.error);
+      if (!res.success) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
       if (editingPaymentId === txId) resetForm();
       setIsProcessing(false);
     }

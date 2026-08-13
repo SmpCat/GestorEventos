@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { updateAttendeeDays, addPayment, deletePayment, deleteAttendee } from '@/actions/attendance';
 import TrashIcon from './TrashIcon';
 import SelectField from './SelectField';
 import styles from './AttendeesAdmin.module.css';
 
 export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { attendees: any[], pricingRules: any[], isAdmin: boolean }) {
+  const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
 
   // Estados para el editor manual de asistentes
@@ -51,9 +53,10 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     const attendee = attendees.find(a => a.id === attId);
     const drinkOpt = attendee?.drinkOption ?? 'CON_ALCOHOL';
     const eatFoodVal = attendee?.eatFood ?? true;
-    const res = await updateAttendeeDays(attId, newVal, drinkOpt, eatFoodVal);
+     const res = await updateAttendeeDays(attId, newVal, drinkOpt, eatFoodVal);
     if (res.success) {
       setNewDays(newVal);
+      router.refresh();
     } else {
       alert(res.error || 'Error al actualizar días.');
     }
@@ -63,7 +66,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
   const handleUpdateDrinkOption = async (attId: string, currentDays: number, drinkOption: string, currentEatFood: boolean) => {
     setLoading(`att-${attId}`);
     const res = await updateAttendeeDays(attId, currentDays, drinkOption, currentEatFood);
-    if (!res.success) {
+    if (res.success) {
+      router.refresh();
+    } else {
       alert(res.error || 'Error al actualizar preferencia de bebida.');
     }
     setLoading(null);
@@ -72,7 +77,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
   const handleUpdateEatFood = async (attId: string, currentDays: number, currentDrinkOption: string, eatFood: boolean) => {
     setLoading(`att-${attId}`);
     const res = await updateAttendeeDays(attId, currentDays, currentDrinkOption, eatFood);
-    if (!res.success) {
+    if (res.success) {
+      router.refresh();
+    } else {
       alert(res.error || 'Error al actualizar preferencia de comida.');
     }
     setLoading(null);
@@ -86,6 +93,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     if (res.success) {
       alert(`Pago de ${newPaymentAmount}€ registrado.`);
       setNewPaymentAmount('');
+      router.refresh();
     } else {
       alert(res.error || 'Error al añadir pago.');
     }
@@ -99,6 +107,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
       const res = await deletePayment(paymentId);
       if (res.success) {
         alert('Pago eliminado.');
+        router.refresh();
       } else {
         alert(res.error || 'Error al borrar el pago.');
       }
@@ -127,6 +136,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
       if (res.success) {
         alert('Asistente expulsado del evento correctamente.');
         setEditingAttendee(null);
+        router.refresh();
       } else {
         alert(res.error || 'Error al eliminar el asistente.');
       }

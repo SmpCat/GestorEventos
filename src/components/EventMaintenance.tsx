@@ -181,7 +181,7 @@ export default function EventMaintenance({ events, session }: { events: any[], s
         onClose={() => setIsModalOpen(false)} 
         event={editingEvent} 
         session={session}
-        onSaved={() => {}}
+        onSaved={() => router.refresh()}
       />
     </div>
   );
