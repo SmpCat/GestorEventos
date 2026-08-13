@@ -164,19 +164,41 @@ export async function calculateExpectedPayment(
   });
 
   if (matchingRules.length > 0) {
-    // Ordenar por especificidad (la regla con más criterios definidos gana)
+    // Ordenar: 1ª prioridad días próximos, 2ª especificidad de criterios
     matchingRules.sort((a: any, b: any) => {
-      // 1ª prioridad: días más próximos al real (menor diferencia positiva gana)
-      // Ej: para 3 días, rule.days=3 (diff=0) gana a rule.days=1 (diff=2)
       const daysDiffA = daysAttending - a.days;
       const daysDiffB = daysAttending - b.days;
       if (daysDiffA !== daysDiffB) return daysDiffA - daysDiffB;
-      // 2ª prioridad: especificidad de otros criterios (bebida, comida, socio, edad)
       const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinkOption !== null ? 1 : 0) + (a.eatFood !== null ? 1 : 0);
       const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinkOption !== null ? 1 : 0) + (b.eatFood !== null ? 1 : 0);
       return scoreB - scoreA;
     });
-    return { price: matchingRules[0].price };
+
+    const best = matchingRules[0];
+
+    // Detección de "gap": si la mejor regla no es exacta (days < daysAttending)
+    // y su límite superior es abierto (maxDays=null), verificar si existe un umbral
+    // superior compatible que deje a daysAttending en una zona sin cobertura.
+    if (best.days < daysAttending && (best.maxDays === null || best.maxDays === undefined)) {
+      const nextThreshold = rules
+        .filter((r: any) => {
+          if (r.days <= best.days) return false;
+          if (r.isMember !== null && r.isMember !== isMember) return false;
+          if (r.minAge !== null && age < r.minAge) return false;
+          if (r.maxAge !== null && age > r.maxAge) return false;
+          if (r.drinkOption !== null && r.drinkOption !== drinkOption) return false;
+          if (r.eatFood !== null && r.eatFood !== eatFood) return false;
+          return true;
+        })
+        .map((r: any) => r.days as number)
+        .sort((a: number, b: number) => a - b)[0];
+
+      if (nextThreshold !== undefined && daysAttending < nextThreshold) {
+        return { price: null, error: `No hay tarifa configurada para ${daysAttending} día(s) con las opciones seleccionadas. Consulta al administrador.` };
+      }
+    }
+
+    return { price: best.price };
   }
 
   // Fallback: coincidencia por días si existe alguna regla general
