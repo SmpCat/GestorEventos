@@ -166,6 +166,12 @@ export async function calculateExpectedPayment(
   if (matchingRules.length > 0) {
     // Ordenar por especificidad (la regla con más criterios definidos gana)
     matchingRules.sort((a: any, b: any) => {
+      // 1ª prioridad: días más próximos al real (menor diferencia positiva gana)
+      // Ej: para 3 días, rule.days=3 (diff=0) gana a rule.days=1 (diff=2)
+      const daysDiffA = daysAttending - a.days;
+      const daysDiffB = daysAttending - b.days;
+      if (daysDiffA !== daysDiffB) return daysDiffA - daysDiffB;
+      // 2ª prioridad: especificidad de otros criterios (bebida, comida, socio, edad)
       const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinkOption !== null ? 1 : 0) + (a.eatFood !== null ? 1 : 0);
       const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinkOption !== null ? 1 : 0) + (b.eatFood !== null ? 1 : 0);
       return scoreB - scoreA;
