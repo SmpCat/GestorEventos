@@ -22,7 +22,7 @@ export interface PricingRuleInput {
   id?: string;
   name?: string | null;
   days: number;
-  maxDays?: number | null;
+  maxDays?: never;
   price: number;
   isMember?: boolean | null;
   minAge?: number | null;
@@ -48,7 +48,7 @@ export async function savePricingRules(eventId: string, rules: PricingRuleInput[
           data: rules.map(r => ({
             name: r.name || null,
             days: r.days,
-            maxDays: r.maxDays !== undefined ? r.maxDays : null,
+            // maxDays eliminado: el algoritmo de proximidad de días lo hace innecesario
             price: r.price,
             isMember: r.isMember !== undefined ? r.isMember : null,
             minAge: r.minAge !== undefined ? r.minAge : null,
@@ -143,8 +143,8 @@ export async function calculateExpectedPayment(
 
   // Filtrar reglas compatibles
   const matchingRules = rules.filter((rule: any) => {
-    // Días: coincide dentro del rango [rule.days, rule.maxDays]
-    const daysMatch = daysAttending >= rule.days && (rule.maxDays === null || rule.maxDays === undefined || daysAttending <= rule.maxDays) || (daysAttending === rule.days);
+    // Días: la regla aplica desde rule.days en adelante; el algoritmo de proximidad elige la más apropiada
+    const daysMatch = daysAttending >= rule.days;
     if (!daysMatch) return false;
 
     // Filtro Socio
@@ -176,10 +176,10 @@ export async function calculateExpectedPayment(
 
     const best = matchingRules[0];
 
-    // Detección de "gap": si la mejor regla no es exacta (days < daysAttending)
-    // y su límite superior es abierto (maxDays=null), verificar si existe un umbral
-    // superior compatible que deje a daysAttending en una zona sin cobertura.
-    if (best.days < daysAttending && (best.maxDays === null || best.maxDays === undefined)) {
+    // Detección de "gap": si la mejor regla no es exacta (days < daysAttending),
+    // verificar si existe una regla compatible con días superiores que deje
+    // a daysAttending en una zona sin cobertura.
+    if (best.days < daysAttending) {
       const nextThreshold = rules
         .filter((r: any) => {
           if (r.days <= best.days) return false;
