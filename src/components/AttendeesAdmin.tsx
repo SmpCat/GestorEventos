@@ -17,6 +17,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
   // Nuevo pago y días
   const [newPaymentAmount, setNewPaymentAmount] = useState<number | ''>('');
   const [newDays, setNewDays] = useState<number | ''>('');
+  const [newPaymentIsMembershipFee, setNewPaymentIsMembershipFee] = useState<boolean>(false);
 
   // Bulk Expel - Removed
 
@@ -39,6 +40,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
     setEditingAttendee(att.id);
     setNewPaymentAmount('');
     setNewDays(att.daysAttending);
+    setNewPaymentIsMembershipFee(false);
   };
 
   const handleUpdateDays = async (attId: string, newVal: number) => {
@@ -89,10 +91,11 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
   const handleAddPayment = async (attId: string) => {
     if (newPaymentAmount === '' || Number(newPaymentAmount) <= 0) return;
     setLoading(`pay-${attId}`);
-    const res = await addPayment(attId, Number(newPaymentAmount));
+    const res = await addPayment(attId, Number(newPaymentAmount), newPaymentIsMembershipFee);
     if (res.success) {
       alert(`Pago de ${newPaymentAmount}€ registrado.`);
       setNewPaymentAmount('');
+      setNewPaymentIsMembershipFee(false);
       router.refresh();
     } else {
       alert(res.error || 'Error al añadir pago.');
@@ -189,7 +192,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
             {filteredAttendees.map((att: any) => {
               const isEditing = editingAttendee === att.id;
               const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
-              const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
+              const amountPaid = att.payments?.reduce((acc: number, p: any) => (p.type === 'INCOME' && !p.isMembershipFee) ? acc + p.amount : acc, 0) || 0;
               const reimbursed = att.payments?.reduce((acc: number, p: any) => p.type === 'EXPENSE' ? acc + p.amount : acc, 0) || 0;
               const contributed = att.contributedExpenses?.reduce((acc: number, e: any) => acc + e.amount, 0) || 0;
               const currentQuota = att.expectedPayment !== null ? att.expectedPayment : 0; 
@@ -349,6 +352,17 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                               +
                             </button>
                           </div>
+                          <div className="flex items-center gap-2 mt-2" style={{ paddingLeft: '75px' }}>
+                            <label className="checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.8rem' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={newPaymentIsMembershipFee}
+                                onChange={e => setNewPaymentIsMembershipFee(e.target.checked)}
+                                style={{ width: '1rem', height: '1rem', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
+                              />
+                              <span>¿Es cuota de Socio?</span>
+                            </label>
+                          </div>
                         </div>
                       )}
 
@@ -361,10 +375,10 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                               <span className={styles.paymentDate}>
                                 {new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}
                                 <span style={{fontSize: '0.65rem', opacity: 0.6}}><br/>
-                                  {p.type === 'INCOME' ? '💶 Cuota' : '💸 Devolución'} (por @{p.registeredBy?.username || '?'})
+                                  {p.isMembershipFee ? '👑 Cuota de Socio' : (p.type === 'INCOME' ? '💶 Cuota' : '💸 Devolución')} (por @{p.registeredBy?.username || '?'})
                                 </span>
                               </span>
-                              <span className={styles.paymentAmount} style={{ color: p.type === 'INCOME' ? '#4ade80' : '#f87171' }}>{p.type === 'INCOME' ? '+' : '-'}{p.amount}€</span>
+                              <span className={styles.paymentAmount} style={{ color: p.isMembershipFee ? '#60a5fa' : (p.type === 'INCOME' ? '#4ade80' : '#f87171') }}>{p.type === 'INCOME' ? '+' : '-'}{p.amount}€</span>
                               {isAdmin && (
                                 <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Movimiento">
                                   <TrashIcon />
@@ -426,7 +440,7 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                 {filteredAttendees.map((att: any) => {
                   const isEditing = editingAttendee === att.id;
                   const isProcessing = loading === `att-${att.id}` || loading === `pay-${att.id}` || loading?.startsWith('del-pay');
-                  const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
+                  const amountPaid = att.payments?.reduce((acc: number, p: any) => (p.type === 'INCOME' && !p.isMembershipFee) ? acc + p.amount : acc, 0) || 0;
                   const reimbursed = att.payments?.reduce((acc: number, p: any) => p.type === 'EXPENSE' ? acc + p.amount : acc, 0) || 0;
                   const contributed = att.contributedExpenses?.reduce((acc: number, e: any) => acc + e.amount, 0) || 0;
                   const currentQuota = att.expectedPayment !== null ? att.expectedPayment : 0;
@@ -593,6 +607,17 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                       +
                                     </button>
                                   </div>
+                                  <div className="flex items-center gap-2 mt-1 mb-2" style={{ paddingLeft: '45px' }}>
+                                    <label className="checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.75rem' }}>
+                                      <input 
+                                        type="checkbox" 
+                                        checked={newPaymentIsMembershipFee}
+                                        onChange={e => setNewPaymentIsMembershipFee(e.target.checked)}
+                                        style={{ width: '0.9rem', height: '0.9rem', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
+                                      />
+                                      <span>¿Es cuota de Socio?</span>
+                                    </label>
+                                  </div>
                                 </>
                               )}
                               <div style={{ marginTop: '0.75rem' }}>
@@ -602,9 +627,9 @@ export default function AttendeesAdmin({ attendees, pricingRules, isAdmin }: { a
                                     <div key={p.id} className={styles.paymentRow} style={{ padding: '0.4rem', fontSize: '0.7rem' }}>
                                       <span className={styles.paymentDate}>
                                         {new Date(p.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                        <span style={{opacity: 0.6}}> {p.type === 'INCOME' ? '💶' : '💸'} (@{p.registeredBy?.username || '?'})</span>
+                                        <span style={{opacity: 0.6}}> {p.isMembershipFee ? '👑 Socio' : (p.type === 'INCOME' ? '💶' : '💸')} (@{p.registeredBy?.username || '?'})</span>
                                       </span>
-                                      <span className={styles.paymentAmount} style={{ color: p.type === 'INCOME' ? '#4ade80' : '#f87171' }}>{p.type === 'INCOME' ? '+' : '-'}{p.amount}€</span>
+                                      <span className={styles.paymentAmount} style={{ color: p.isMembershipFee ? '#60a5fa' : (p.type === 'INCOME' ? '#4ade80' : '#f87171') }}>{p.type === 'INCOME' ? '+' : '-'}{p.amount}€</span>
                                       {isAdmin && (
                                         <button onClick={() => handleDeletePayment(p.id)} className={styles.deletePaymentBtn} disabled={isProcessing} title="Borrar Movimiento">
                                           <TrashIcon />

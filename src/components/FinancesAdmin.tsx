@@ -14,6 +14,7 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
   const [txAmount, setTxAmount] = useState('');
   const [txDescription, setTxDescription] = useState('');
   const [txAttendeeId, setTxAttendeeId] = useState<string>(''); // Vacio = Ninguno
+  const [txIsMembershipFee, setTxIsMembershipFee] = useState<boolean>(false);
   const [attendeeSearch, setAttendeeSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -39,6 +40,7 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
     setTxAmount('');
     setTxDescription('');
     setTxAttendeeId('');
+    setTxIsMembershipFee(false);
     setAttendeeSearch('');
     setEditingPaymentId(null);
   };
@@ -49,6 +51,7 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
     setTxAmount(payment.amount.toString());
     setTxDescription(payment.description || '');
     setTxAttendeeId(payment.attendeeId || '');
+    setTxIsMembershipFee(payment.isMembershipFee || false);
     // Hacer scroll arriba
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -68,9 +71,9 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
     let res;
     
     if (editingPaymentId) {
-      res = await updateTransaction(editingPaymentId, val, txType, txDescription, txAttendeeId || null);
+      res = await updateTransaction(editingPaymentId, val, txType, txDescription, txAttendeeId || null, txIsMembershipFee);
     } else {
-      res = await addTransaction(eventId, val, txType, txDescription, currentUser.id, txAttendeeId || null);
+      res = await addTransaction(eventId, val, txType, txDescription, currentUser.id, txAttendeeId || null, txIsMembershipFee);
     }
     
     if (!res.success) {
@@ -161,6 +164,29 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
               </SelectField>
             </div>
           </div>
+
+          {txAttendeeId && (
+            <div className={styles.addPaymentRow} style={{ marginTop: '1rem', alignItems: 'center' }}>
+              <span className={styles.infoLabel} style={{ minWidth: '80px' }}></span>
+              <div style={{ flex: 1 }}>
+                <label className="checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={txIsMembershipFee}
+                    onChange={e => {
+                      setTxIsMembershipFee(e.target.checked);
+                      if (e.target.checked && !txDescription.trim()) {
+                        setTxDescription('Cuota de Socio');
+                      }
+                    }}
+                    disabled={isProcessing}
+                    style={{ width: '1.1rem', height: '1.1rem', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
+                  />
+                  <span style={{ fontSize: '0.9rem', color: '#e4e4e7' }}>¿Es cuota de Socio? (No influye en la cuota de fiesta)</span>
+                </label>
+              </div>
+            </div>
+          )}
 
           <div className={styles.addPaymentRow} style={{ marginTop: '1rem', alignItems: 'center' }}>
             <span className={styles.infoLabel} style={{ minWidth: '80px' }}>Motivo:</span>
@@ -269,7 +295,12 @@ export default function FinancesAdmin({ attendees, payments, eventId, currentUse
                 </div>
 
                 <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '0.95rem', wordBreak: 'break-word' }}>{p.description || 'Sin descripción'}</span>
+                  <span style={{ fontWeight: 'bold', fontSize: '0.95rem', wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    {p.description || 'Sin descripción'}
+                    {p.isMembershipFee && (
+                      <span className="badge" style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.3)', fontSize: '0.65rem', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 600 }}>Socio</span>
+                    )}
+                  </span>
                   <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>
                     {p.attendee ? `👤 ${p.attendee.user.name}` : '🌐 Bote Global (Externo)'}
                   </span>

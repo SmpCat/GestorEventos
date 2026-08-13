@@ -286,7 +286,7 @@ export async function updateAttendeeDays(attendeeId: string, newDays: number, dr
 
 // --- GESTIÓN DE PAGOS ---
 
-export async function addPayment(attendeeId: string, amount: number) {
+export async function addPayment(attendeeId: string, amount: number, isMembershipFee: boolean = false) {
   if (amount <= 0) {
     return { success: false, error: 'El importe del pago debe ser mayor que 0.' };
   }
@@ -306,7 +306,9 @@ export async function addPayment(attendeeId: string, amount: number) {
         attendeeId, 
         eventId: attendee.eventId,
         amount,
-        registeredById: session.id
+        registeredById: session.id,
+        isMembershipFee,
+        description: isMembershipFee ? 'Cuota de Socio' : null
       }
     });
     revalidatePath('/pricing/attendees');

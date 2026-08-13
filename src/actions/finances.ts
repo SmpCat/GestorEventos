@@ -25,7 +25,8 @@ export async function addTransaction(
   type: 'INCOME' | 'EXPENSE',
   description: string,
   registeredById: string,
-  attendeeId?: string | null
+  attendeeId?: string | null,
+  isMembershipFee: boolean = false
 ) {
   try {
     const payment = await prisma.payment.create({
@@ -35,7 +36,8 @@ export async function addTransaction(
         description: description || null,
         eventId,
         attendeeId: attendeeId || null,
-        registeredById
+        registeredById,
+        isMembershipFee
       }
     });
 
@@ -54,7 +56,8 @@ export async function updateTransaction(
   amount: number,
   type: 'INCOME' | 'EXPENSE',
   description: string,
-  attendeeId?: string | null
+  attendeeId?: string | null,
+  isMembershipFee: boolean = false
 ) {
   try {
     const payment = await prisma.payment.update({
@@ -63,7 +66,8 @@ export async function updateTransaction(
         amount,
         type,
         description: description || null,
-        attendeeId: attendeeId || null
+        attendeeId: attendeeId || null,
+        isMembershipFee
       }
     });
 

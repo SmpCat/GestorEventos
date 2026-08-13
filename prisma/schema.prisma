@@ -96,6 +96,7 @@ model Payment {
   amount      Float
   type        String   @default("INCOME") // "INCOME" o "EXPENSE"
   description String?
+  isMembershipFee Boolean @default(false)
   date        DateTime @default(now())
   
   // Relación con el Evento (Requerida)

@@ -46,15 +46,20 @@ export default async function ResultsPage() {
   let personasRezagadas = 0;
 
   attendees.forEach((att: any) => {
-    const amountPaid = att.payments?.reduce((acc: number, p: any) => {
+    const amountPaidAll = att.payments?.reduce((acc: number, p: any) => {
       return p.type === 'INCOME' ? acc + p.amount : acc;
     }, 0) || 0;
+    const amountPaidCuotas = att.payments?.reduce((acc: number, p: any) => {
+      return (p.type === 'INCOME' && !p.isMembershipFee) ? acc + p.amount : acc;
+    }, 0) || 0;
     const expected = att.expectedPayment !== null ? att.expectedPayment : 0;
-    totalRecaudado += amountPaid;
-    totalRecaudadoCuotas += amountPaid;
+    
+    totalRecaudado += amountPaidAll;
+    totalRecaudadoCuotas += amountPaidCuotas;
     totalBoteEsperado += expected;
-    if (expected > amountPaid) {
-      deudaRezagados += (expected - amountPaid);
+    
+    if (expected > amountPaidCuotas) {
+      deudaRezagados += (expected - amountPaidCuotas);
       personasRezagadas++;
     }
   });
@@ -92,7 +97,7 @@ export default async function ResultsPage() {
   // Pendiente de reembolso: lo que el bote debe a asistentes (balances negativos)
   let pendienteReembolso = 0;
   attendees.forEach((att: any) => {
-    const amountPaid = att.payments?.reduce((acc: number, p: any) => p.type === 'INCOME' ? acc + p.amount : acc, 0) || 0;
+    const amountPaid = att.payments?.reduce((acc: number, p: any) => (p.type === 'INCOME' && !p.isMembershipFee) ? acc + p.amount : acc, 0) || 0;
     const reimbursed = att.payments?.reduce((acc: number, p: any) => p.type === 'EXPENSE' ? acc + p.amount : acc, 0) || 0;
     const contributed = att.contributedExpenses?.reduce((acc: number, e: any) => acc + e.amount, 0) || 0;
     const quota = att.expectedPayment !== null ? att.expectedPayment : 0;
