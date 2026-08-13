@@ -141,11 +141,20 @@ export async function calculateExpectedPayment(
     return { price: null, error: 'No hay tarifas configuradas para este evento.' };
   }
 
+  // 1. Determinar el tramo (tier) de días del evento aplicable para este número de días
+  // Ej: si hay reglas con days=1, days=2 y days=3, y daysAttending es 3, el tramo es 3.
+  const eventTiers = Array.from(new Set(rules.map((r: any) => r.days))).sort((a: number, b: number) => b - a);
+  const targetTier = eventTiers.find(t => daysAttending >= t);
+
+  // 2. Comprobar si el evento diferencia por la opción de bebida/comida seleccionada
+  const hasSpecificDrinkRule = rules.some((r: any) => r.drinkOption === drinkOption);
+  const hasSpecificFoodRule = rules.some((r: any) => r.eatFood === eatFood);
+
   // Filtrar reglas compatibles
   const matchingRules = rules.filter((rule: any) => {
-    // Días: la regla aplica desde rule.days en adelante; el algoritmo de proximidad elige la más apropiada
-    const daysMatch = daysAttending >= rule.days;
-    if (!daysMatch) return false;
+    // Días: debe pertenecer exactamente al tramo (tier) correspondiente
+    if (targetTier !== undefined && rule.days !== targetTier) return false;
+    if (targetTier === undefined && daysAttending < rule.days) return false;
 
     // Filtro Socio
     if (rule.isMember !== null && rule.isMember !== isMember) return false;
@@ -154,50 +163,32 @@ export async function calculateExpectedPayment(
     if (rule.minAge !== null && age < rule.minAge) return false;
     if (rule.maxAge !== null && age > rule.maxAge) return false;
 
-    // Filtro Bebida (null = aplica a todos)
-    if (rule.drinkOption !== null && rule.drinkOption !== undefined && rule.drinkOption !== drinkOption) return false;
+    // Filtro Bebida estricto: si hay reglas específicas de su bebida, exigir coincidencia exacta
+    if (hasSpecificDrinkRule) {
+      if (rule.drinkOption !== drinkOption) return false;
+    } else {
+      if (rule.drinkOption !== null && rule.drinkOption !== undefined && rule.drinkOption !== drinkOption) return false;
+    }
 
-    // Filtro Comida (null = aplica a todos)
-    if (rule.eatFood !== null && rule.eatFood !== undefined && rule.eatFood !== eatFood) return false;
+    // Filtro Comida estricto: si hay reglas específicas de su comida, exigir coincidencia exacta
+    if (hasSpecificFoodRule) {
+      if (rule.eatFood !== eatFood) return false;
+    } else {
+      if (rule.eatFood !== null && rule.eatFood !== undefined && rule.eatFood !== eatFood) return false;
+    }
 
     return true;
   });
 
   if (matchingRules.length > 0) {
-    // Ordenar: 1ª prioridad días próximos, 2ª especificidad de criterios
+    // Ordenar por especificidad (la regla con más criterios definidos gana)
     matchingRules.sort((a: any, b: any) => {
-      const daysDiffA = daysAttending - a.days;
-      const daysDiffB = daysAttending - b.days;
-      if (daysDiffA !== daysDiffB) return daysDiffA - daysDiffB;
       const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinkOption !== null ? 1 : 0) + (a.eatFood !== null ? 1 : 0);
       const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinkOption !== null ? 1 : 0) + (b.eatFood !== null ? 1 : 0);
       return scoreB - scoreA;
     });
 
     const best = matchingRules[0];
-
-    // Detección de "gap": si la mejor regla no es exacta (days < daysAttending),
-    // verificar si existe una regla compatible con días superiores que deje
-    // a daysAttending en una zona sin cobertura.
-    if (best.days < daysAttending) {
-      const nextThreshold = rules
-        .filter((r: any) => {
-          if (r.days <= best.days) return false;
-          if (r.isMember !== null && r.isMember !== isMember) return false;
-          if (r.minAge !== null && age < r.minAge) return false;
-          if (r.maxAge !== null && age > r.maxAge) return false;
-          if (r.drinkOption !== null && r.drinkOption !== drinkOption) return false;
-          if (r.eatFood !== null && r.eatFood !== eatFood) return false;
-          return true;
-        })
-        .map((r: any) => r.days as number)
-        .sort((a: number, b: number) => a - b)[0];
-
-      if (nextThreshold !== undefined && daysAttending < nextThreshold) {
-        return { price: null, error: `No hay tarifa configurada para ${daysAttending} día(s) con las opciones seleccionadas. Consulta al administrador.` };
-      }
-    }
-
     return { price: best.price };
   }
 
