@@ -41,6 +41,7 @@ export default async function ResultsPage() {
   // Calcular lo recaudado y lo pendiente en base a los asistentes
   let totalRecaudado = 0;
   let totalRecaudadoCuotas = 0; // solo pagos de asistentes, para calcular pendiente de cuota
+  let totalSocioFees = 0;       // cuotas de socio (isMembershipFee === true)
   let totalBoteEsperado = 0;
   let deudaRezagados = 0;
   let personasRezagadas = 0;
@@ -52,10 +53,14 @@ export default async function ResultsPage() {
     const amountPaidCuotas = att.payments?.reduce((acc: number, p: any) => {
       return (p.type === 'INCOME' && !p.isMembershipFee) ? acc + p.amount : acc;
     }, 0) || 0;
+    const socioFees = att.payments?.reduce((acc: number, p: any) => {
+      return (p.type === 'INCOME' && p.isMembershipFee) ? acc + p.amount : acc;
+    }, 0) || 0;
     const expected = att.expectedPayment !== null ? att.expectedPayment : 0;
     
     totalRecaudado += amountPaidAll;
     totalRecaudadoCuotas += amountPaidCuotas;
+    totalSocioFees += socioFees;
     totalBoteEsperado += expected;
     
     if (expected > amountPaidCuotas) {
@@ -91,7 +96,7 @@ export default async function ResultsPage() {
   const totalGastadoBote = totalGastado - (pocketExpensesAgg._sum.amount || 0);
 
   const saldoFisico = totalRecaudado - totalGastadoBote - totalSalidasGlobales - totalDevoluciones;
-  const totalOtrosIngresos = totalRecaudado - totalRecaudadoCuotas;
+  const totalIngresosGlobales = globalIncomeAgg._sum.amount || 0;
   const dineroPorCobrar = Math.max(0, totalBoteEsperado - totalRecaudadoCuotas);
 
   // Pendiente de reembolso: lo que el bote debe a asistentes (balances negativos)
@@ -275,10 +280,16 @@ export default async function ResultsPage() {
                   <span className="breakdown-label">Ingresos por Cuotas de Fiesta:</span>
                   <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalRecaudadoCuotas.toFixed(2)}€</span>
                 </div>
-                {totalOtrosIngresos > 0 && (
+                {totalIngresosGlobales > 0 && (
                   <div className="breakdown-item">
-                    <span className="breakdown-label">Ingresos Globales (Bote Anterior / Cuotas de Socio):</span>
-                    <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalOtrosIngresos.toFixed(2)}€</span>
+                    <span className="breakdown-label">Bote Anterior / Sobrante de Años Anteriores:</span>
+                    <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalIngresosGlobales.toFixed(2)}€</span>
+                  </div>
+                )}
+                {totalSocioFees > 0 && (
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">Cuotas de Socio Recaudadas (👑 Alta Socio):</span>
+                    <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalSocioFees.toFixed(2)}€</span>
                   </div>
                 )}
                 <div className="breakdown-item">
