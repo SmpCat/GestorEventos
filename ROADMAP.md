@@ -63,7 +63,10 @@ En lugar de forzar al administrador a escribir textos manuales en el móvil, los
 *   Para cuotas: Preseleccionado como `"Cuota Fiesta"` o `"Cuota Peña"`.
 *   Para compras/adelantos: Opciones de categoría como `[Carne/Comida]`, `[Bebida]`, `[Hielo/Menaje]`, `[Otros...]` (esta última abre un campo de texto libre).
 
-### C. Soporte Histórico de Temporadas (Historial del Bote)
+### C. Registro Explícito y Manual
+El sistema no realizará divisiones contables automáticas ni deducciones implícitas (por ejemplo, si un ticket supera un adelanto). Todo movimiento (adelantos, justificaciones, compras de bolsillo y reembolsos) debe ser registrado de forma explícita y manual por el administrador para garantizar un control total de la caja y evitar comportamientos "mágicos" del software.
+
+### D. Soporte Histórico de Temporadas (Historial del Bote)
 Dado que la base de datos ya soporta multi-evento mediante la propiedad `isActive: Boolean` en el modelo `Event`, el año que viene se podrá desactivar el evento 2026 y activar el de 2027 sin borrar los datos del año anterior. Se sugiere añadir un **Selector de Evento** en el panel de administrador para poder consultar el histórico contable y de asistencia de años pasados en formato "solo lectura".
 
 ---
