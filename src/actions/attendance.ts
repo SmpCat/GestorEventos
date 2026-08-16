@@ -141,12 +141,7 @@ export async function calculateExpectedPayment(
     return { price: null, error: 'No hay tarifas configuradas para este evento.' };
   }
 
-  // 1. Determinar el tramo (tier) de días del evento aplicable para este número de días
-  // Ej: si hay reglas con days=1, days=2 y days=3, y daysAttending es 3, el tramo es 3.
-  const eventTiers = Array.from(new Set(rules.map((r: any) => r.days))).sort((a: number, b: number) => b - a);
-  const targetTier = eventTiers.find(t => daysAttending >= t);
-
-  // 2. Comprobar si el evento diferencia por la opción de bebida/comida seleccionada
+  // Comprobar si el evento diferencia por la opción de bebida/comida seleccionada
   // (Solo aplica si el usuario selecciona una opción personalizada: bebida !== CON_ALCOHOL, o comida === false)
   const isCustomDrink = drinkOption !== 'CON_ALCOHOL';
   const hasSpecificDrinkRule = isCustomDrink && rules.some((r: any) => r.drinkOption === drinkOption);
@@ -156,9 +151,8 @@ export async function calculateExpectedPayment(
 
   // Filtrar reglas compatibles
   const matchingRules = rules.filter((rule: any) => {
-    // Días: debe pertenecer exactamente al tramo (tier) correspondiente
-    if (targetTier !== undefined && rule.days !== targetTier) return false;
-    if (targetTier === undefined && daysAttending < rule.days) return false;
+    // Días: debe asistir al menos los días requeridos por la regla
+    if (daysAttending < rule.days) return false;
 
     // Filtro Socio
     if (rule.isMember !== null && rule.isMember !== isMember) return false;
@@ -186,10 +180,15 @@ export async function calculateExpectedPayment(
 
   if (matchingRules.length > 0) {
     // Ordenar por especificidad (la regla con más criterios definidos gana)
+    // Desempatar por número de días de la regla de forma descendente (el tramo más alto aplicable gana)
     matchingRules.sort((a: any, b: any) => {
       const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinkOption !== null ? 1 : 0) + (a.eatFood !== null ? 1 : 0);
       const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinkOption !== null ? 1 : 0) + (b.eatFood !== null ? 1 : 0);
-      return scoreB - scoreA;
+      
+      if (scoreA !== scoreB) {
+        return scoreB - scoreA;
+      }
+      return b.days - a.days;
     });
 
     const best = matchingRules[0];
@@ -197,7 +196,9 @@ export async function calculateExpectedPayment(
   }
 
   // Fallback: coincidencia por días si existe alguna regla general
-  const fallbackDaysRule = rules.find((r: any) => r.days === daysAttending || (daysAttending >= 3 && r.days === 3));
+  const fallbackDaysRule = rules
+    .filter((r: any) => daysAttending >= r.days)
+    .sort((a: any, b: any) => b.days - a.days)[0];
   if (fallbackDaysRule) return { price: (fallbackDaysRule as any).price };
 
   return { price: null, error: `No hay una tarifa configurada para ${daysAttending} días con las características del usuario.` };

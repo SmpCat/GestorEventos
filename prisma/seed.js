@@ -76,7 +76,11 @@ async function main() {
         matchingRules.sort((a, b) => {
           const scoreA = (a.isMember !== null ? 1 : 0) + (a.minAge !== null ? 1 : 0) + (a.drinkOption !== null ? 1 : 0) + (a.eatFood !== null ? 1 : 0);
           const scoreB = (b.isMember !== null ? 1 : 0) + (b.minAge !== null ? 1 : 0) + (b.drinkOption !== null ? 1 : 0) + (b.eatFood !== null ? 1 : 0);
-          return scoreB - scoreA;
+          
+          if (scoreA !== scoreB) {
+            return scoreB - scoreA;
+          }
+          return b.days - a.days;
         });
         await prisma.eventAttendee.update({
           where: { id: att.id },
