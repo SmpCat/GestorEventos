@@ -278,36 +278,36 @@ export default async function ResultsPage() {
               <h3 className="breakdown-title">Desglose del Dinero en Caja</h3>
               <div className="breakdown-list">
                 <div className="breakdown-item">
-                  <span className="breakdown-label">Ingresos por Cuotas de Fiesta:</span>
+                  <span className="breakdown-label">Cuotas de Fiesta Recaudadas:</span>
                   <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalRecaudadoCuotas.toFixed(2)}€</span>
                 </div>
                 {totalOtrosIngresos > 0 && (
                   <>
                     <div className="breakdown-item">
-                      <span className="breakdown-label">Ingresos Globales:</span>
+                      <span className="breakdown-label">Otros Ingresos (Globales):</span>
                       <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalOtrosIngresos.toFixed(2)}€</span>
                     </div>
                     {totalIngresosGlobales > 0 && (
-                      <div className="breakdown-item" style={{ paddingLeft: '1.5rem', opacity: 0.85 }}>
-                        <span className="breakdown-label">• Bote Anterior / Sobrante de Años Anteriores:</span>
+                      <div className="breakdown-item" style={{ paddingLeft: '1rem', opacity: 0.85, fontSize: '0.8rem' }}>
+                        <span className="breakdown-label">• Bote Anterior (Sobrante 2025):</span>
                         <span className="breakdown-value">+{totalIngresosGlobales.toFixed(2)}€</span>
                       </div>
                     )}
                     {totalSocioFees > 0 && (
-                      <div className="breakdown-item" style={{ paddingLeft: '1.5rem', opacity: 0.85 }}>
-                        <span className="breakdown-label">• Cuotas de Socio Recaudadas (👑 Alta Socio):</span>
+                      <div className="breakdown-item" style={{ paddingLeft: '1rem', opacity: 0.85, fontSize: '0.8rem' }}>
+                        <span className="breakdown-label">• Cuotas de Socio (👑 Altas):</span>
                         <span className="breakdown-value">+{totalSocioFees.toFixed(2)}€</span>
                       </div>
                     )}
                   </>
                 )}
                 <div className="breakdown-item">
-                  <span className="breakdown-label">Gastos reales pagados con el Bote:</span>
+                  <span className="breakdown-label">Gastos pagados con Bote:</span>
                   <span className="breakdown-value" style={{ color: 'var(--accent-danger)' }}>-{totalGastadoBote.toFixed(2)}€</span>
                 </div>
                 {totalDevoluciones > 0 && (
                   <div className="breakdown-item">
-                    <span className="breakdown-label">Devoluciones y Reembolsos pagados:</span>
+                    <span className="breakdown-label">Devoluciones a Asistentes:</span>
                     <span className="breakdown-value" style={{ color: 'var(--accent-danger)' }}>-{totalDevoluciones.toFixed(2)}€</span>
                   </div>
                 )}
@@ -318,7 +318,7 @@ export default async function ResultsPage() {
                   </div>
                 )}
                 <div className="breakdown-total">
-                  <span style={{ color: '#fff' }}>Saldo Físico Neto en Caja:</span>
+                  <span style={{ color: '#fff' }}>Saldo Físico Neto:</span>
                   <span style={{ color: saldoFisico >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
                     {saldoFisico >= 0 ? `+${saldoFisico.toFixed(2)}` : saldoFisico.toFixed(2)}€
                   </span>
