@@ -195,13 +195,7 @@ export async function calculateExpectedPayment(
     return { price: best.price };
   }
 
-  // Fallback: coincidencia por días si existe alguna regla general
-  const fallbackDaysRule = rules
-    .filter((r: any) => daysAttending >= r.days)
-    .sort((a: any, b: any) => b.days - a.days)[0];
-  if (fallbackDaysRule) return { price: (fallbackDaysRule as any).price };
-
-  return { price: null, error: `No hay una tarifa configurada para ${daysAttending} días con las características del usuario.` };
+  return { price: null, error: `No existe una tarifa que coincida exactamente con tu perfil (${daysAttending} días, ${isMember ? 'Socio' : 'No Socio'}, bebida: ${drinkOption === 'CON_ALCOHOL' ? 'con alcohol' : drinkOption === 'SIN_ALCOHOL' ? 'sin alcohol' : 'no bebida'}, comida: ${eatFood ? 'sí' : 'no'}). Por favor, contacta con el administrador.` };
 }
 
 // Cuando un usuario se une al evento
