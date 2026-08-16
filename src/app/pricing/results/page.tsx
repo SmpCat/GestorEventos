@@ -91,7 +91,7 @@ export default async function ResultsPage() {
   const totalGastadoBote = totalGastado - (pocketExpensesAgg._sum.amount || 0);
 
   const saldoFisico = totalRecaudado - totalGastadoBote - totalSalidasGlobales - totalDevoluciones;
-  // Pendiente de pago = solo cuotas (los ingresos globales no son cuotas de asistentes)
+  const totalOtrosIngresos = totalRecaudado - totalRecaudadoCuotas;
   const dineroPorCobrar = Math.max(0, totalBoteEsperado - totalRecaudadoCuotas);
 
   // Pendiente de reembolso: lo que el bote debe a asistentes (balances negativos)
@@ -187,6 +187,45 @@ export default async function ResultsPage() {
           color: var(--text-secondary);
           margin: 0;
         }
+        .breakdown-section {
+          margin-top: 1.5rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .breakdown-title {
+          font-size: 0.875rem;
+          font-weight: bold;
+          margin-bottom: 0.75rem;
+          color: #fff;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .breakdown-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+        }
+        .breakdown-item {
+          display: flex;
+          justify-content: space-between;
+          padding: 0.25rem 0;
+        }
+        .breakdown-label {
+          color: var(--text-secondary);
+        }
+        .breakdown-value {
+          font-weight: bold;
+        }
+        .breakdown-total {
+          display: flex;
+          justify-content: space-between;
+          padding: 0.5rem 0;
+          border-top: 1px dashed rgba(255, 255, 255, 0.12);
+          margin-top: 0.25rem;
+          font-size: 1rem;
+          font-weight: bold;
+        }
       `}</style>
       <div className="results-container">
         <div className="results-header">
@@ -226,6 +265,44 @@ export default async function ResultsPage() {
                 <p className="results-card-subtitle" style={{ color: pendienteReembolsoRounded > 0 ? '#fbbf24' : 'var(--text-secondary)' }}>
                   {pendienteReembolsoRounded > 0 ? 'El bote debe a asistentes' : 'Sin reembolsos pendientes'}
                 </p>
+              </div>
+            </div>
+
+            <div className="breakdown-section">
+              <h3 className="breakdown-title">Desglose del Dinero en Caja</h3>
+              <div className="breakdown-list">
+                <div className="breakdown-item">
+                  <span className="breakdown-label">Ingresos por Cuotas de Fiesta:</span>
+                  <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalRecaudadoCuotas.toFixed(2)}€</span>
+                </div>
+                {totalOtrosIngresos > 0 && (
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">Ingresos Globales (Bote Anterior / Cuotas de Socio):</span>
+                    <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalOtrosIngresos.toFixed(2)}€</span>
+                  </div>
+                )}
+                <div className="breakdown-item">
+                  <span className="breakdown-label">Gastos reales pagados con el Bote:</span>
+                  <span className="breakdown-value" style={{ color: 'var(--accent-danger)' }}>-{totalGastadoBote.toFixed(2)}€</span>
+                </div>
+                {totalDevoluciones > 0 && (
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">Devoluciones y Reembolsos pagados:</span>
+                    <span className="breakdown-value" style={{ color: 'var(--accent-danger)' }}>-{totalDevoluciones.toFixed(2)}€</span>
+                  </div>
+                )}
+                {totalSalidasGlobales > 0 && (
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">Salidas globales del Bote:</span>
+                    <span className="breakdown-value" style={{ color: 'var(--accent-danger)' }}>-{totalSalidasGlobales.toFixed(2)}€</span>
+                  </div>
+                )}
+                <div className="breakdown-total">
+                  <span style={{ color: '#fff' }}>Saldo Físico Neto en Caja:</span>
+                  <span style={{ color: saldoFisico >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
+                    {saldoFisico >= 0 ? `+${saldoFisico.toFixed(2)}` : saldoFisico.toFixed(2)}€
+                  </span>
+                </div>
               </div>
             </div>
           </div>
