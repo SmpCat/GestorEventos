@@ -97,6 +97,7 @@ export default async function ResultsPage() {
 
   const saldoFisico = totalRecaudado - totalGastadoBote - totalSalidasGlobales - totalDevoluciones;
   const totalIngresosGlobales = globalIncomeAgg._sum.amount || 0;
+  const totalOtrosIngresos = totalRecaudado - totalRecaudadoCuotas;
   const dineroPorCobrar = Math.max(0, totalBoteEsperado - totalRecaudadoCuotas);
 
   // Pendiente de reembolso: lo que el bote debe a asistentes (balances negativos)
@@ -280,17 +281,25 @@ export default async function ResultsPage() {
                   <span className="breakdown-label">Ingresos por Cuotas de Fiesta:</span>
                   <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalRecaudadoCuotas.toFixed(2)}€</span>
                 </div>
-                {totalIngresosGlobales > 0 && (
-                  <div className="breakdown-item">
-                    <span className="breakdown-label">Bote Anterior / Sobrante de Años Anteriores:</span>
-                    <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalIngresosGlobales.toFixed(2)}€</span>
-                  </div>
-                )}
-                {totalSocioFees > 0 && (
-                  <div className="breakdown-item">
-                    <span className="breakdown-label">Cuotas de Socio Recaudadas (👑 Alta Socio):</span>
-                    <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalSocioFees.toFixed(2)}€</span>
-                  </div>
+                {totalOtrosIngresos > 0 && (
+                  <>
+                    <div className="breakdown-item">
+                      <span className="breakdown-label">Ingresos Globales:</span>
+                      <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalOtrosIngresos.toFixed(2)}€</span>
+                    </div>
+                    {totalIngresosGlobales > 0 && (
+                      <div className="breakdown-item" style={{ paddingLeft: '1.5rem', opacity: 0.85 }}>
+                        <span className="breakdown-label">• Bote Anterior / Sobrante de Años Anteriores:</span>
+                        <span className="breakdown-value">+{totalIngresosGlobales.toFixed(2)}€</span>
+                      </div>
+                    )}
+                    {totalSocioFees > 0 && (
+                      <div className="breakdown-item" style={{ paddingLeft: '1.5rem', opacity: 0.85 }}>
+                        <span className="breakdown-label">• Cuotas de Socio Recaudadas (👑 Alta Socio):</span>
+                        <span className="breakdown-value">+{totalSocioFees.toFixed(2)}€</span>
+                      </div>
+                    )}
+                  </>
                 )}
                 <div className="breakdown-item">
                   <span className="breakdown-label">Gastos reales pagados con el Bote:</span>
