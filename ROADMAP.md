@@ -28,32 +28,50 @@ Interfaz de usuario simplificada pero con total transparencia:
 
 ### B. El Administrador
 Control absoluto del evento:
-*   **Registrar Movimientos**: Único usuario capaz de registrar los 7 tipos de movimientos financieros en la ficha de los asistentes.
+*   **Registrar Movimientos**: Único usuario capaz de registrar los tipos de movimientos financieros en la ficha de los asistentes.
 *   **Gestión de Listas**: Crear, renombrar y borrar listas de la compra, así como añadir y asignar productos.
 *   **Gestión de Tarifas**: Configurar y editar las reglas de precios del evento.
 
 ---
 
-## 💶 3. Los 7 Tipos de Movimientos de Asistente
+## 💶 3. Los Movimientos Parametrizables de Asistente (Base de Datos)
 
-Toda transacción se clasificará en uno de estos 7 tipos, los cuales se seleccionarán a través de un menú desplegable (dropdown) interactivo en la interfaz de usuario de administración. Cada tipo tiene su comportamiento específico:
+En lugar de programar de forma rígida los tipos de movimientos en el código, estos serán **100% parametrizables desde la base de datos** a través de la zona de administración. Esto permite que la lógica de cálculo y los formularios se adapten dinámicamente.
 
-| # | Tipo de Movimiento | ¿Lleva Ticket? | Impacto en Balance de Asistente | Impacto en Caja Física del Bote |
-| :-: | :--- | :---: | :---: | :---: |
-| **1** | **Pago Cuota (Ingreso)** | No | **Resta de su deuda** | **Suma al bote** (Efectivo/Bizum) |
-| **2** | **Alta Socio (Ingreso)** | No | Ninguno (no afecta a fiesta) | **Suma al bote** (Efectivo/Bizum) |
-| **3** | **Compra con su Dinero (Gasto Personal)** | **Sí** (Foto/Manual) | **Saldo a su favor (Bote le debe)** | Ninguno |
-| **4** | **Reembolso / Devolución por Compra (Salida)** | No | **Cancela su saldo a favor** | **Resta del bote** (Efectivo/Bizum) |
-| **5** | **Adelanto para Compra (Salida)** | No | Ninguno (dinero del bote) | **Resta del bote** (Efectivo/Bizum) |
-| **6** | **Justificación de Compra con Bote (Ticket Bote)** | **Sí** (Foto/Manual) | Ninguno | Ninguno (ya restado en paso 5) |
-| **7** | **Devolución de Cambio (Ingreso)** | No | Ninguno | **Suma al bote** (Efectivo/Bizum) |
+Cada movimiento en la base de datos se configurará mediante el modelo `MovementConfig`:
+
+| Concepto de Configuración | Tipo / Opciones | Descripción |
+| :--- | :---: | :--- |
+| **Nombre** | Texto | Nombre del movimiento (ej. "Pago Cuota", "Alta Socio", "Adelanto"). |
+| **Efecto en Asistente** | `NONE` / `INCOME` / `EXPENSE` | Cómo repercute en su cuota de fiesta (ej: `INCOME` resta lo que debe, `EXPENSE` suma). |
+| **Efecto en Bote** | `NONE` / `INCOME` / `EXPENSE` | Cómo repercute en la caja física (ej: `INCOME` suma dinero real, `EXPENSE` lo resta). |
+| **Requiere Ticket** | `Boolean` (Sí/No) | Si está activo, el formulario exigirá escanear o subir un ticket de compra. |
+
+### Configuración por Defecto (Los 7 Movimientos Iniciales)
+
+Bajo esta lógica parametrizable, los 7 movimientos del sistema se definen por base de datos de esta forma:
+
+1.  **Pago Cuota (Ingreso)**:
+    *   Efecto Asistente: `INCOME` (resta deuda) | Efecto Bote: `INCOME` (suma dinero) | Requiere Ticket: `No`.
+2.  **Alta Socio (Ingreso)**:
+    *   Efecto Asistente: `NONE` | Efecto Bote: `INCOME` (suma dinero) | Requiere Ticket: `No`.
+3.  **Compra con su Dinero (Gasto Personal)**:
+    *   Efecto Asistente: `INCOME` (le genera saldo a favor) | Efecto Bote: `NONE` | Requiere Ticket: `Sí`.
+4.  **Reembolso / Devolución por Compra (Salida)**:
+    *   Efecto Asistente: `EXPENSE` (cancela su saldo a favor) | Efecto Bote: `EXPENSE` (sale dinero) | Requiere Ticket: `No`.
+5.  **Adelanto para Compra (Salida)**:
+    *   Efecto Asistente: `NONE` | Efecto Bote: `EXPENSE` (sale dinero) | Requiere Ticket: `No`.
+6.  **Justificación de Compra con Bote (Ticket Bote)**:
+    *   Efecto Asistente: `NONE` | Efecto Bote: `NONE` (ya salió en paso 5) | Requiere Ticket: `Sí`.
+7.  **Devolución de Cambio (Ingreso)**:
+    *   Efecto Asistente: `NONE` | Efecto Bote: `INCOME` (entra cambio) | Requiere Ticket: `No`.
 
 ---
 
 ## 💡 4. Aportaciones y Mejoras de Usabilidad Real
 
 ### A. Diferenciación de Caja: Bizum vs. Efectivo
-Para facilitar el cuadre físico de la caja al final del evento, los movimientos que afecten al bote (Pagos, Altas, Reembolsos, Adelantos) tendrán una etiqueta obligatoria del **Método de Pago**:
+Para facilitar el cuadre físico de la caja al final del evento, los movimientos que afecten al bote (donde `affectsPot !== NONE`) tendrán una etiqueta obligatoria del **Método de Pago**:
 *   **Efectivo (Hucha física)**
 *   **Bizum / Digital (Cuenta bancaria)**
 Esto permitirá al panel de Flujo de Caja desglosar el dinero real disponible en metálico frente al dinero virtual.
@@ -73,30 +91,33 @@ Dado que la base de datos ya soporta multi-evento mediante la propiedad `isActiv
 
 ## 🛠️ 5. Impacto en Base de Datos y Código
 
-### A. Modelo `Payment` (Prisma Schema)
-Se expandirá el modelo `Payment` para incluir el tipo específico de movimiento, método de pago y concepto:
+### A. Modelo de Datos de Movimientos (Prisma Schema)
+La base de datos utilizará un sistema dinámico cargando la configuración de movimientos:
 ```prisma
-enum MovementType {
-  PAGO_CUOTA
-  ALTA_SOCIO
-  COMPRA_PERSONAL
-  REEMBOLSO_COMPRA
-  ADELANTO_COMPRA
-  COMPRA_BOTE
-  DEVOLUCION_CAMBIO
+enum AffectsDirection {
+  NONE
+  INCOME
+  EXPENSE
 }
 
 enum PaymentMethod {
   EFECTIVO
   BIZUM
-  NINGUNO // Para movimientos virtuales como COMPRA_PERSONAL
+  NINGUNO // Para movimientos sin movimiento físico (ej. Compra Personal)
+}
+
+model MovementConfig {
+  id              String           @id @default(uuid())
+  name            String
+  affectsAttendee AffectsDirection @default(NONE)
+  affectsPot      AffectsDirection @default(NONE)
+  requiresTicket  Boolean          @default(false)
+  payments        Payment[]
 }
 
 model Payment {
   id              String         @id @default(uuid())
   amount          Float
-  type            String         // "INCOME" o "EXPENSE" (para compatibilidad de caja)
-  movementType    MovementType
   paymentMethod   PaymentMethod  @default(EFECTIVO)
   concept         String         // Categoría predefinida o texto libre
   description     String?        // Notas adicionales opcionales
@@ -107,7 +128,11 @@ model Payment {
   attendeeId      String?        // Opcional si es global, requerido para asistente
   registeredById  String?        // Auditoría
   
-  // Archivo del ticket asociado (Para movimientos COMPRA_PERSONAL y COMPRA_BOTE)
+  // Configuración del movimiento (Cargado dinámicamente)
+  movementConfigId String
+  movementConfig   MovementConfig @relation(fields: [movementConfigId], references: [id])
+  
+  // Archivo del ticket asociado (Se habilita si movementConfig.requiresTicket es true)
   ticketUrl       String?      
   ticketItems     String?        // Detalles de productos comprados leídos por IA (JSON)
 }
