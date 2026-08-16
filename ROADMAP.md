@@ -17,10 +17,14 @@ Para evitar la redundancia y simplificar el uso de la aplicación, el sistema se
 ## 👥 2. Definición Estricta de Roles
 
 ### A. El Asistente (Usuario Normal)
-Interfaz de usuario simplificada al máximo:
-*   **Gestión de Asistencia**: Apuntarse/desapuntarse del evento activo, indicando días de asistencia (1, 2, 3+), opción de bebida (Con Alcohol, Sin Alcohol, No Bebida) y comida (Sí/No).
-*   **Consulta (Solo lectura)**: Ver su cuota calculada, sus pagos realizados y si tiene saldo pendiente.
-*   **Lista de la Compra (Lectura)**: Ver todos los productos necesarios y marcar como "comprados" los que tenga asignados. *No puede crear ni modificar listas*.
+Interfaz de usuario simplificada pero con total transparencia:
+*   **Gestión de Asistencia (Escritura)**: Apuntarse/desapuntarse del evento activo, indicando días de asistencia (1, 2, 3+), opción de bebida (Con Alcohol, Sin Alcohol, No Bebida) y comida (Sí/No).
+*   **Visibilidad Completa (Solo lectura)**:
+    *   Ver sus propios saldos y balances del evento.
+    *   Ver los saldos y balances de todos los demás asistentes (para máxima transparencia grupal).
+    *   Consultar el historial del **Flujo de Caja** completo en modo lectura.
+    *   Consultar todas las **Listas de la Compra** y marcar como "comprados" los productos que tenga asignados.
+*   *Restricción*: No tiene permisos para crear movimientos, alterar la contabilidad, ni subir o escanear tickets.
 
 ### B. El Administrador
 Control absoluto del evento:
