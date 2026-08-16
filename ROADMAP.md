@@ -89,7 +89,9 @@ Se propone crear una tabla `Category` en la base de datos para que el administra
 El sistema no realizará divisiones contables automáticas ni deducciones implícitas (por ejemplo, si un ticket supera un adelanto). Todo movimiento (adelantos, justificaciones, compras de bolsillo y reembolsos) debe ser registrado de forma explícita y manual por el administrador para garantizar un control total de la caja y evitar comportamientos "mágicos" del software.
 
 ### E. Soporte Histórico de Temporadas (Historial del Bote)
-Dado que la base de datos ya soporta multi-evento mediante la propiedad `isActive: Boolean` en el modelo `Event`, el año que viene se podrá desactivar el evento 2026 y activar el de 2027 sin borrar los datos del año anterior. Se sugiere añadir un **Selector de Evento** en el panel de administrador para poder consultar el histórico contable y de asistencia de años pasados en formato "solo lectura".
+Dado que la base de datos ya soporta multi-evento mediante la propiedad `isActive: Boolean` en el modelo `Event`, la temporada 2027 partirá completamente de cero a nivel contable (caja, listas y pagos limpios). 
+*   **Usuarios Persistentes**: El registro global de usuarios (`User`) se conserva intacto para que no tengan que volver a registrarse.
+*   **Consulta Histórica**: El evento de 2026 pasará a estar inactivo (`isActive: false`) y quedará bloqueado en formato "solo consulta" para revisar el histórico del bote de ese año sin riesgo de modificaciones. Las nuevas reglas de movimientos dinámicos solo aplicarán de forma activa a partir de los eventos creados para 2027 en adelante.
 
 ---
 
