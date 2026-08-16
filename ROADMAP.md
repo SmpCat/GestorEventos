@@ -36,7 +36,7 @@ Control absoluto del evento:
 
 ## 💶 3. Los 7 Tipos de Movimientos de Asistente
 
-Toda transacción se clasificará en uno de estos 7 tipos, cada uno con su comportamiento contable específico:
+Toda transacción se clasificará en uno de estos 7 tipos, los cuales se seleccionarán a través de un menú desplegable (dropdown) interactivo en la interfaz de usuario de administración. Cada tipo tiene su comportamiento específico:
 
 | # | Tipo de Movimiento | ¿Lleva Ticket? | Impacto en Balance de Asistente | Impacto en Caja Física del Bote |
 | :-: | :--- | :---: | :---: | :---: |
