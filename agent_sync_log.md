@@ -177,15 +177,11 @@
   - El desplegable `SearchableUserSelect` se auto-posiciona hacia arriba (`openUpwards`) si se detecta cerca del borde inferior del móvil.
 - **Empaquetado:** Todo el código y base de datos quedan listos y empaquetados en `gestoreventos.zip` y subidos al repositorio Git en `main`.
 
-
-
-
-
-
-
-
-
-
-
-
-
+## Sesión 17/08/2026 — Investigación de Sobrante y Traspaso al Mac
+- **Incidencia:** El usuario reporta una discrepancia en producción: "Bote Anterior (Sobrante 2025)" muestra `+400.00€`, pero según las cuentas debería ser `+390.00€`. Hay 10€ de descuadre.
+- **Análisis de Código:** En [results/page.tsx](file:///C:/Users/smpca/IA/Proyectos/GestorEventos/src/app/pricing/results/page.tsx), `totalIngresosGlobales` se calcula sumando todos los pagos donde `attendeeId` es `null`, `type` es `'INCOME'` y el `eventId` es el del evento activo.
+- **Acción requerida para el Agente del Mac (que tiene permisos SSH/RSYNC al NAS):**
+  1. Al arrancar en el Mac, ejecuta `./pull_from_nas.sh` para volcar la base de datos de producción real en tu entorno local.
+  2. Consulta la base de datos local recién sincronizada buscando los pagos globales (donde `eventId` es el evento activo, `attendeeId IS NULL` y `type = 'INCOME'`).
+  3. Identifica de dónde salen esos 10€ extra: ¿El pago `Sobrante 2025` se registró como 400€ en producción en lugar de 390€? ¿O hay otro pago de 10€ en la base de datos?
+  4. Muestra al usuario el desglose de conceptos y cantidades de estos pagos globales para aclarar el descuadre.
