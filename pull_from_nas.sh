@@ -19,6 +19,7 @@ async function dump() {
   const data = {
     users: await p.user.findMany(),
     events: await p.event.findMany(),
+    shoppingLists: await p.shoppingList.findMany(),
     eventAttendees: await p.eventAttendee.findMany(),
     payments: await p.payment.findMany(),
     pricingRules: await p.pricingRule.findMany(),
@@ -69,6 +70,7 @@ async function importData() {
   await prisma.shoppingListHistory.deleteMany();
   await prisma.shoppingListItem.deleteMany();
   await prisma.shoppingListEvidence.deleteMany();
+  await prisma.shoppingList.deleteMany();
   await prisma.expenseItem.deleteMany();
   await prisma.expenseImage.deleteMany();
   await prisma.expense.deleteMany();
@@ -81,6 +83,7 @@ async function importData() {
 
   for (const u of dump.users) await prisma.user.create({ data: u });
   for (const e of dump.events) await prisma.event.create({ data: e });
+  for (const sl of dump.shoppingLists) await prisma.shoppingList.create({ data: sl });
   for (const ea of dump.eventAttendees) await prisma.eventAttendee.create({ data: ea });
   for (const pr of dump.pricingRules) await prisma.pricingRule.create({ data: pr });
   for (const p of dump.payments) await prisma.payment.create({ data: p });

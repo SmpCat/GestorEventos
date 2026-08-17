@@ -70,15 +70,29 @@ export default async function ResultsPage() {
   });
 
   // Pagos globales del flujo de caja (sin asistente vinculado, ej: sobrante año anterior)
-  const globalIncomeAgg = await prisma.payment.aggregate({
-    _sum: { amount: true },
+  const globalIncomes = await prisma.payment.findMany({
     where: { eventId: activeEvent.id, attendeeId: null, type: 'INCOME' }
   });
+
+  let totalBoteAnterior = 0;
+  let totalOtrosGlobales = 0;
+
+  globalIncomes.forEach((p: any) => {
+    const desc = p.description?.toLowerCase() || '';
+    if (desc.includes('sobrante') || desc.includes('bote anterior') || desc.includes('inicial')) {
+      totalBoteAnterior += p.amount;
+    } else {
+      totalOtrosGlobales += p.amount;
+    }
+  });
+
+  const totalIngresosGlobales = totalBoteAnterior + totalOtrosGlobales;
+  totalRecaudado += totalIngresosGlobales;
+
   const globalExpenseAgg = await prisma.payment.aggregate({
     _sum: { amount: true },
     where: { eventId: activeEvent.id, attendeeId: null, type: 'EXPENSE' }
   });
-  totalRecaudado += globalIncomeAgg._sum.amount || 0;
   const totalSalidasGlobales = globalExpenseAgg._sum.amount || 0;
 
   // Restar también las devoluciones a asistentes (salidas físicas del bote)
@@ -96,7 +110,6 @@ export default async function ResultsPage() {
   const totalGastadoBote = totalGastado - (pocketExpensesAgg._sum.amount || 0);
 
   const saldoFisico = totalRecaudado - totalGastadoBote - totalSalidasGlobales - totalDevoluciones;
-  const totalIngresosGlobales = globalIncomeAgg._sum.amount || 0;
   const totalOtrosIngresos = totalRecaudado - totalRecaudadoCuotas;
   const dineroPorCobrar = Math.max(0, totalBoteEsperado - totalRecaudadoCuotas);
 
@@ -287,16 +300,22 @@ export default async function ResultsPage() {
                       <span className="breakdown-label">Otros Ingresos (Globales):</span>
                       <span className="breakdown-value" style={{ color: 'var(--accent-success)' }}>+{totalOtrosIngresos.toFixed(2)}€</span>
                     </div>
-                    {totalIngresosGlobales > 0 && (
+                    {totalBoteAnterior > 0 && (
                       <div className="breakdown-item" style={{ paddingLeft: '1rem', opacity: 0.85, fontSize: '0.8rem' }}>
                         <span className="breakdown-label">• Bote Anterior (Sobrante 2025):</span>
-                        <span className="breakdown-value">+{totalIngresosGlobales.toFixed(2)}€</span>
+                        <span className="breakdown-value">+{totalBoteAnterior.toFixed(2)}€</span>
                       </div>
                     )}
                     {totalSocioFees > 0 && (
                       <div className="breakdown-item" style={{ paddingLeft: '1rem', opacity: 0.85, fontSize: '0.8rem' }}>
                         <span className="breakdown-label">• Cuotas de Socio (👑 Altas):</span>
                         <span className="breakdown-value">+{totalSocioFees.toFixed(2)}€</span>
+                      </div>
+                    )}
+                    {totalOtrosGlobales > 0 && (
+                      <div className="breakdown-item" style={{ paddingLeft: '1rem', opacity: 0.85, fontSize: '0.8rem' }}>
+                        <span className="breakdown-label">• Varios (Comidas / Otros):</span>
+                        <span className="breakdown-value">+{totalOtrosGlobales.toFixed(2)}€</span>
                       </div>
                     )}
                   </>
