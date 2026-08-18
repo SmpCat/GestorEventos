@@ -38,11 +38,23 @@ async function main() {
     return;
   }
 
-  // Obtener todos los archivos en public/uploads/ (excluyendo subcarpetas si las hay)
-  const filesOnDisk = fs.readdirSync(uploadsDir).filter(file => {
-    const stat = fs.statSync(path.join(uploadsDir, file));
-    return stat.isFile();
-  });
+  // Obtener todos los archivos recursivamente en public/uploads/
+  function getAllFiles(dirPath, arrayOfFiles = []) {
+    const files = fs.readdirSync(dirPath);
+
+    files.forEach(file => {
+      const fullPath = path.join(dirPath, file);
+      if (fs.statSync(fullPath).isDirectory()) {
+        arrayOfFiles = getAllFiles(fullPath, arrayOfFiles);
+      } else {
+        arrayOfFiles.push(fullPath);
+      }
+    });
+
+    return arrayOfFiles;
+  }
+
+  const allPhysicalFiles = getAllFiles(uploadsDir);
 
   // Obtener todas las URLs de imágenes referenciadas en ExpenseImage
   const expenseImages = db.prepare("SELECT url FROM ExpenseImage").all();
@@ -54,28 +66,19 @@ async function main() {
     ...shoppingListImages.map(img => img.imageUrl)
   ]);
 
-  // Convertir a nombres de archivos relativos para comparar
-  // Las URLs en la base de datos suelen guardarse como '/uploads/filename.ext'
-  const dbReferencedFiles = new Set();
-  dbReferencedUrls.forEach(url => {
-    const filename = path.basename(url);
-    dbReferencedFiles.add(filename);
-  });
-
   const orphanFiles = [];
-  filesOnDisk.forEach(file => {
-    if (!dbReferencedFiles.has(file)) {
-      orphanFiles.push(file);
+  allPhysicalFiles.forEach(absolutePath => {
+    // Convertir ruta absoluta local a URL relativa (ej: /uploads/receipts/archivo.jpg)
+    const relativePath = '/uploads' + absolutePath.split('/public/uploads')[1].replace(/\\/g, '/');
+    if (!dbReferencedUrls.has(relativePath)) {
+      orphanFiles.push(relativePath);
     }
   });
 
   console.log(`\n2. 🖼️  ARCHIVOS DE IMÁGENES HUÉRFANAS EN DISCO (Archivos en la carpeta uploads sin referencia en la BBDD): ${orphanFiles.length}`);
   if (orphanFiles.length > 0) {
     orphanFiles.forEach(file => {
-      const filePath = path.join(uploadsDir, file);
-      const stat = fs.statSync(filePath);
-      const sizeMB = (stat.size / (1024 * 1024)).toFixed(2);
-      console.log(`   - Archivo: ${file} (${sizeMB} MB)`);
+      console.log(`   - Archivo huérfano: ${file}`);
     });
   } else {
     console.log("   ✅ No hay archivos de imágenes huérfanas en la carpeta de uploads.");
@@ -84,8 +87,8 @@ async function main() {
   // 3. Buscar referencias rotas en la BBDD (registros que apuntan a archivos que no existen en disco)
   const brokenReferences = [];
   dbReferencedUrls.forEach(url => {
-    const filename = path.basename(url);
-    if (!filesOnDisk.includes(filename)) {
+    const localPath = path.join(__dirname, 'public', url);
+    if (!fs.existsSync(localPath)) {
       brokenReferences.push(url);
     }
   });
