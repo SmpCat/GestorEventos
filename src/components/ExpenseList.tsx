@@ -495,7 +495,7 @@ export default function ExpenseList({
 
       {/* Listado agrupado por categoría */}
       {(() => {
-        const visibleExpenses = expenses.filter((exp: any) => exp.isScanned || exp.amount > 0);
+        const visibleExpenses = expenses;
         const totalAll = visibleExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
 
         // Agrupar por nombre de grupo

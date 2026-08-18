@@ -185,3 +185,9 @@
   2. Consulta la base de datos local recién sincronizada buscando los pagos globales (donde `eventId` es el evento activo, `attendeeId IS NULL` y `type = 'INCOME'`).
   3. Identifica de dónde salen esos 10€ extra: ¿El pago `Sobrante 2025` se registró como 400€ en producción en lugar de 390€? ¿O hay otro pago de 10€ en la base de datos?
   4. Muestra al usuario el desglose de conceptos y cantidades de estos pagos globales para aclarar el descuadre.
+
+## Sesión 18/08/2026 — Corrección de visibilidad de tickets fallidos de IA
+- **Incidencia:** Si el escaneo de un ticket con la IA de Gemini fallaba, la imagen se guardaba en el servidor y se creaba el registro en BD con importe `0.00€` y `isScanned: false`. Sin embargo, al haberse quitado la galería inferior de evidencias en commits anteriores (`5059ae8`), y debido al filtro de `visibleExpenses = expenses.filter(exp => exp.isScanned || exp.amount > 0)`, estos tickets fallidos de 0€ quedaban completamente ocultos de la UI, de modo que el usuario no podía verlos, editarlos ni re-escanearlos.
+- **Cambio realizado:** En [ExpenseList.tsx](file:///C:/Users/smpca/IA/Proyectos/GestorEventos/src/components/ExpenseList.tsx) se ha eliminado el filtro del listado, asignando directamente `visibleExpenses = expenses`.
+- **Efecto:** Los tickets fallidos de 0€ ahora aparecen en el listado bajo su categoría con la advertencia `⚠️ No digitalizado` e importe `0.00€`. El usuario puede pulsar en editar (✏️) para rellenar a mano toda la información (Establecimiento, Importe, Descripción, Pagado por) o bien pulsar en re-escanear (🔄) para intentar procesarlo de nuevo con la IA.
+
