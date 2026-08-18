@@ -381,7 +381,7 @@ export async function updateExpenseDescription(expenseId: string, description: s
   }
 }
 
-export async function updateExpenseDetails(expenseId: string, data: { store?: string; amount?: number; date?: string; description?: string; contributorAttendeeId?: string | null }) {
+export async function updateExpenseDetails(expenseId: string, data: { store?: string; amount?: number; date?: string; description?: string; contributorAttendeeId?: string | null; groupId?: string | null }) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: "No autorizado" };
@@ -400,6 +400,7 @@ export async function updateExpenseDetails(expenseId: string, data: { store?: st
         ...(data.date !== undefined && { date: new Date(data.date) }),
         ...(data.description !== undefined && { description: data.description.trim() }),
         ...(data.contributorAttendeeId !== undefined && { contributorAttendeeId: data.contributorAttendeeId || null }),
+        ...(data.groupId !== undefined && { groupId: data.groupId || null }),
       }
     });
 

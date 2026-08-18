@@ -44,6 +44,7 @@ export default function ExpenseList({
   const [editModalDesc, setEditModalDesc] = useState('');
   const [editModalContributor, setEditModalContributor] = useState('');
   const [editModalContributorSearch, setEditModalContributorSearch] = useState('');
+  const [editModalGroup, setEditModalGroup] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const openEditModal = (expense: any) => {
@@ -54,6 +55,7 @@ export default function ExpenseList({
     setEditModalDesc(expense.description || '...');
     setEditModalContributor(expense.contributorAttendeeId || '');
     setEditModalContributorSearch('');
+    setEditModalGroup(expense.groupId || '');
   };
 
   const handleSaveEdit = async () => {
@@ -65,6 +67,7 @@ export default function ExpenseList({
       date: editModalDate,
       description: editModalDesc,
       contributorAttendeeId: editModalContributor || null,
+      groupId: editModalGroup || null,
     });
     setIsSavingEdit(false);
     if (!res.success) alert(`Error: ${res.error}`);
@@ -710,6 +713,15 @@ export default function ExpenseList({
               <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Descripción</label>
               <input type="text" className="input-field" value={editModalDesc} onChange={e => setEditModalDesc(e.target.value)}
                 style={{ width: '100%' }} placeholder="..." />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Categoría / Grupo</label>
+              <select className="input-field" value={editModalGroup} onChange={e => setEditModalGroup(e.target.value)} style={{ width: '100%' }}>
+                <option value="">Sin categoría (General)</option>
+                {groups.map((g: any) => (
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.25rem' }}>Pagado de su bolsillo por</label>
