@@ -191,3 +191,16 @@
 - **Cambio realizado:** En [ExpenseList.tsx](file:///C:/Users/smpca/IA/Proyectos/GestorEventos/src/components/ExpenseList.tsx) se ha eliminado el filtro del listado, asignando directamente `visibleExpenses = expenses`.
 - **Efecto:** Los tickets fallidos de 0€ ahora aparecen en el listado bajo su categoría con la advertencia `⚠️ No digitalizado` e importe `0.00€`. El usuario puede pulsar en editar (✏️) para rellenar a mano toda la información (Establecimiento, Importe, Descripción, Pagado por) o bien pulsar en re-escanear (🔄) para intentar procesarlo de nuevo con la IA.
 
+## Relevo para el Agente en macOS (Mac Mini) — Diagnóstico y Despliegue de Producción
+El usuario se traslada al Mac Mini para continuar con la verificación en producción.
+**Acción requerida para el Agente del Mac:**
+1. **Sincronizar repositorio:** Ejecuta `git pull` para obtener el fix del listado, el script de diagnóstico `check_dead_tickets.js` y el script de PowerShell `pull_from_nas.ps1`.
+2. **Descargar base de datos real:** Ejecuta `./pull_from_nas.sh` (tú tienes los accesos SSH automáticos al NAS de producción).
+3. **Ejecutar diagnóstico:** Corre `node check_dead_tickets.js` en local. Este script detectará:
+   * Los registros de tickets a `0€` y `isScanned: false` en la BBDD (huérfanos de IA).
+   * Los archivos de fotos en `/public/uploads` del NAS que no tienen ninguna referencia en la BBDD (archivos muertos).
+   * Referencias rotas (registros que apuntan a fotos que no existen en disco).
+4. **Reportar al usuario:** Muestra en el chat el informe con el listado de registros y archivos muertos detectados.
+5. **Desplegar fix:** Una vez verificado, ejecuta `./deploy_to_nas.sh` para subir los cambios a producción. Así, el usuario podrá editar o re-escanear esos tickets de `0€` en la web real.
+
+
