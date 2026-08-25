@@ -5,9 +5,9 @@ const path = require('path');
 async function main() {
   console.log("🔍 INICIANDO ANÁLISIS DE REGISTROS Y ARCHIVOS HUÉRFANOS (TICKETS MUERTOS)...");
 
-  const dbPath = 'dev.db';
+  const dbPath = fs.existsSync('prisma/dev.db') ? 'prisma/dev.db' : 'dev.db';
   if (!fs.existsSync(dbPath)) {
-    console.error("❌ No se encuentra el archivo dev.db local. Por favor, ejecuta primero ./pull_from_nas.sh para descargar los datos de producción.");
+    console.error("❌ No se encuentra el archivo dev.db local (ni en raíz ni en prisma/). Por favor, ejecuta primero ./pull_from_nas.sh para descargar los datos de producción.");
     return;
   }
 
@@ -69,7 +69,7 @@ async function main() {
   const orphanFiles = [];
   allPhysicalFiles.forEach(absolutePath => {
     // Convertir ruta absoluta local a URL relativa (ej: /uploads/receipts/archivo.jpg)
-    const relativePath = '/uploads' + absolutePath.split('/public/uploads')[1].replace(/\\/g, '/');
+    const relativePath = '/uploads' + absolutePath.split(path.join('public', 'uploads'))[1].replace(/\\/g, '/');
     if (!dbReferencedUrls.has(relativePath)) {
       orphanFiles.push(relativePath);
     }
