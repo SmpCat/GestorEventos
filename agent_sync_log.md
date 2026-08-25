@@ -204,5 +204,31 @@ El usuario se traslada al Mac Mini para continuar con la verificación en produc
 5. **Desplegar fix:** Una vez verificado, ejecuta `./deploy_to_nas.sh` para subir los cambios a producción. Así, el usuario podrá editar o re-escanear esos tickets de `0€` en la web real.
 6. **Transferencia de Clave SSH al Windows (Mente Colmena):** El usuario ha solicitado expresamente que le pases la clave SSH privada del Mac al Windows en este relevo. Copia el contenido de la clave privada del Mac (`~/.ssh/id_rsa` o `~/.ssh/id_ed25519`) y guárdalo en la carpeta de configuración global (`~/.gemini/config/id_rsa_temp` o similar) y haz un git push en esa carpeta. Así el agente de Windows podrá descargarla en la siguiente sesión, instalarla en `C:\Users\smpca\.ssh\`, configurar sus permisos y borrar el archivo temporal del repositorio para no dejar rastros.
 
+---
+
+## Sesión 25/08/2026 — Auditoría de Sistemas y Reparación de Entorno en Windows (Mente Colmena V2)
+
+### Cambios Implementados
+- **Reparación del Entorno Local de Windows (Portátil):**
+  - Se identificó corrupción en los node_modules locales (módulo `@prisma/engines` faltante). Se ejecutó `npm install` y `npx prisma generate` restaurando la operatividad de desarrollo.
+  - Se sincronizó la base de datos SQLite local (`prisma/dev.db`) con el esquema actual mediante `npx prisma db push`, añadiendo los campos más recientes (como `isScanned` en `Expense`).
+- **Correcciones en Script de Diagnóstico (`check_dead_tickets.js`):**
+  - Corregido bug de rutas que provocaba crash en Windows (uso de barra invertida en rutas absolutas). Ahora utiliza `path.join('public', 'uploads')` de forma dinámica y es compatible con Windows y macOS.
+  - Se configuró fallback automático para leer `prisma/dev.db` si no existe la base de datos en la raíz del proyecto.
+- **Reescritura de Script de Sincronización para Windows (`pull_from_nas.ps1`):**
+  - Se eliminó el flujo complejo de exportación JSON (que fallaba por escaping de comillas y caracteres especiales en PowerShell).
+  - Se implementó la copia directa binaria de `prod.db` a `prisma/dev.db` y sincronización recursiva de la carpeta `public/uploads` mediante `scp -O` (forzando protocolo SCP legacy para evitar fallos de SFTP subsystem en QNAP).
+  - Se solucionaron problemas de permisos de escritura de `smp` en la carpeta montada `/public/uploads` del NAS haciendo copia a directorios transitivos.
+- **Ejecución y Verificación:**
+  - Se corrió el script de sincronización con éxito total: base de datos y todas las imágenes reales importadas localmente de manera segura.
+  - El diagnóstico de `check_dead_tickets.js` reporta **0 referencias rotas** (todas las imágenes de la BBDD existen físicamente en disco) y **13 archivos huérfanos** (imágenes obsoletas reales en el disco duro del NAS).
+  - Todos los repositorios fueron actualizados y puestos al día (`git status` limpio en todos).
+
+### Relevo para el Agente en macOS (Mac Mini)
+1. **Fixes de scripts ya sincronizados:** Los cambios en `pull_from_nas.ps1` y `check_dead_tickets.js` ya están subidos a GitHub (`git push origin main` realizado con éxito). Solo tienes que hacer `git pull` al arrancar.
+2. **Entorno local en portátil de Windows totalmente listo:** Si el usuario decide continuar en Windows, el servidor local y de base de datos están 100% operativos. Las BBDD local y del NAS quedan totalmente independientes.
+3. **Clave SSH:** La clave SSH ya está configurada localmente en la ruta `C:\Users\smpca\.ssh\id_ed25519` permitiendo conexión passwordless segura al NAS (puerto 8222).
+
+
 
 
