@@ -163,4 +163,5 @@ Para facilitar la puesta en marcha de cada nueva temporada sin tener que introdu
 *   Dado que la base de datos conserva a los usuarios (`User`) de forma global para que no tengan que volver a registrarse, se creará una pantalla de gestión en la administración.
 *   Esta pantalla listará a todos los usuarios históricos registrados en el sistema que aún no pertenezcan al evento activo.
 *   El Administrador podrá seleccionar múltiples usuarios mediante casillas de verificación y, con un solo clic, darlos de alta como asistentes (`EventAttendee`) del evento activo, configurando su estado inicial.
+*   **Independencia de Asistencia por Año:** Este modelo respeta que un usuario pueda participar un año y no otro. El registro de `User` es global y persistente, pero su registro de asistencia (`EventAttendee`) se crea y gestiona de forma única e independiente para cada evento activo. Si un usuario no asiste a un evento específico, simplemente no tendrá el registro `EventAttendee` de ese año, sin perder su cuenta de usuario.
 ```
