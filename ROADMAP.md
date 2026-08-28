@@ -74,11 +74,15 @@ El sistema contable de cara al participante se simplifica para admitir únicamen
 1.  **Pago Cuota Fiesta:** 
     *   **Cálculo Automático:** Se calcula a partir de las tarifas cargadas en la tabla de precios (`PricingRule`).
     *   **Regla de Ajuste Exacto (Sin Aproximaciones):** No se realizarán aproximaciones de días ni fallbacks si no hay coincidencia exacta. Si el perfil del asistente (días, edad, alcohol, comida, socio) coincide exactamente con alguna tarifa, esta se aplica. En caso contrario, no se calcula cuota esperada y se muestra un mensaje en pantalla indicando que debe **consultar con el Administrador**.
-    *   **Impacto Contable:** Reduce la deuda del asistente (genera saldo a favor si paga de más, o saldo en contra si paga de menos) y genera un ingreso real en el Bote.
+    *   **Cálculo de Deuda / Saldo (Pagos Fraccionados o en Exceso):** El asistente puede realizar múltiples pagos parciales o pagar de más. El saldo se calcula como: `Suma(Pagos de Fiesta) - Cuota de Fiesta`.
+        *   Si el resultado es **negativo** (ej. Cuota: 60€ | Pagado: 50€): El asistente **debe** la diferencia al Bote (deuda de 10€).
+        *   Si el resultado es **positivo** (ej. Cuota: 60€ | Pagado: 70€): El Bote **debe** la diferencia al asistente (saldo a favor de 10€).
 2.  **Pago Cuota Socio:**
     *   **Cálculo del Importe:** Establecido y configurado directamente por el Administrador.
-    *   **Automatización de Condición de Socio:** Al registrarse el pago de cuota de socio de forma exitosa, el backend actualizará de forma automática la propiedad `isMember: true` en el registro del usuario (`User`).
-    *   **Impacto Contable:** Genera saldo a favor/crédito en el asistente y añade fondos al Bote.
+    *   **Cálculo de Deuda / Saldo (Pagos Fraccionados o en Exceso):** El saldo se calcula como: `Suma(Pagos de Socio) - Cuota de Socio`.
+        *   Si el resultado es **negativo** (ej. Cuota Socio: 20€ | Pagado: 10€): El asistente **debe** la diferencia al Bote (deuda de 10€).
+        *   Si el resultado es **positivo** (ej. Cuota Socio: 20€ | Pagado: 50€): El Bote **debe** la diferencia al asistente (saldo a favor de 30€).
+    *   **Automatización de Condición de Socio:** Al registrarse el pago de cuota de socio (ya sea el primer pago fraccionado o el pago completo), el backend actualizará de forma automática la propiedad `isMember: true` en el registro del usuario (`User`).
 
 Estos dos son los únicos tipos de transacciones que pueden alterar la deuda/saldo de un participante o registrar entradas financieras del mismo al Bote.
 
