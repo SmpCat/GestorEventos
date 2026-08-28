@@ -128,3 +128,24 @@ model Payment {
   registeredBy    User?          @relation("PaymentRegisteredBy", fields: [registeredById], references: [id])
 }
 ```
+
+---
+
+## 🗄️ 6. Estrategia de Migración y Despliegue (GestorEventos v2)
+
+Para garantizar la seguridad del entorno de producción y realizar una transición sin riesgos, la fase de desarrollo y migración se dividirá en los siguientes hitos:
+
+### A. Desarrollo Aislado (Nuevo Proyecto)
+*   Toda la reescritura de código, estandarización de CSS y cambios en el modelo de base de datos se llevarán a cabo en un nuevo directorio de desarrollo independiente: `/Volumes/Orico/IA/Proyectos/GestorEventos2`.
+*   Esto mantiene la versión 1 de `GestorEventos` totalmente operativa en producción y permite experimentar con la reestructuración de la base de datos sin interferir en los datos en vivo.
+
+### B. Normalización y Migración de Datos (BBDD Antigua a Nueva)
+Una vez que el código y el esquema de la nueva base de datos en `GestorEventos2` estén finalizados y validados, se ejecutará un proceso de migración de datos para trasladar el histórico:
+1.  **Backup Obligatorio:** Se realizará una copia de seguridad binaria de la base de datos de producción (`prod.db`) antes de cualquier acción.
+2.  **Script de Normalización:** Se desarrollará un script específico en Node.js que:
+    *   Lea los usuarios (`User`), eventos (`Event`) y asistentes (`EventAttendee`) intactos de la base de datos original.
+    *   Mapee los pagos de cuotas y de socios (`Payment`), transformando el campo booleano `isMembershipFee` al nuevo enumerado `PaymentType` (`FIESTA` o `SOCIO`).
+    *   Migre los tickets de compra (`Expense`) limpiando cualquier asignación personal (`contributorAttendeeId = null`) para convertirlos en gastos puramente globales del bote.
+    *   Cargue el saldo sobrante del año anterior configurando el campo `previousSurplus` en el modelo `Event` correspondiente.
+3.  **Despliegue y Pruebas en Desarrollo:** El script se ejecutará y validará primero de forma local en el nuevo proyecto antes de aplicarse en producción.
+```
