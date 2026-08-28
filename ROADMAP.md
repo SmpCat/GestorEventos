@@ -176,6 +176,7 @@ Para realizar una refactorización segura y controlada, dividiremos la construcc
     *   Crear la nueva carpeta física `/Volumes/Orico/IA/Proyectos/GestorEventos2`.
     *   Copiar la estructura del esqueleto del proyecto actual (ficheros de configuración de Next.js, tsconfig, package.json, y la carpeta `src/`), omitiendo directorios pesados (`node_modules`, `.next`, `data/`) y bases de datos locales `.db`.
     *   **Replicar Scripts de Automatización:** Copiar y adaptar los scripts de despliegue, sincronización y mantenimiento (`deploy_to_nas.sh`, `pull_from_nas.sh`, `pull_from_nas.ps1`, `fix_containers.sh`, etc.) en el nuevo directorio para asegurar que las herramientas de integración y sincronización sigan operativas.
+    *   **Soporte en Gestor de Arranque (Desarrollo):** Actualizar la aplicación o scripts del `GestorArranque` local para incorporar el registro del nuevo entorno de desarrollo y su puerto asignado para la v2.
     *   Instalar las dependencias (`npm install`) y configurar el archivo de entorno `.env` con la API key de Gemini.
     *   Inicializar un nuevo repositorio Git local para llevar el control de versiones independiente de la versión 2.
 *   **Fase 1: Base de Estilos (CSS Puro):** Configuración de las variables de color (paleta de 3-4 colores) en `globals.css` y definición de las clases básicas de maquetación y tipografía.
@@ -187,5 +188,8 @@ Para realizar una refactorización segura y controlada, dividiremos la construcc
     4.  **Caso de Uso D:** Listas de la compra por categorías.
     5.  **Caso de Uso E:** Herramientas de administración (clonación de tarifas y promoción masiva).
 *   **Fase 4: Integración Lógica y Buscadores (Por etapas incrementales):** Conectar de forma progresiva la interfaz visual estática con la lógica del servidor de cada caso de uso y aplicar los buscadores homogéneos correspondientes, probando cada flujo de extremo a extremo de manera aislada.
-*   **Fase 5: Migración de Datos Históricos:** Desarrollo del script de normalización para trasladar de forma segura los datos de `prod.db` (v1) al nuevo esquema simplificado (v2) y realizar el despliegue final.
+*   **Fase 5: Migración de Datos Históricos y Despliegue:**
+    *   Desarrollo del script de normalización para trasladar de forma segura los datos de `prod.db` (v1) al nuevo esquema simplificado (v2).
+    *   **Actualización en Gestor de Arranque (Producción):** Modificar la configuración de arranque de contenedores de la aplicación `GestorArranque` en producción para dar soporte al nuevo contenedor de la v2 (puertos, reinicios, redirección de subida de archivos).
+    *   Realizar el despliegue final y la puesta en marcha de la v2.
 ```
