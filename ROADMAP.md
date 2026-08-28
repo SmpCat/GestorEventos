@@ -1,12 +1,37 @@
-# Roadmap GestorEventos 2027: Arquitectura Simplificada de Caja Única
+# Roadmap GestorEventos: Conexión de Caja Única y Estandarización de Diseño
 
-Este documento contiene las especificaciones conceptuales y de desarrollo para la reestructuración de la base de datos, lógica de negocio y experiencia de usuario (UI/UX) de cara a la temporada 2027.
+Este documento contiene las especificaciones conceptuales, de desarrollo y de diseño para la reestructuración del sistema de cara a la nueva versión. El objetivo principal es lograr una arquitectura financiera robusta junto con una base de código visualmente unificada, limpia de estilos inline y consistente en su iconografía.
 
 ---
 
-## 📌 1. Filosofía del Sistema: "Caja Única y Centro de Acción"
+## 🎨 1. Estandarización de Diseño (UI/UX) y CSS Puro
 
-Para evitar la redundancia y simplificar el uso de la aplicación, el sistema se dividirá en tres áreas funcionales bien diferenciadas:
+Para corregir la discrepancia de estilos inline y la mezcla de componentes visuales en la aplicación, se establecen las siguientes directrices estrictas de diseño:
+
+### A. Paleta de Colores Reducida y Centralizada
+Toda la aplicación se regirá exclusivamente por una paleta de **3 o 4 colores base**, configurados como variables CSS en `:root` dentro de [`globals.css`](file:///Volumes/Orico/IA/Proyectos/GestorEventos/src/app/globals.css). Se prohíbe el uso de códigos de color `#hex` o `rgb` embebidos en los componentes React.
+*   **Fondo Principal (Background):** Fondo ultra-oscuro / negro para el tema oscuro.
+*   **Texto (Primary Text):** Tono claro de alta legibilidad (blanco / gris claro).
+*   **Acento (Accent):** Un único color de acento y realce (ej. azul eléctrico o violeta).
+*   **Contraste/Alerta (Contrast/Alert):** Color complementario para errores, borrados o advertencias críticas de forma muy dosificada.
+
+### B. Eliminación Total de Estilos Inline
+Se realizará una refactorización completa de todos los archivos `.tsx` para eliminar el atributo `style={{ ... }}`.
+*   Toda propiedad de maquetación, espaciado, fuentes y colores debe definirse mediante clases globales en `globals.css` o a través de **CSS Modules** (`*.module.css`).
+*   Los componentes reutilizables como `SelectField` o botones recibirán únicamente clases CSS para sus variantes, manteniendo el marcado HTML completamente limpio.
+
+### C. Consistencia de Iconografía por Operación
+Se evitará la duplicidad y variación de iconos (tanto emojis como vectores) para las mismas acciones de usuario. Se define una relación unívoca de iconografía:
+*   **Editar / Modificar:** Un único elemento visual consistente (ej. siempre el mismo lápiz ✏️ o `PencilIcon`).
+*   **Eliminar / Cancelar:** Un único elemento visual consistente (ej. siempre la papelera 🗑️ o `TrashIcon`).
+*   **Añadir / Registrar:** Un único icono estándar (ej. `+`).
+*   **Acciones de Estado (Éxito / Fallo / Carga):** Estandarización de checkmarks, alertas e indicadores de carga.
+
+---
+
+## 📌 2. Filosofía del Sistema: "Caja Única y Centro de Acción"
+
+El sistema se divide en tres áreas funcionales bien diferenciadas a nivel de lógica de negocio:
 
 1.  **Asistentes (El Centro de Acción)**: El único canal a través del cual el administrador puede introducir datos financieros o registrar compras. Todo movimiento de dinero está de esta forma vinculado a un participante.
 2.  **Flujo de Caja (El Libro Contable de Solo Lectura)**: Un historial cronológico unificado de todas las entradas, salidas, tickets y movimientos. Desaparece la sección independiente de "Tickets de Compra", integrándose la visualización de los mismos en esta línea de tiempo.
@@ -14,17 +39,17 @@ Para evitar la redundancia y simplificar el uso de la aplicación, el sistema se
 
 ---
 
-## 👥 2. Definición Estricta de Roles
+## 👥 3. Definición Estricta de Roles
 
 ### A. El Asistente (Usuario Normal)
 Interfaz de usuario simplificada pero con total transparencia:
-*   **Gestión de Asistencia (Escritura)**: Apuntarse/desapuntarse del evento activo, indicando días de asistencia (1, 2, 3+), opción de bebida (Con Alcohol, Sin Alcohol, No Bebida) y comida (Sí/No).
+*   **Gestión de Asistencia (Escritura)**: Apuntarse/desapuntarse del evento activo, indicando días de asistencia, opción de bebida y comida.
 *   **Visibilidad Completa (Solo lectura)**:
     *   Ver sus propios saldos y balances del evento.
-    *   Ver los saldos y balances de todos los demás asistentes (para máxima transparencia grupal).
-    *   Consultar el historial del **Flujo de Caja** completo en modo lectura.
-    *   Consultar todas las **Listas de la Compra** y marcar como "comprados" los productos que tenga asignados.
-*   *Restricción*: No tiene permisos para crear movimientos, alterar la contabilidad, ni subir o escanear tickets.
+    *   Ver los saldos y balances de todos los demás asistentes.
+    *   Consultar el historial del **Flujo de Caja** completo.
+    *   Consultar todas las **Listas de la Compra** y marcar como "comprados" los productos asignados.
+*   *Restricción*: No tiene permisos para crear movimientos directos, alterar la contabilidad global, ni subir o escanear tickets.
 
 ### B. El Administrador
 Control absoluto del evento:
@@ -34,9 +59,9 @@ Control absoluto del evento:
 
 ---
 
-## 💶 3. Los Movimientos Parametrizables de Asistente (Base de Datos)
+## 💶 4. Los Movimientos Parametrizables de Asistente (Base de Datos)
 
-En lugar de programar de forma rígida los tipos de movimientos en el código, estos serán **100% parametrizables desde la base de datos** a través de la zona de administración. Esto permite que la lógica de cálculo y los formularios se adapten dinámicamente.
+En lugar de programar de forma rígida los tipos de movimientos en el código, estos serán **100% parametrizables desde la base de datos** a través de la zona de administración.
 
 Cada movimiento en la base de datos se configurará mediante el modelo `MovementConfig`:
 
@@ -48,56 +73,18 @@ Cada movimiento en la base de datos se configurará mediante el modelo `Movement
 | **Requiere Ticket** | `Boolean` (Sí/No) | Si está activo, el formulario exigirá escanear o subir un ticket de compra. |
 
 ### Configuración por Defecto (Los 7 Movimientos Iniciales)
-
-Bajo esta lógica parametrizable, los 7 movimientos del sistema se definen por base de datos de esta forma:
-
-1.  **Pago Cuota (Ingreso)**:
-    *   Efecto Asistente: `INCOME` (resta deuda) | Efecto Bote: `INCOME` (suma dinero) | Requiere Ticket: `No`.
-2.  **Alta Socio (Ingreso)**:
-    *   Efecto Asistente: `NONE` | Efecto Bote: `INCOME` (suma dinero) | Requiere Ticket: `No`.
-3.  **Compra con su Dinero (Gasto Personal)**:
-    *   Efecto Asistente: `INCOME` (le genera saldo a favor) | Efecto Bote: `NONE` | Requiere Ticket: `Sí`.
-4.  **Reembolso / Devolución por Compra (Salida)**:
-    *   Efecto Asistente: `EXPENSE` (cancela su saldo a favor) | Efecto Bote: `EXPENSE` (sale dinero) | Requiere Ticket: `No`.
-5.  **Adelanto para Compra (Salida)**:
-    *   Efecto Asistente: `NONE` | Efecto Bote: `EXPENSE` (sale dinero) | Requiere Ticket: `No`.
-6.  **Justificación de Compra con Bote (Ticket Bote)**:
-    *   Efecto Asistente: `NONE` | Efecto Bote: `NONE` (ya salió en paso 5) | Requiere Ticket: `Sí`.
-7.  **Devolución de Cambio (Ingreso)**:
-    *   Efecto Asistente: `NONE` | Efecto Bote: `INCOME` (entra cambio) | Requiere Ticket: `No`.
+1.  **Pago Cuota (Ingreso)**: Asistente: `INCOME` | Bote: `INCOME` | Requiere Ticket: `No`.
+2.  **Alta Socio (Ingreso)**: Asistente: `NONE` | Bote: `INCOME` | Requiere Ticket: `No`.
+3.  **Compra con su Dinero (Gasto Personal)**: Asistente: `INCOME` | Bote: `NONE` | Requiere Ticket: `Sí`.
+4.  **Reembolso / Devolución por Compra (Salida)**: Asistente: `EXPENSE` | Bote: `EXPENSE` | Requiere Ticket: `No`.
+5.  **Adelanto para Compra (Salida)**: Asistente: `NONE` | Bote: `EXPENSE` | Requiere Ticket: `No`.
+6.  **Justificación de Compra con Bote (Ticket Bote)**: Asistente: `NONE` | Bote: `NONE` | Requiere Ticket: `Sí`.
+7.  **Devolución de Cambio (Ingreso)**: Asistente: `NONE` | Bote: `INCOME` | Requiere Ticket: `No`.
 
 ---
 
-## 💡 4. Aportaciones y Mejoras de Usabilidad Real
+## 🛠️ 5. Impacto en Base de Datos (Prisma Schema)
 
-### A. Diferenciación de Caja: Bizum vs. Efectivo
-Para facilitar el cuadre físico de la caja al final del evento, los movimientos que afecten al bote (donde `affectsPot !== NONE`) tendrán una etiqueta obligatoria del **Método de Pago**:
-*   **Efectivo (Hucha física)**
-*   **Bizum / Digital (Cuenta bancaria)**
-Esto permitirá al panel de Flujo de Caja desglosar el dinero real disponible en metálico frente al dinero virtual.
-
-### B. Desplegable de Conceptos Predefinidos (Motivos)
-En lugar de forzar al administrador a escribir textos manuales en el móvil, los motivos de los movimientos se seleccionarán desde un desplegable estándar:
-*   Para cuotas: Preseleccionado como `"Cuota Fiesta"` o `"Cuota Peña"`.
-*   Para compras/adelantos: Opciones de categoría como `[Carne/Comida]`, `[Bebida]`, `[Hielo/Menaje]`, `[Otros...]` (esta última abre un campo de texto libre).
-
-### C. Categorías Parametrizables para Gastos y Listas
-Se propone crear una tabla `Category` en la base de datos para que el administrador pueda añadir, editar y eliminar categorías directamente desde el panel de control. Estas categorías alimentarán los desplegables de las Listas de la Compra y del Flujo de Caja.
-*   *Nota de diseño:* Las categorías iniciales y la estructura final de esta tabla se definirán y estudiarán analizando detalladamente los datos de la base de datos real al finalizar el evento de la presente temporada.
-
-### D. Registro Explícito y Manual
-El sistema no realizará divisiones contables automáticas ni deducciones implícitas (por ejemplo, si un ticket supera un adelanto). Todo movimiento (adelantos, justificaciones, compras de bolsillo y reembolsos) debe ser registrado de forma explícita y manual por el administrador para garantizar un control total de la caja y evitar comportamientos "mágicos" del software.
-
-### E. Soporte Histórico de Temporadas (Historial del Bote)
-Dado que la base de datos ya soporta multi-evento mediante la propiedad `isActive: Boolean` en el modelo `Event`, la temporada 2027 partirá completamente de cero a nivel contable (caja, listas y pagos limpios). 
-*   **Usuarios Persistentes**: El registro global de usuarios (`User`) se conserva intacto para que no tengan que volver a registrarse.
-*   **Consulta Histórica**: El evento de 2026 pasará a estar inactivo (`isActive: false`) y quedará bloqueado en formato "solo consulta" para revisar el histórico del bote de ese año sin riesgo de modificaciones. Las nuevas reglas de movimientos dinámicos solo aplicarán de forma activa a partir de los eventos creados para 2027 en adelante.
-
----
-
-## 🛠️ 5. Impacto en Base de Datos y Código
-
-### A. Modelo de Datos de Movimientos (Prisma Schema)
 La base de datos utilizará un sistema dinámico cargando la configuración de movimientos:
 ```prisma
 enum AffectsDirection {
@@ -131,18 +118,13 @@ model Payment {
   
   // Relaciones
   eventId         String
-  attendeeId      String?        // Opcional si es global, requerido para asistente
+  attendeeId      String?        // Opcional si es global
   registeredById  String?        // Auditoría
   
-  // Configuración del movimiento (Cargado dinámicamente)
   movementConfigId String
   movementConfig   MovementConfig @relation(fields: [movementConfigId], references: [id])
   
-  // Archivo del ticket asociado (Se habilita si movementConfig.requiresTicket es true)
   ticketUrl       String?      
-  ticketItems     String?        // Detalles de productos comprados leídos por IA (JSON)
+  ticketItems     String?        // Detalles de productos (JSON)
 }
 ```
-
-### B. Eliminación de Modelos Obsoletos
-*   El modelo `Expense` se integrará completamente en `Payment` (los movimientos `COMPRA_PERSONAL` y `COMPRA_BOTE` asumen su rol), eliminando tablas redundantes en la base de datos SQLite y simplificando las migraciones.
