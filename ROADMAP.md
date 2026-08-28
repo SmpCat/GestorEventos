@@ -174,7 +174,12 @@ Para realizar una refactorización segura y controlada, dividiremos la construcc
 
 *   **Fase 1: Base de Estilos (CSS Puro):** Configuración de las variables de color (paleta de 3-4 colores) en `globals.css` y definición de las clases básicas de maquetación y tipografía.
 *   **Fase 2: Esqueleto Visual (HTML/TSX Estático):** Reescribir las pantallas (Dashboard, Listas, Caja, Tickets, Admin) para limpiar todo estilo inline, aplicar los nuevos estilos CSS globales y unificar la iconografía. Se trabajará inicialmente en formato estático (sin conectar llamadas al servidor ni base de datos) para validar y ajustar el diseño visual en móviles y escritorio.
-*   **Fase 3: Base de Datos y Acciones del Servidor:** Implementar el esquema de base de datos simplificado (Prisma) y desarrollar las server actions backend para la gestión de cuotas, el marcaje automático de socios y el registro de tickets de gasto globales.
-*   **Fase 4: Integración Lógica y Buscadores:** Conectar la interfaz visual estática con la lógica del servidor e implementar los buscadores en vivo homogéneos por pantalla.
+*   **Fase 3: Base de Datos y Acciones del Servidor (Por etapas incrementales):** Implementar el esquema de base de datos simplificado (Prisma). El desarrollo se realizará **etapa por etapa para cada caso de uso individual** (nunca todo de golpe) para validar su correcto funcionamiento en aislamiento:
+    1.  **Caso de Uso A:** Gestión y cálculo de cuotas exactas según Tarifas (sin aproximación).
+    2.  **Caso de Uso B:** Registro de pagos (Fiesta y Socio) con automatización de conversión de socio en base de datos.
+    3.  **Caso de Uso C:** Carga y registro de tickets de gasto globales (sin vinculación de deudores/personas).
+    4.  **Caso de Uso D:** Listas de la compra por categorías.
+    5.  **Caso de Uso E:** Herramientas de administración (clonación de tarifas y promoción masiva).
+*   **Fase 4: Integración Lógica y Buscadores (Por etapas incrementales):** Conectar de forma progresiva la interfaz visual estática con la lógica del servidor de cada caso de uso y aplicar los buscadores homogéneos correspondientes, probando cada flujo de extremo a extremo de manera aislada.
 *   **Fase 5: Migración de Datos Históricos:** Desarrollo del script de normalización para trasladar de forma segura los datos de `prod.db` (v1) al nuevo esquema simplificado (v2) y realizar el despliegue final.
 ```
