@@ -92,7 +92,9 @@ El sistema contable de cara al participante se simplifica para admitir únicamen
     *   **Cálculo de Deuda / Saldo (Pagos Fraccionados o en Exceso):** El saldo se calcula como: `Suma(Pagos de Socio) - Cuota de Socio`.
         *   Si el resultado es **negativo** (ej. Cuota Socio: 20€ | Pagado: 10€): El asistente **debe** la diferencia al Bote (deuda de 10€).
         *   Si el resultado es **positivo** (ej. Cuota Socio: 20€ | Pagado: 50€): El Bote **debe** la diferencia al asistente (saldo a favor de 30€).
-    *   **Automatización de Condición de Socio:** Al registrarse el pago de cuota de socio (ya sea el primer pago fraccionado o el pago completo), el backend actualizará de forma automática la propiedad `isMember: true` en el registro del usuario (`User`).
+    *   **Automatización de Condición de Socio y Recálculo de Cuota:** Al registrarse un pago de cuota de socio (parcial o completo), el backend actualizará de forma automática la propiedad `isMember: true` en el registro del usuario (`User`).
+        *   **Efecto en el año en curso:** Al marcarse como socio en ese instante, el motor de tarifas recalculará su **Cuota de Fiesta** esperada del evento activo aplicando las reglas más baratas de *Socio* (en vez de *No Socio*). Así, el usuario se beneficia del descuento ese mismo año de forma inmediata.
+        *   **Efecto histórico/futuro:** Dado que la cuenta de usuario (`User`) es permanente, en las siguientes temporadas el sistema lo reconocerá como Socio desde el primer día.
 
 Estos dos son los únicos tipos de transacciones que pueden alterar la deuda/saldo de un participante o registrar entradas financieras del mismo al Bote.
 
