@@ -192,6 +192,7 @@ Para realizar una refactorización segura y controlada, dividiremos la construcc
 *   **Fase 4: Integración Lógica y Buscadores (Por etapas incrementales):** Conectar de forma progresiva la interfaz visual estática con la lógica del servidor de cada caso de uso y aplicar los buscadores homogéneos correspondientes, probando cada flujo de extremo a extremo de manera aislada.
 *   **Fase 5: Migración de Datos Históricos y Despliegue:**
     *   Desarrollo del script de normalización para trasladar de forma segura los datos de `prod.db` (v1) al nuevo esquema simplificado (v2).
+    *   **Adaptación de Script de Despliegue:** Modificar el fichero `deploy_to_nas.sh` en `GestorEventos2` y actualizar la acción del botón de despliegue en la interfaz de `GestorArranque` para que ejecute el nuevo script de la v2.
     *   **Actualización en Gestor de Arranque (Producción):** Modificar la configuración de arranque de contenedores de la aplicación `GestorArranque` en producción para dar soporte al nuevo contenedor de la v2 (puertos, reinicios, redirección de subida de archivos).
     *   Realizar el despliegue final y la puesta en marcha de la v2.
 ```
