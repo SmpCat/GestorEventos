@@ -67,72 +67,52 @@ Control absoluto del evento:
 
 ---
 
-## 💶 4. Los Movimientos Parametrizables de Asistente (Base de Datos)
+## 💶 4. Los Movimientos Financieros del Asistente (Cuotas y Gestión de Deuda)
 
-En lugar de programar de forma rígida los tipos de movimientos en el código, estos serán **100% parametrizables desde la base de datos** a través de la zona de administración.
+El sistema contable de cara al participante se simplifica para admitir únicamente dos tipos de movimientos financieros (ingresos):
 
-Cada movimiento en la base de datos se configurará mediante el modelo `MovementConfig`:
+1.  **Pago Cuota Fiesta:** 
+    *   **Cálculo Automático:** Se calcula a partir de las tarifas cargadas en la tabla de precios (`PricingRule`).
+    *   **Regla de Ajuste Exacto (Sin Aproximaciones):** No se realizarán aproximaciones de días ni fallbacks si no hay coincidencia exacta. Si el perfil del asistente (días, edad, alcohol, comida, socio) coincide exactamente con alguna tarifa, esta se aplica. En caso contrario, no se calcula cuota esperada y se muestra un mensaje en pantalla indicando que debe **consultar con el Administrador**.
+    *   **Impacto Contable:** Reduce la deuda del asistente (genera saldo a favor si paga de más, o saldo en contra si paga de menos) y genera un ingreso real en el Bote.
+2.  **Pago Cuota Socio:**
+    *   **Cálculo del Importe:** Establecido y configurado directamente por el Administrador.
+    *   **Automatización de Condición de Socio:** Al registrarse el pago de cuota de socio de forma exitosa, el backend actualizará de forma automática la propiedad `isMember: true` en el registro del usuario (`User`).
+    *   **Impacto Contable:** Genera saldo a favor/crédito en el asistente y añade fondos al Bote.
 
-| Concepto de Configuración | Tipo / Opciones | Descripción |
-| :--- | :---: | :--- |
-| **Nombre** | Texto | Nombre del movimiento (ej. "Pago Cuota", "Alta Socio", "Adelanto"). |
-| **Efecto en Asistente** | `NONE` / `INCOME` / `EXPENSE` | Cómo repercute en su cuota de fiesta (ej: `INCOME` resta lo que debe, `EXPENSE` suma). |
-| **Efecto en Bote** | `NONE` / `INCOME` / `EXPENSE` | Cómo repercute en la caja física (ej: `INCOME` suma dinero real, `EXPENSE` lo resta). |
-| **Requiere Ticket** | `Boolean` (Sí/No) | Si está activo, el formulario exigirá escanear o subir un ticket de compra. |
-
-### Configuración por Defecto (Los 7 Movimientos Iniciales)
-1.  **Pago Cuota (Ingreso)**: Asistente: `INCOME` | Bote: `INCOME` | Requiere Ticket: `No`.
-2.  **Alta Socio (Ingreso)**: Asistente: `NONE` | Bote: `INCOME` | Requiere Ticket: `No`.
-3.  **Compra con su Dinero (Gasto Personal)**: Asistente: `INCOME` | Bote: `NONE` | Requiere Ticket: `Sí`.
-4.  **Reembolso / Devolución por Compra (Salida)**: Asistente: `EXPENSE` | Bote: `EXPENSE` | Requiere Ticket: `No`.
-5.  **Adelanto para Compra (Salida)**: Asistente: `NONE` | Bote: `EXPENSE` | Requiere Ticket: `No`.
-6.  **Justificación de Compra con Bote (Ticket Bote)**: Asistente: `NONE` | Bote: `NONE` | Requiere Ticket: `Sí`.
-7.  **Devolución de Cambio (Ingreso)**: Asistente: `NONE` | Bote: `INCOME` | Requiere Ticket: `No`.
+Estos dos son los únicos tipos de transacciones que pueden alterar la deuda/saldo de un participante o registrar entradas financieras del mismo al Bote.
 
 ---
 
 ## 🛠️ 5. Impacto en Base de Datos (Prisma Schema)
 
-La base de datos utilizará un sistema dinámico cargando la configuración de movimientos:
+El modelo de datos para los pagos se simplifica eliminando configuraciones dinámicas innecesarias, basándose en un enumerado estático de tipo de pago:
+
 ```prisma
-enum AffectsDirection {
-  NONE
-  INCOME
-  EXPENSE
+enum PaymentType {
+  FIESTA   // Pago de la cuota de fiesta
+  SOCIO    // Pago de la cuota de socio
 }
 
 enum PaymentMethod {
   EFECTIVO
   BIZUM
-  NINGUNO // Para movimientos sin movimiento físico (ej. Compra Personal)
-}
-
-model MovementConfig {
-  id              String           @id @default(uuid())
-  name            String
-  affectsAttendee AffectsDirection @default(NONE)
-  affectsPot      AffectsDirection @default(NONE)
-  requiresTicket  Boolean          @default(false)
-  payments        Payment[]
 }
 
 model Payment {
   id              String         @id @default(uuid())
   amount          Float
+  type            PaymentType    @default(FIESTA)
   paymentMethod   PaymentMethod  @default(EFECTIVO)
-  concept         String         // Categoría predefinida o texto libre
-  description     String?        // Notas adicionales opcionales
+  description     String?        // Notas opcionales
   date            DateTime       @default(now())
   
   // Relaciones
   eventId         String
-  attendeeId      String?        // Opcional si es global
-  registeredById  String?        // Auditoría
-  
-  movementConfigId String
-  movementConfig   MovementConfig @relation(fields: [movementConfigId], references: [id])
-  
-  ticketUrl       String?      
-  ticketItems     String?        // Detalles de productos (JSON)
+  event           Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  attendeeId      String?        // Vinculado al participante
+  attendee        EventAttendee? @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+  registeredById  String?        // Auditoría del Administrador
+  registeredBy    User?          @relation("PaymentRegisteredBy", fields: [registeredById], references: [id])
 }
 ```
