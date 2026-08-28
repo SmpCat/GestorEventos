@@ -50,7 +50,9 @@ El sistema se divide en tres áreas funcionales bien diferenciadas a nivel de l�
     *   **Bote Anterior (Sobrante de la temporada pasada):** Este valor se configura en la ficha de **Gestión de Eventos** por parte del Administrador (guardado en el modelo `Event` como `previousSurplus`). El Flujo de Caja lo lee automáticamente y lo muestra de solo lectura como la entrada inicial de la línea de tiempo, inicializando el saldo de la caja.
     *   **Alta de Cuota (Ingreso):** Registros de pagos parciales o completos de la cuota de fiesta por parte de los asistentes.
     *   **Alta de Socio (Ingreso):** Registros de pagos de la cuota de socio por parte de los asistentes.
-    *   **Gasto (Salida):** Movimientos de salida de caja generados directamente a partir de los **Tickets de Compra** (ya sean escaneados por la IA o añadidos manualmente). **Nota Crítica:** Los tickets de gasto son globales, restan importe directamente al bote y **NO** se pueden asignar a ninguna persona.
+    *   **Gasto (Salida):** Movimientos de salida de caja generados directamente a partir de los **Tickets de Compra** (ya sean escaneados por la IA o añadidos manualmente).
+        *   **Nota Crítica:** Los tickets de gasto son globales, restan importe directamente al bote y **NO** se pueden asignar a ninguna persona.
+        *   **Flujo para Adelantos de Compra:** Si se entrega dinero en metálico del bote a un asistente para una compra futura, el Administrador registrará un Gasto manual con la etiqueta `[Adelanto]` y el nombre del destinatario en la descripción (ej: `[Adelanto] Compra perol (Rosa Palacios)`). Al completarse la compra, el Administrador editará este gasto con el importe real del ticket final, subirá la foto, y devolverá el cambio sobrante a la caja física. Esto permite mantener la caja cuadrada y buscar el movimiento por concepto o nombre del encargado en el buscador sin generar falsas deudas sobre el participante.
 3.  **Lista de la Compra (La Coordinación)**: Se mantiene como organizador de productos necesarios para el evento, gestionada por el administrador y consultable por todos.
 
 ---
