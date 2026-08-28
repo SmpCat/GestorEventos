@@ -43,7 +43,7 @@ El sistema se divide en tres áreas funcionales bien diferenciadas a nivel de l�
 
 1.  **Asistentes (El Centro de Acción)**: El único canal a través del cual el administrador puede introducir datos financieros o registrar compras. Todo movimiento de dinero está de esta forma vinculado a un participante.
 2.  **Flujo de Caja (El Libro Contable)**: Un historial unificado en estricto orden cronológico que muestra la evolución del Bote. Únicamente se mostrarán los siguientes tipos de movimientos:
-    *   **Bote Anterior (Sobrante de la temporada pasada):** Un registro especial que se introduce al inicio del evento y que figurará siempre como el primer movimiento cronológico del flujo, sumándose al balance inicial.
+    *   **Bote Anterior (Sobrante de la temporada pasada):** Este valor se configura en la ficha de **Gestión de Eventos** por parte del Administrador (guardado en el modelo `Event` como `previousSurplus`). El Flujo de Caja lo lee automáticamente y lo muestra de solo lectura como la entrada inicial de la línea de tiempo, inicializando el saldo de la caja.
     *   **Alta de Cuota (Ingreso):** Registros de pagos parciales o completos de la cuota de fiesta por parte de los asistentes.
     *   **Alta de Socio (Ingreso):** Registros de pagos de la cuota de socio por parte de los asistentes.
     *   **Gasto (Salida):** Movimientos de salida de caja generados directamente a partir de los **Tickets de Compra** (ya sean escaneados por la IA o añadidos manualmente).
