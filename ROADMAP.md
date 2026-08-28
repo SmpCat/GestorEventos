@@ -27,6 +27,14 @@ Se evitará la duplicidad y variación de iconos (tanto emojis como vectores) pa
 *   **Añadir / Registrar:** Un único icono estándar (ej. `+`).
 *   **Acciones de Estado (Éxito / Fallo / Carga):** Estandarización de checkmarks, alertas e indicadores de carga.
 
+### D. Tareas de Homogeneización Asignadas al Agente (IA)
+Para asegurar la cohesión visual, el agente de IA tiene asignadas las siguientes tareas de estandarización en toda la base de código:
+1.  **Paleta de colores actual:** Mapear todos los valores de color (hex, rgb, nombres) dispersos por la app a un conjunto unificado de 3 o 4 variables CSS en `:root`.
+2.  **Iconos utilizados:** Consolidar todos los emojis e iconos en un catálogo coherente para que cada operación use exclusivamente el mismo elemento gráfico.
+3.  **Tipos de botones:** Crear y aplicar un estándar de estilos/variantes de botones (ej. primario, secundario, peligro, icono-acción) eliminando variaciones arbitrarias.
+4.  **Tipos de entrada de datos:** Estandarizar componentes de formulario (inputs de texto, checkboxes, áreas de texto y selectores como `SelectField`).
+5.  **Tipo de salidas de datos:** Unificar el diseño visual de elementos informativos (tablas, listas, tarjetas, resúmenes, balances, insignias/badges y modales).
+
 ---
 
 ## 📌 2. Filosofía del Sistema: "Caja Única y Centro de Acción"
