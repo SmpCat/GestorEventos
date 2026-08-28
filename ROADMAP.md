@@ -148,4 +148,19 @@ Una vez que el código y el esquema de la nueva base de datos en `GestorEventos2
     *   Migre los tickets de compra (`Expense`) limpiando cualquier asignación personal (`contributorAttendeeId = null`) para convertirlos en gastos puramente globales del bote.
     *   Cargue el saldo sobrante del año anterior configurando el campo `previousSurplus` en el modelo `Event` correspondiente.
 3.  **Despliegue y Pruebas en Desarrollo:** El script se ejecutará y validará primero de forma local en el nuevo proyecto antes de aplicarse en producción.
+
+---
+
+## 🔄 7. Gestión Avanzada Multi-Evento (Administración)
+
+Para facilitar la puesta en marcha de cada nueva temporada sin tener que introducir los datos repetidamente, se añadirán herramientas específicas de clonación y asignación en la zona de administración:
+
+### A. Clonación de Tarifas entre Eventos
+*   En la vista de **Configurador de Tarifas**, el Administrador dispondrá de un botón para importar de golpe las tarifas (`PricingRule`) de cualquier evento anterior (ej. Fiestas 2026) al evento activo.
+*   Esto duplica de forma segura los registros en la base de datos bajo el nuevo `eventId`, ahorrando tener que definir manualmente las reglas una a una cada año.
+
+### B. Promoción y Asignación Masiva de Asistentes
+*   Dado que la base de datos conserva a los usuarios (`User`) de forma global para que no tengan que volver a registrarse, se creará una pantalla de gestión en la administración.
+*   Esta pantalla listará a todos los usuarios históricos registrados en el sistema que aún no pertenezcan al evento activo.
+*   El Administrador podrá seleccionar múltiples usuarios mediante casillas de verificación y, con un solo clic, darlos de alta como asistentes (`EventAttendee`) del evento activo, configurando su estado inicial.
 ```
