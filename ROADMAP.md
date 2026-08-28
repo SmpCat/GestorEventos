@@ -197,4 +197,17 @@ Para realizar una refactorización segura y controlada, dividiremos la construcc
     *   **Adaptación de Script de Despliegue:** Modificar el fichero `deploy_to_nas.sh` en `GestorEventos2` y actualizar la acción del botón de despliegue en la interfaz de `GestorArranque` para que ejecute el nuevo script de la v2.
     *   **Actualización en Gestor de Arranque (Producción):** Modificar la configuración de arranque de contenedores de la aplicación `GestorArranque` en producción para dar soporte al nuevo contenedor de la v2 (puertos, reinicios, redirección de subida de archivos).
     *   Realizar el despliegue final y la puesta en marcha de la v2.
+
+---
+
+## 🎙️ 9. Futuras Integraciones: Comandos de Voz (Gemini 3.5 Transcribe)
+
+Una vez completada la migración a la v2, la aplicación estará preparada para integrar funciones de dictado inteligente mediante la nueva API de voz de Google:
+
+*   **Dictado de Gastos/Tickets Manuales:** El Administrador podrá pulsar un icono de micrófono en la pestaña de Caja y dictar el gasto de viva voz (ej. *"Apunta un ticket de 60 euros en Mercadona por un jamón"*). El sistema procesará el audio con `gemini-3.5-transcribe` para extraer estructuradamente:
+    *   `Amount` = 60.00
+    *   `Store` = "Mercadona"
+    *   `Concept` = "Jamón"
+    Y creará el movimiento contable global al instante, ideal cuando el admin está ocupado organizando el evento.
+*   **Dictado de Productos en la Lista de la Compra:** Añadir múltiples artículos en bloque mediante voz (ej: *"Añade tres sacos de carbón y una caja de vasos"*), autodetectando las categorías.
 ```
