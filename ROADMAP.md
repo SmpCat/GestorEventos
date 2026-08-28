@@ -42,7 +42,11 @@ Para asegurar la cohesión visual, el agente de IA tiene asignadas las siguiente
 El sistema se divide en tres áreas funcionales bien diferenciadas a nivel de lógica de negocio:
 
 1.  **Asistentes (El Centro de Acción)**: El único canal a través del cual el administrador puede introducir datos financieros o registrar compras. Todo movimiento de dinero está de esta forma vinculado a un participante.
-2.  **Flujo de Caja (El Libro Contable de Solo Lectura)**: Un historial cronológico unificado de todas las entradas, salidas, tickets y movimientos. Desaparece la sección independiente de "Tickets de Compra", integrándose la visualización de los mismos en esta línea de tiempo.
+2.  **Flujo de Caja (El Libro Contable)**: Un historial unificado en estricto orden cronológico que muestra la evolución del Bote. Únicamente se mostrarán los siguientes tipos de movimientos:
+    *   **Bote Anterior (Sobrante de la temporada pasada):** Un registro especial que se introduce al inicio del evento y que figurará siempre como el primer movimiento cronológico del flujo, sumándose al balance inicial.
+    *   **Alta de Cuota (Ingreso):** Registros de pagos parciales o completos de la cuota de fiesta por parte de los asistentes.
+    *   **Alta de Socio (Ingreso):** Registros de pagos de la cuota de socio por parte de los asistentes.
+    *   **Gasto (Salida):** Movimientos de salida de caja generados directamente a partir de los **Tickets de Compra** (ya sean escaneados por la IA o añadidos manualmente).
 3.  **Lista de la Compra (La Coordinación)**: Se mantiene como organizador de productos necesarios para el evento, gestionada por el administrador y consultable por todos.
 
 ---
