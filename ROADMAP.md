@@ -41,12 +41,12 @@ Para asegurar la cohesión visual, el agente de IA tiene asignadas las siguiente
 
 El sistema se divide en tres áreas funcionales bien diferenciadas a nivel de lógica de negocio:
 
-1.  **Asistentes (El Centro de Acción)**: El único canal a través del cual el administrador puede introducir datos financieros o registrar compras. Todo movimiento de dinero está de esta forma vinculado a un participante.
+1.  **Asistentes (El Centro de Acción)**: El canal para registrar los pagos (Cuota de Fiesta y Cuota de Socio), lo que vincula estos ingresos directamente al saldo e historial de cada participante.
 2.  **Flujo de Caja (El Libro Contable)**: Un historial unificado en estricto orden cronológico que muestra la evolución del Bote. Únicamente se mostrarán los siguientes tipos de movimientos:
     *   **Bote Anterior (Sobrante de la temporada pasada):** Este valor se configura en la ficha de **Gestión de Eventos** por parte del Administrador (guardado en el modelo `Event` como `previousSurplus`). El Flujo de Caja lo lee automáticamente y lo muestra de solo lectura como la entrada inicial de la línea de tiempo, inicializando el saldo de la caja.
     *   **Alta de Cuota (Ingreso):** Registros de pagos parciales o completos de la cuota de fiesta por parte de los asistentes.
     *   **Alta de Socio (Ingreso):** Registros de pagos de la cuota de socio por parte de los asistentes.
-    *   **Gasto (Salida):** Movimientos de salida de caja generados directamente a partir de los **Tickets de Compra** (ya sean escaneados por la IA o añadidos manualmente).
+    *   **Gasto (Salida):** Movimientos de salida de caja generados directamente a partir de los **Tickets de Compra** (ya sean escaneados por la IA o añadidos manualmente). **Nota Crítica:** Los tickets de gasto son globales, restan importe directamente al bote y **NO** se pueden asignar a ninguna persona.
 3.  **Lista de la Compra (La Coordinación)**: Se mantiene como organizador de productos necesarios para el evento, gestionada por el administrador y consultable por todos.
 
 ---
