@@ -181,7 +181,9 @@ Para realizar una refactorización segura y controlada, dividiremos la construcc
     *   **Soporte en Gestor de Arranque (Desarrollo):** Actualizar la aplicación o scripts del `GestorArranque` local para incorporar el registro del nuevo entorno de desarrollo y su puerto asignado para la v2.
     *   Instalar las dependencias (`npm install`) y configurar el archivo de entorno `.env` con la API key de Gemini.
     *   Inicializar un nuevo repositorio Git local para llevar el control de versiones independiente de la versión 2.
-*   **Fase 1: Base de Estilos (CSS Puro):** Configuración de las variables de color (paleta de 3-4 colores) en `globals.css` y definición de las clases básicas de maquetación y tipografía.
+*   **Fase 1: Base de Estilos (CSS Puro):**
+    *   **Acceso Móvil (Nginx):** Crear el subdominio temporal `eventos2-dev.duckdns.org` en Nginx Proxy Manager apuntando al puerto `3002` de desarrollo local para permitir testeo visual responsivo en dispositivos móviles.
+    *   Configuración de las variables de color (paleta de 3-4 colores) en `globals.css` y definición de las clases básicas de maquetación y tipografía.
 *   **Fase 2: Esqueleto Visual (HTML/TSX Estático):** Reescribir las pantallas (Dashboard, Listas, Caja, Tickets, Admin) para limpiar todo estilo inline, aplicar los nuevos estilos CSS globales y unificar la iconografía. Se trabajará inicialmente en formato estático (sin conectar llamadas al servidor ni base de datos) para validar y ajustar el diseño visual en móviles y escritorio.
 *   **Fase 3: Base de Datos y Acciones del Servidor (Por etapas incrementales):** Implementar el esquema de base de datos simplificado (Prisma). El desarrollo se realizará **etapa por etapa para cada caso de uso individual** (nunca todo de golpe) para validar su correcto funcionamiento en aislamiento:
     1.  **Caso de Uso A:** Gestión y cálculo de cuotas exactas según Tarifas (sin aproximación).
