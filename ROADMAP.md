@@ -175,6 +175,7 @@ Para realizar una refactorización segura y controlada, dividiremos la construcc
 *   **Fase 0: Preparación del Entorno de Desarrollo (GestorEventos2):**
     *   Crear la nueva carpeta física `/Volumes/Orico/IA/Proyectos/GestorEventos2`.
     *   Copiar la estructura del esqueleto del proyecto actual (ficheros de configuración de Next.js, tsconfig, package.json, y la carpeta `src/`), omitiendo directorios pesados (`node_modules`, `.next`, `data/`) y bases de datos locales `.db`.
+    *   **Replicar Scripts de Automatización:** Copiar y adaptar los scripts de despliegue, sincronización y mantenimiento (`deploy_to_nas.sh`, `pull_from_nas.sh`, `pull_from_nas.ps1`, `fix_containers.sh`, etc.) en el nuevo directorio para asegurar que las herramientas de integración y sincronización sigan operativas.
     *   Instalar las dependencias (`npm install`) y configurar el archivo de entorno `.env` con la API key de Gemini.
     *   Inicializar un nuevo repositorio Git local para llevar el control de versiones independiente de la versión 2.
 *   **Fase 1: Base de Estilos (CSS Puro):** Configuración de las variables de color (paleta de 3-4 colores) en `globals.css` y definición de las clases básicas de maquetación y tipografía.
