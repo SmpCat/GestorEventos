@@ -165,4 +165,16 @@ Para facilitar la puesta en marcha de cada nueva temporada sin tener que introdu
 *   **Selección Selectiva:** Además de la promoción en bloque, se dispondrá de casillas de verificación para seleccionar únicamente usuarios específicos si se prefiere.
 *   **Sinergia con Purga de Asistentes:** Los asistentes que finalmente no participen y no tengan movimientos contables registrados podrán ser depurados más adelante mediante la opción existente de *"Borrar asistentes limpios"*.
 *   **Independencia de Asistencia por Año:** Este modelo respeta que un usuario pueda participar un año y no otro. El registro de `User` es global y persistente, pero su registro de asistencia (`EventAttendee`) se crea y gestiona de forma única e independiente para cada evento activo. Si un usuario no asiste a un evento específico, simplemente no tendrá el registro `EventAttendee` de ese año, sin perder su cuenta de usuario.
+
+---
+
+## 🚀 8. Fases de Desarrollo por Módulos (GestorEventos v2)
+
+Para realizar una refactorización segura y controlada, dividiremos la construcción del nuevo proyecto en fases incrementales:
+
+*   **Fase 1: Base de Estilos (CSS Puro):** Configuración de las variables de color (paleta de 3-4 colores) en `globals.css` y definición de las clases básicas de maquetación y tipografía.
+*   **Fase 2: Esqueleto Visual (HTML/TSX Estático):** Reescribir las pantallas (Dashboard, Listas, Caja, Tickets, Admin) para limpiar todo estilo inline, aplicar los nuevos estilos CSS globales y unificar la iconografía. Se trabajará inicialmente en formato estático (sin conectar llamadas al servidor ni base de datos) para validar y ajustar el diseño visual en móviles y escritorio.
+*   **Fase 3: Base de Datos y Acciones del Servidor:** Implementar el esquema de base de datos simplificado (Prisma) y desarrollar las server actions backend para la gestión de cuotas, el marcaje automático de socios y el registro de tickets de gasto globales.
+*   **Fase 4: Integración Lógica y Buscadores:** Conectar la interfaz visual estática con la lógica del servidor e implementar los buscadores en vivo homogéneos por pantalla.
+*   **Fase 5: Migración de Datos Históricos:** Desarrollo del script de normalización para trasladar de forma segura los datos de `prod.db` (v1) al nuevo esquema simplificado (v2) y realizar el despliegue final.
 ```
