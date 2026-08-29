@@ -20,12 +20,19 @@ Se realizará una refactorización completa de todos los archivos `.tsx` para el
 *   Toda propiedad de maquetación, espaciado, fuentes y colores debe definirse mediante clases globales en `globals.css` o a través de **CSS Modules** (`*.module.css`).
 *   Los componentes reutilizables como `SelectField` o botones recibirán únicamente clases CSS para sus variantes, manteniendo el marcado HTML completamente limpio.
 
-### C. Consistencia de Iconografía por Operación
-Se evitará la duplicidad y variación de iconos (tanto emojis como vectores) para las mismas acciones de usuario. Se define una relación unívoca de iconografía:
-*   **Editar / Modificar:** Un único elemento visual consistente (ej. siempre el mismo lápiz ✏️ o `PencilIcon`).
-*   **Eliminar / Cancelar:** Un único elemento visual consistente (ej. siempre la papelera 🗑️ o `TrashIcon`).
-*   **Añadir / Registrar:** Un único icono estándar (ej. `+`).
-*   **Acciones de Estado (Éxito / Fallo / Carga):** Estandarización de checkmarks, alertas e indicadores de carga.
+### C. Consistencia de Iconografía por Operación (100% SVG Vectoriales)
+Se elimina por completo el uso de emojis en los botones, menús y acciones de usuario, sustituyéndolos por un set unificado de **iconos vectoriales SVG monocromáticos**. Se define una relación unívoca de iconografía:
+*   **Editar / Modificar:** Icono SVG lineal de lápiz (estilo minimalista).
+*   **Eliminar / Borrar:** Icono SVG lineal de papelera.
+*   **Añadir / Registrar:** Icono SVG de suma (`+`).
+*   **Guardar / Aceptar:** Icono SVG de marca de verificación (`✓`).
+*   **Cancelar / Cerrar:** Icono SVG de aspa (`✕`).
+*   **Perfil / Asistente:** Icono SVG lineal de silueta de usuario.
+*   **Ajustes / Tarifas / Mantenimiento:** Icono SVG lineal de engranaje (`gear`).
+*   **Listas de Compra:** Icono SVG lineal de carrito de compra.
+*   **Caja / Caja de Flujo:** Icono SVG lineal de tarjeta de crédito / estadísticas.
+*   **Tickets:** Icono SVG lineal de cámara de fotos.
+*   **Nota Crítica:** El color, tamaño y transición de los SVGs se controlará 100% a través de la clase `.ui-icon` en el archivo CSS global, permitiendo iluminar u oscurecer los iconos dinámicamente según la acción (acento, peligro, etc.).
 
 ### D. Tareas de Homogeneización Asignadas al Agente (IA)
 Para asegurar la cohesión visual y funcional, el agente de IA tiene asignadas las siguientes tareas de estandarización en toda la base de código:
